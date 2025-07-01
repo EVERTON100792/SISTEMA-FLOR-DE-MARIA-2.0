@@ -31,17 +31,17 @@
             --text-muted: #94A3B8;   /* Cinza médio */
             --border-color: #475569;   /* Borda */
             --hover-bg: #475569;     /* Hover */
-            
+           
             /* Gradientes */
             --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             --gradient-dark: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
-            
+           
             /* Sombras */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            
+           
             /* Transições */
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -104,7 +104,7 @@
         .btn-secondary:hover {
             background: var(--hover-bg);
         }
-        
+       
         .btn-success {
             background: var(--accent-color);
             color: var(--text-primary);
@@ -122,7 +122,7 @@
         .btn-danger:hover {
             background: #DC2626;
         }
-        
+       
         .btn-warning {
             background: var(--warning-color);
             color: var(--text-primary);
@@ -194,7 +194,7 @@
             font-size: 14px;
             transition: var(--transition);
         }
-        
+       
         .form-select {
             cursor: pointer;
         }
@@ -375,15 +375,15 @@
             color: var(--text-primary);
             font-weight: 600;
         }
-        
+       
         .sidebar-nav-link.active::before {
-             content: '';
-             position: absolute;
-             left: 0;
-             top: 0;
-             bottom: 0;
-             width: 4px;
-             background: var(--accent-color);
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-color);
         }
 
         .main-content {
@@ -454,11 +454,11 @@
             .card {
                 padding: 16px; /* Reduz padding do card */
             }
-            
+           
             .grid-2, .grid-3, .grid-4, .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+           
             .page-title {
                 font-size: 24px; /* CORREÇÃO: Reduz o tamanho da fonte do título */
             }
@@ -473,28 +473,28 @@
             }
 
             .receipt-professional-header, .flex-between {
-                 flex-direction: column;
-                 align-items: flex-start;
-                 gap: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
             }
             .receipt-company-details {
-                 text-align: left;
-                 margin-top: 16px;
+                text-align: left;
+                margin-top: 16px;
             }
             .receipt-sale-info {
-                 grid-template-columns: 1fr;
+                grid-template-columns: 1fr;
             }
             .receipt-sale-info .receipt-info-block.text-right {
-                 text-align: left;
+                text-align: left;
             }
             .receipt-summary {
-                 justify-content: flex-start;
+                justify-content: flex-start;
             }
-             .receipt-summary table {
-                 width: 100%;
-                 max-width: none;
-             }
-            
+            .receipt-summary table {
+                width: 100%;
+                max-width: none;
+            }
+           
             .btn { /* NOVO: Botões menores em telas pequenas */
                 padding: 10px 18px;
                 font-size: 13px;
@@ -502,6 +502,13 @@
 
             .form-input, .form-select { /* NOVO: Campos de formulário com fonte menor */
                 font-size: 13px;
+            }
+
+            /* ===== CORREÇÃO DO GRÁFICO ===== */
+            .chart-container {
+                position: relative;
+                max-height: 350px; /* Define uma altura máxima para o gráfico */
+                width: 100%;
             }
         }
 
@@ -698,7 +705,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+       
         .stat-icon {
             position: absolute;
             top: 24px;
@@ -708,19 +715,19 @@
             opacity: 0.3;
         }
         .stat-value {
-             font-size: 24px;
-             font-weight: 700;
-             color: var(--primary-color);
-             margin-bottom: 4px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
         }
 
         .stat-label {
-             font-size: 12px;
-             color: var(--text-muted);
-             text-transform: uppercase;
-             letter-spacing: 0.5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
+       
         /* PDV - Sugestões de produtos */
         .suggestion-item:hover {
             background: var(--surface-bg) !important;
@@ -838,18 +845,18 @@
             </div>
             <h1 class="login-title">Flor de Maria</h1>
             <p class="login-subtitle">Sistema de Gestão Integrado</p>
-            
+           
             <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label" for="username">Usuário</label>
                     <input type="text" id="username" class="form-input" placeholder="Digite seu usuário" required>
                 </div>
-                
+               
                 <div class="form-group">
                     <label class="form-label" for="password">Senha</label>
                     <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
                 </div>
-                
+               
                 <button type="submit" class="btn btn-primary" style="width: 100%;">
                     <i class="fas fa-sign-in-alt"></i>
                     Entrar
@@ -870,7 +877,7 @@
                     <span>Flor de Maria</span>
                 </div>
             </div>
-            
+           
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-item">
                     <a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard">
@@ -1012,18 +1019,18 @@
                                 Novo Cliente
                             </h3>
                         </div>
-                        
+                       
                         <form id="clientForm">
                             <div class="form-group">
                                 <label class="form-label" for="clientName">Nome Completo</label>
                                 <input type="text" id="clientName" class="form-input" placeholder="Digite o nome do cliente" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="clientPhone">Telefone</label>
                                 <input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000" required>
                             </div>
-                            
+                           
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i>
@@ -1044,11 +1051,11 @@
                                 Buscar Cliente
                             </h3>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone do cliente">
                         </div>
-                        
+                       
                         <div class="flex-between">
                             <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
                             <button class="btn btn-secondary btn-sm" id="exportClients">
@@ -1066,7 +1073,7 @@
                             Lista de Clientes
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1104,35 +1111,35 @@
                                 Novo Produto
                             </h3>
                         </div>
-                        
+                       
                         <form id="productForm">
                             <div class="form-group">
                                 <label class="form-label" for="productRefCode">Código de Referência</label>
                                 <input type="text" id="productRefCode" class="form-input" placeholder="Ex: PRD001" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="productName">Nome do Produto</label>
                                 <input type="text" id="productName" class="form-input" placeholder="Digite o nome do produto" required>
                             </div>
-                            
+                           
                             <div class="grid grid-2">
                                 <div class="form-group">
                                     <label class="form-label" for="productQuantity">Quantidade</label>
                                     <input type="number" id="productQuantity" class="form-input" min="0" placeholder="0" required>
                                 </div>
-                                
+                               
                                 <div class="form-group">
                                     <label class="form-label" for="productCostPrice">Preço de Custo</label>
                                     <input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                                 </div>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="productSalePrice">Preço de Venda</label>
                                 <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                             </div>
-                            
+                           
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i>
@@ -1153,7 +1160,7 @@
                                 Resumo do Estoque
                             </h3>
                         </div>
-                        
+                       
                         <div class="grid grid-2 mb-3">
                             <div class="text-center">
                                 <div class="stat-value" id="totalProducts">0</div>
@@ -1164,11 +1171,11 @@
                                 <div class="stat-label">Produtos Esgotados</div>
                             </div>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código">
                         </div>
-                        
+                       
                         <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;">
                             <i class="fas fa-download"></i>
                             Exportar Estoque
@@ -1183,7 +1190,7 @@
                             Lista de Produtos
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1224,11 +1231,11 @@
                                 Buscar Produto
                             </h3>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
                         </div>
-                        
+                       
                         <div id="productSuggestions" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;">
                         </div>
                     </div>
@@ -1240,14 +1247,14 @@
                                 Cliente e Pagamento
                             </h3>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label" for="saleClient">Cliente</label>
                             <select id="saleClient" class="form-select">
                                 <option value="">Selecione um cliente (opcional)</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
                             <select id="salePaymentMethod" class="form-select" required>
@@ -1258,7 +1265,7 @@
                                 <option value="Crediário">Crediário</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group hidden" id="installmentsGroup">
                             <label class="form-label" for="saleInstallments">Número de Parcelas</label>
                             <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
@@ -1279,7 +1286,7 @@
                             </button>
                         </div>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1300,7 +1307,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+                   
                     <div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
                         <div>
                             <strong style="font-size: 24px; color: var(--primary-color);">
@@ -1346,7 +1353,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
-                           Lista de Vendas
+                            Lista de Vendas
                         </h3>
                     </div>
                      <div class="table-responsive">
@@ -1381,7 +1388,7 @@
                                 Novo Lançamento Manual
                             </h3>
                         </div>
-                        
+                       
                         <form id="cashFlowForm">
                             <div class="form-group">
                                 <label class="form-label" for="cashFlowType">Tipo</label>
@@ -1390,22 +1397,22 @@
                                     <option value="saida">Saída</option>
                                 </select>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="cashFlowDescription">Descrição</label>
                                 <input type="text" id="cashFlowDescription" class="form-input" placeholder="Descrição do lançamento" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="cashFlowValue">Valor</label>
                                 <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="cashFlowDate">Data</label>
                                 <input type="date" id="cashFlowDate" class="form-input" required>
                             </div>
-                            
+                           
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i>
@@ -1426,7 +1433,7 @@
                                 Resumo Financeiro
                             </h3>
                         </div>
-                        
+                       
                         <div class="grid grid-2 mb-3">
                             <div class="text-center">
                                 <div class="stat-value" id="totalEntradas" style="color: var(--accent-color);">R$ 0,00</div>
@@ -1437,16 +1444,16 @@
                                 <div class="stat-label">Total Saídas</div>
                             </div>
                         </div>
-                        
+                       
                         <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
                             <div class="stat-value" id="saldoAtual">R$ 0,00</div>
                             <div class="stat-label">Saldo Atual</div>
                         </div>
-                        
+                       
                         <div class="form-group mt-3">
                             <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento">
                         </div>
-                        
+                       
                         <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;">
                             <i class="fas fa-download"></i>
                             Exportar Fluxo de Caixa
@@ -1461,7 +1468,7 @@
                             Histórico de Lançamentos
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1499,13 +1506,13 @@
                                 Nova Despesa
                             </h3>
                         </div>
-                        
+                       
                         <form id="expenseForm">
                             <div class="form-group">
                                 <label class="form-label" for="expenseDescription">Descrição</label>
                                 <input type="text" id="expenseDescription" class="form-input" placeholder="Descrição da despesa" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="expenseCategory">Categoria</label>
                                 <select id="expenseCategory" class="form-select" required>
@@ -1524,17 +1531,17 @@
                                     <option value="Outros">Outros</option>
                                 </select>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="expenseValue">Valor</label>
                                 <input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="expenseDate">Data</label>
                                 <input type="date" id="expenseDate" class="form-input" required>
                             </div>
-                            
+                           
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i>
@@ -1555,7 +1562,7 @@
                                 Resumo de Despesas
                             </h3>
                         </div>
-                        
+                       
                         <div class="grid grid-2 mb-3">
                             <div class="text-center">
                                 <div class="stat-value" id="totalExpensesMonth" style="color: var(--danger-color);">R$ 0,00</div>
@@ -1566,11 +1573,11 @@
                                 <div class="stat-label">Despesas do Ano</div>
                             </div>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa">
                         </div>
-                        
+                       
                         <div class="flex gap-2">
                             <select id="expenseFilterCategory" class="form-select">
                                 <option value="">Todas as categorias</option>
@@ -1602,7 +1609,7 @@
                             Lista de Despesas
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1640,7 +1647,7 @@
                                 Nova Conta a Receber (Manual)
                             </h3>
                         </div>
-                        
+                       
                         <form id="receivableForm">
                             <div class="form-group">
                                 <label class="form-label" for="receivableClient">Cliente</label>
@@ -1648,22 +1655,22 @@
                                     <option value="">Selecione um cliente</option>
                                 </select>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="receivableDescription">Descrição</label>
                                 <input type="text" id="receivableDescription" class="form-input" placeholder="Descrição da conta" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="receivableValue">Valor</label>
                                 <input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                             </div>
-                            
+                           
                             <div class="form-group">
                                 <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
                                 <input type="date" id="receivableDueDate" class="form-input" required>
                             </div>
-                            
+                           
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i>
@@ -1684,7 +1691,7 @@
                                 Resumo de Recebimentos
                             </h3>
                         </div>
-                        
+                       
                         <div class="grid grid-2 mb-3">
                             <div class="text-center">
                                 <div class="stat-value" id="totalReceivablesPending" style="color: var(--warning-color);">R$ 0,00</div>
@@ -1695,16 +1702,16 @@
                                 <div class="stat-label">Vencidas</div>
                             </div>
                         </div>
-                        
+                       
                         <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
                             <div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$ 0,00</div>
                             <div class="stat-label">Recebidas</div>
                         </div>
-                        
+                       
                         <div class="form-group mt-3">
                             <input type="text" id="receivableSearch" class="form-input" placeholder="Buscar por cliente ou descrição">
                         </div>
-                        
+                       
                         <div class="flex gap-2">
                             <select id="receivableFilterStatus" class="form-select">
                                 <option value="">Todos os status</option>
@@ -1727,7 +1734,7 @@
                             Lista de Contas a Receber
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -1765,18 +1772,18 @@
                             Filtros de Relatório
                         </h3>
                     </div>
-                    
+                   
                     <div class="grid grid-4">
                         <div class="form-group">
                             <label class="form-label" for="reportStartDate">Data Inicial</label>
                             <input type="date" id="reportStartDate" class="form-input">
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label" for="reportEndDate">Data Final</label>
                             <input type="date" id="reportEndDate" class="form-input">
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label" for="reportType">Tipo de Relatório</label>
                             <select id="reportType" class="form-select">
@@ -1787,14 +1794,14 @@
                                 <option value="contas_a_receber">Contas a Receber</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group hidden" id="reportClientFilterContainer">
                              <label class="form-label" for="reportReceivableClient">Cliente</label>
                              <select id="reportReceivableClient" class="form-select">
                                  <option value="">Todos os Clientes</option>
                              </select>
                         </div>
-                        
+                       
                         <div class="form-group hidden" id="reportStatusFilterContainer">
                             <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
                             <select id="reportReceivableStatus" class="form-select">
@@ -1804,7 +1811,7 @@
                                 <option value="Vencido">Vencidas</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">&nbsp;</label>
                             <button class="btn btn-primary" id="generateReport" style="width: 100%;">
@@ -1823,7 +1830,7 @@
                                 Resumo Geral
                             </h3>
                         </div>
-                        
+                       
                         <div class="grid grid-2">
                             <div class="text-center">
                                 <div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$ 0,00</div>
@@ -1851,7 +1858,7 @@
                                 Top 5 (Produtos/Clientes/Devedores)
                             </h3>
                         </div>
-                        
+                       
                         <div id="topProductsList">
                             <p class="text-center" style="color: var(--text-muted); padding: 20px;">
                                 Gere um relatório para ver os destaques.
@@ -1877,9 +1884,10 @@
                             </button>
                         </div>
                     </div>
-                    
-                    <canvas id="reportChart" width="400" height="200"></canvas>
-                </div>
+                    <div class="chart-container">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                    </div>
 
                 <div class="card mt-4">
                     <div class="card-header">
@@ -1888,7 +1896,7 @@
                             Detalhes do Relatório
                         </h3>
                     </div>
-                    
+                   
                     <div class="table-responsive">
                         <table class="table" id="reportDetailTable">
                             <thead id="reportTableHead">
@@ -1920,11 +1928,11 @@
                                 Backup dos Dados
                             </h3>
                         </div>
-                        
+                       
                         <p style="color: var(--text-muted); margin-bottom: 20px;">
                             Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.
                         </p>
-                        
+                       
                         <div class="grid grid-2 mb-3">
                             <div class="text-center">
                                 <div class="stat-value" id="backupClientsCount">0</div>
@@ -1943,7 +1951,7 @@
                                 <div class="stat-label">Contas a Receber</div>
                             </div>
                         </div>
-                        
+                       
                         <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
                             <i class="fas fa-download"></i>
                             Baixar Backup Completo
@@ -1957,16 +1965,16 @@
                                 Restaurar Dados
                             </h3>
                         </div>
-                        
+                       
                         <p style="color: var(--text-muted); margin-bottom: 20px;">
                             Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.
                         </p>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
                             <input type="file" id="restoreFile" class="form-input" accept=".json">
                         </div>
-                        
+                       
                         <div class="flex gap-2">
                             <button class="btn btn-warning" id="restoreBackup" disabled>
                                 <i class="fas fa-upload"></i>
@@ -2002,7 +2010,7 @@
 
     <script>
     // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.6 (CORRIGIDO) =====
-    
+   
     // Configurações globais
     const CONFIG = {
         users: { username: 'maria', password: 'flor123' },
@@ -2090,11 +2098,11 @@
         show(message, type = 'success') {
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
-            
+           
             notificationText.textContent = message;
             notification.className = `notification notification-${type}`;
             notification.classList.add('show');
-            
+           
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
@@ -2109,10 +2117,10 @@
         show(title, content, actionsHtml = '') {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalBody').innerHTML = content;
-            
+           
             const existingActions = document.getElementById('modalActions');
             if (existingActions) existingActions.remove();
-            
+           
             if (actionsHtml) {
                 const modalContent = document.querySelector('.modal-content');
                 const actionsContainer = document.createElement('div');
@@ -2123,7 +2131,7 @@
                 actionsContainer.innerHTML = actionsHtml;
                 modalContent.appendChild(actionsContainer);
             }
-            
+           
             document.getElementById('modal').classList.add('show');
         },
         hide() {
@@ -2144,7 +2152,7 @@
 
             const mobileToggle = document.getElementById('mobileMenuToggle');
             const sidebar = document.getElementById('sidebar');
-            
+           
             mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
 
             document.addEventListener('click', (e) => {
@@ -2223,7 +2231,7 @@
             Navigation.navigateTo('dashboard');
         }
     };
-    
+   
     // Dashboard
     const Dashboard = {
         chart: null,
@@ -2239,14 +2247,14 @@
 
             const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
             const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
-            
+           
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
 
             const monthlySales = sales
                 .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
                 .reduce((total, s) => total + s.total, 0);
-                
+               
             const monthlyExpenses = cashFlow
                 .filter(cf => cf.type === 'saida' && (cf.relatedExpenseId || (cf.description && cf.description.toLowerCase().includes('despesa:'))))
                 .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
@@ -2297,7 +2305,7 @@
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Comparar apenas a data
-            
+           
             const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
 
             const container = document.getElementById('overdueAccounts');
@@ -2379,7 +2387,7 @@
 
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => s.clientId === id);
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.clientId === id);
-            
+           
             const totalSpent = sales.reduce((sum, sale) => sum + sale.total, 0);
             const totalDebt = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
 
@@ -2393,7 +2401,7 @@
                     ${sales.map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
                     </tbody></table>
                 </div>`}
-                
+               
                 <h4 class="mt-3">Contas (Crediário)</h4>
                 <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
                 <hr style="margin: 16px 0;">
@@ -2465,7 +2473,7 @@
             Notification.success('Relatório exportado!');
         }
     };
-    
+   
     // Módulo de Produtos
     const Products = {
         currentEditId: null,
@@ -2627,12 +2635,12 @@
 
             const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
             const filtered = products.filter(p => (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.refCode.toLowerCase().includes(searchTerm.toLowerCase())) && p.quantity > 0);
-            
+           
             if (filtered.length === 0) {
                 suggestions.classList.add('hidden');
                 return;
             }
-            
+           
             suggestions.innerHTML = filtered.map(p => `
                 <div class="suggestion-item" data-product-id="${p.id}" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                     <div style="font-weight: 500; pointer-events: none;">${p.name}</div>
@@ -2723,7 +2731,7 @@
             const clientId = document.getElementById('saleClient').value;
             const paymentMethod = document.getElementById('salePaymentMethod').value;
             const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
-            
+           
             if (paymentMethod === 'Crediário' && !clientId) {
                 return Notification.error('Selecione um cliente para vendas em crediário!');
             }
@@ -2782,7 +2790,7 @@
                 Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
                 Notification.success('Venda finalizada com sucesso!');
             }
-            
+           
             Receipts.showReceipt(sale.id);
 
             this.cart = [];
@@ -2819,13 +2827,13 @@
 
             if (clientIdFilter) {
                 if (clientIdFilter === 'guest') {
-                     sales = sales.filter(s => !s.clientId);
+                    sales = sales.filter(s => !s.clientId);
                 } else {
-                     sales = sales.filter(s => s.clientId === clientIdFilter);
+                    sales = sales.filter(s => s.clientId === clientIdFilter);
                 }
             }
              if (dateFilter) {
-                  sales = sales.filter(s => s.date.startsWith(dateFilter));
+                 sales = sales.filter(s => s.date.startsWith(dateFilter));
             }
 
             const tbody = document.getElementById('receiptsTableBody');
@@ -3018,7 +3026,7 @@
             location.reload();
         }
     };
-    
+   
     // Módulo Fluxo de Caixa
     const CashFlow = {
          currentEditId: null,
@@ -3055,7 +3063,7 @@
                 cashFlow.push(newEntry);
                 Notification.success('Lançamento salvo!');
             }
-            
+           
             Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
             this.loadCashFlow();
             this.clearForm();
@@ -3146,7 +3154,7 @@
             );
         }
     };
-    
+   
     // Módulo Despesas
     const Expenses = {
         currentEditId: null,
@@ -3167,12 +3175,12 @@
 
             const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
             const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            
+           
             const expense = {
                 id: this.currentEditId || Utils.generateUUID(),
                 description, category, value, date: new Date(date + 'T00:00:00').toISOString()
             };
-            
+           
             if (this.currentEditId) {
                 const index = expenses.findIndex(exp => exp.id === this.currentEditId);
                 if (index !== -1) {
@@ -3276,7 +3284,7 @@
             );
         }
     };
-    
+   
     // Módulo Contas a Receber
     const Receivables = {
         currentEditId: null,
@@ -3357,7 +3365,7 @@
                 if (r.status === 'Pago') statusBadge = '<span class="badge badge-success">Pago</span>';
                 else if (isOverdue) statusBadge = '<span class="badge badge-danger">Vencido</span>';
                 else statusBadge = '<span class="badge badge-warning">Pendente</span>';
-                
+               
                 return `
                     <tr>
                         <td>${client ? client.name : 'N/A'}</td>
@@ -3382,7 +3390,7 @@
                 if (receivable) {
                     receivable.status = 'Pago';
                     receivable.paymentDate = new Date().toISOString();
-                    
+                   
                     const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
                     cashFlow.push({
                         id: Utils.generateUUID(),
@@ -3449,12 +3457,12 @@
             const status = document.getElementById('receivableFilterStatus').value;
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            
+           
             const filtered = receivables.filter(r => {
                 const client = clients.find(c => c.id === r.clientId);
                 const clientName = client ? client.name.toLowerCase() : '';
                 const matchesSearch = r.description.toLowerCase().includes(searchTerm) || clientName.includes(searchTerm);
-                
+               
                 let currentStatus = r.status;
                 const today = new Date();
                 today.setHours(0,0,0,0);
@@ -3481,7 +3489,7 @@
             );
         }
     };
-    
+   
     // Módulo Relatórios
     const Reports = {
         chart: null,
@@ -3492,7 +3500,7 @@
             document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
-            
+           
             // Listeners para auto-gerar relatório em filtros importantes
             document.getElementById('reportType').addEventListener('change', () => this.generateReport());
             document.getElementById('reportStartDate').addEventListener('input', () => this.generateReport());
@@ -3520,7 +3528,7 @@
             const startDateStr = document.getElementById('reportStartDate').value;
             const endDateStr = document.getElementById('reportEndDate').value;
             this.currentReportType = document.getElementById('reportType').value;
-            
+           
             const statusFilterContainer = document.getElementById('reportStatusFilterContainer');
             const clientFilterContainer = document.getElementById('reportClientFilterContainer');
 
@@ -3533,20 +3541,20 @@
             }
 
             if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
-            
+           
             const startDate = new Date(startDateStr + 'T00:00:00');
             const endDate = new Date(endDateStr + 'T23:59:59');
-            
+           
             if (startDate > endDate) return Notification.error('Data inicial maior que a final!');
 
             const allSales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
             const allExpenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
             const allProducts = Utils.loadFromStorage(CONFIG.storageKeys.products);
             const allClients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            
+           
             const sales = allSales.filter(s => { const d = new Date(s.date); return d >= startDate && d <= endDate; });
             const expenses = allExpenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
-            
+           
             const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
             const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
             const profit = totalSales - totalExpenses;
@@ -3556,7 +3564,7 @@
             document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
             document.getElementById('reportProfit').style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
             document.getElementById('reportSalesCount').textContent = sales.length;
-            
+           
             switch (this.currentReportType) {
                 case 'vendas': this.generateSalesReport(sales, startDate, endDate, allClients); break;
                 case 'financeiro': this.generateFinancialReport(sales, expenses, startDate, endDate); break;
@@ -3565,7 +3573,7 @@
                 case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate, allClients); break;
             }
         },
-        
+       
         generateReceivablesReport(startDate, endDate, clients) {
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             const statusFilter = document.getElementById('reportReceivableStatus').value;
@@ -3580,9 +3588,9 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                    currentStatus = 'Vencido';
+                     currentStatus = 'Vencido';
                 }
-                
+               
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
                 let matchesClient = !clientFilter || r.clientId === clientFilter;
 
@@ -3621,14 +3629,14 @@
                      statusSummary['Pendente'] += r.value;
                  }
             });
-            
+           
             this.renderChart('pie', 
                 ['Pagas', 'Pendentes', 'Vencidas'], 
                 'Valor (R$)', 
                 [statusSummary.Pago, statusSummary.Pendente, statusSummary.Vencido],
                 ['#10B981', '#F59E0B', '#EF4444']
             );
-            
+           
             const debtors = {};
             filteredReceivables.filter(r => r.status !== 'Pago').forEach(r => {
                 const clientName = (clients.find(c => c.id === r.clientId) || {name: 'N/A'}).name;
@@ -3670,13 +3678,13 @@
             const rows = data.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
             this.updateReportTable(headers, rows);
             this.currentReportData = { headers, rows };
-            
+           
             document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">N/A para este relatório.</p>';
 
             this.createFinancialChart(sales, expenses);
             Notification.success('Relatório financeiro gerado!');
         },
-        
+       
         generateProductsReport(sales, products) {
             const productStats = {};
             sales.forEach(sale => {
@@ -3689,7 +3697,7 @@
                     productStats[item.productId].revenue += item.price * item.quantity;
                 });
             });
-            
+           
             const sortedProducts = Object.values(productStats).sort((a,b) => b.revenue - a.revenue);
 
             const headers = ['Produto', 'Qtd. Vendida', 'Receita Total'];
@@ -3712,7 +3720,7 @@
                 clientStats[clientId].purchases++;
                 clientStats[clientId].total += sale.total;
             });
-            
+           
             const sortedClients = Object.values(clientStats).sort((a,b) => b.total - a.total);
             const headers = ['Cliente', 'Nº de Compras', 'Total Gasto'];
             const rows = sortedClients.map(c => [c.name, c.purchases, Utils.formatCurrency(c.total)]);
@@ -3741,13 +3749,13 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                        <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>${name}</span>
-                            <span style="font-weight: bold;">${value}</span>
-                        </div>`).join('') :
+                         <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                             <span>${name}</span>
+                             <span style="font-weight: bold;">${value}</span>
+                         </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
-        
+       
         createSalesChart(sales, startDate, endDate) {
             const chartData = {};
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
@@ -3757,14 +3765,14 @@
 
             this.renderChart('line', Object.keys(chartData).map(d => Utils.formatDate(d)), 'Vendas (R$)', Object.values(chartData), '#3B82F6');
         },
-        
+       
         createFinancialChart(sales, expenses) {
             const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
             const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
-            
+           
             this.renderChart('doughnut', ['Vendas', 'Despesas'], '', [totalSales, totalExpenses], ['#10B981', '#EF4444']);
         },
-        
+       
         createProductChart(products) {
             this.renderChart('bar', products.map(p => p.name), 'Receita (R$)', products.map(p => p.revenue), '#10B981');
         },
@@ -3781,7 +3789,7 @@
                     datasets: [{ label, data, backgroundColor: color, borderColor: color, fill: type === 'line' }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false, // <-- CORREÇÃO PRINCIPAL AQUI
                     plugins: { legend: { labels: { color: '#F1F5F9' } } },
                     scales: {
                         y: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
@@ -3799,7 +3807,7 @@
             }
             tbody.innerHTML = rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
         },
-        
+       
         exportToPDF() {
             if (!this.currentReportData || this.currentReportData.rows.length === 0) {
                 return Notification.warning('Gere um relatório primeiro para exportar.');
@@ -3809,7 +3817,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const { headers, rows } = this.currentReportData;
-            
+           
             const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
             const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
             const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
@@ -3925,7 +3933,7 @@
             Notification.success('Todos os dados foram limpos!');
         }
     };
-    
+   
     // Inicialização do Sistema
     document.addEventListener('DOMContentLoaded', () => {
         Auth.init();
