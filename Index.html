@@ -145,6 +145,8 @@
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
             transition: var(--transition);
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
@@ -160,7 +162,7 @@
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 16px; /* Aumentado o gap para melhor espaçamento quando quebrar linha */
         }
 
         .card-title {
@@ -206,6 +208,12 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -217,6 +225,7 @@
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap; /* Evita que o conteúdo da célula quebre linha */
         }
 
         .table th {
@@ -316,6 +325,8 @@
             border-right: 1px solid var(--border-color);
             padding: 24px 0;
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
             overflow-y: auto;
             transition: var(--transition);
@@ -408,21 +419,30 @@
             color: var(--text-muted);
             font-size: 16px;
         }
+        
+        .chart-container {
+            position: relative;
+            height: 350px; /* Definindo uma altura fixa */
+            width: 100%;
+            flex-grow: 1; /* Permite que o container do gráfico cresça */
+        }
+
 
         /* ===== RESPONSIVIDADE ===== */
         .mobile-menu-toggle {
             display: none;
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 15px; /* Ajustado */
+            left: 15px; /* Ajustado */
             z-index: 1001;
-            background: var(--primary-color);
+            background: var(--surface-bg); /* Mudado para melhor contraste */
             color: var(--text-primary);
-            border: none;
-            padding: 12px;
+            border: 1px solid var(--border-color);
+            padding: 10px 12px; /* Ajustado */
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
+            box-shadow: var(--shadow-md);
         }
 
         @media (max-width: 768px) {
@@ -435,16 +455,16 @@
 
             .sidebar {
                 transform: translateX(-100%);
+                box-shadow: var(--shadow-xl);
             }
 
             .sidebar.active {
                 transform: translateX(0);
-                box-shadow: var(--shadow-xl);
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 70px 15px 20px;
+                padding: 80px 15px 20px; /* Aumentado padding-top para não sobrepor o botão */
             }
 
             .login-card {
@@ -455,6 +475,7 @@
                 padding: 16px;
             }
             
+            /* Ajuste crucial para os grids em mobile */
             .grid-2, .grid-3, .grid-4, .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -462,16 +483,32 @@
             .page-title {
                 font-size: 24px;
             }
-
-            .table-responsive {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+            
+            /* Ajustes para botões e inputs em forms */
+            .form-group .flex.gap-2 {
+                flex-direction: column;
+                align-items: stretch;
             }
-
-            .table {
-                min-width: 600px;
+            .form-group .flex.gap-2 .btn {
+                width: 100%;
             }
-
+            
+            #salesPage .flex-between.mt-3 {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+                text-align: center;
+            }
+            #salesPage .flex-between.mt-3 .btn {
+                width: 100%;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            /* Melhorando a visualização do recibo no modal */
             .receipt-professional-header, .flex-between {
                 flex-direction: column;
                 align-items: flex-start;
@@ -496,18 +533,26 @@
             }
             
             .btn {
-                padding: 10px 18px;
-                font-size: 13px;
+                padding: 12px 18px; /* Aumentando padding para toque mais fácil */
+                font-size: 14px;
             }
 
             .form-input, .form-select {
-                font-size: 13px;
+                font-size: 14px;
+                padding: 12px 16px;
             }
 
             .chart-container {
-                position: relative;
-                max-height: 350px;
-                width: 100%;
+                max-height: 300px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 20px;
             }
         }
 
@@ -631,12 +676,18 @@
             padding: 32px;
             max-width: 600px;
             width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
+            max-height: 85vh; /* Ajustado */
+            display: flex; /* Adicionado para layout interno */
+            flex-direction: column; /* Adicionado para layout interno */
             border: 1px solid var(--border-color);
             transform: scale(0.9);
             transition: var(--transition);
         }
+        
+        #modalBody {
+            overflow-y: auto; /* Permite scroll apenas no corpo do modal */
+        }
+
 
         .modal.show .modal-content {
             transform: scale(1);
@@ -749,6 +800,7 @@
             border-bottom: 2px solid #dee2e6;
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap; /* Adicionado para quebrar em mobile */
         }
         .receipt-logo-container {
             font-size: 2.5rem;
@@ -796,11 +848,13 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             color: #495057;
+            white-space: nowrap;
         }
         .receipt-items-table td {
             padding: 0.75rem;
             border-bottom: 1px solid #dee2e6;
             font-size: 0.95rem;
+            white-space: nowrap;
         }
         .receipt-items-table .text-right { text-align: right; }
         .receipt-items-table .text-center { text-align: center; }
@@ -997,7 +1051,7 @@
                                 Contas Vencidas
                             </h3>
                         </div>
-                        <div id="overdueAccounts" style="max-height: 180px; overflow-y: auto;">
+                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
                             <p class="text-center" style="color: var(--text-muted); padding: 20px;">
                                 Nenhuma conta vencida
                             </p>
@@ -2364,22 +2418,24 @@
                 <h4>Histórico de Compras - ${client.name}</h4>
                 <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${sales.length} compra(s).</p>
                 <hr style="margin: 16px 0;">
-                ${sales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
                 <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                ${sales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
                     <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
                     ${sales.map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
                     </tbody></table>
-                </div>`}
+                `}
+                </div>
                 
                 <h4 class="mt-3">Contas (Crediário)</h4>
                 <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
                 <hr style="margin: 16px 0;">
-                ${receivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
                 <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                ${receivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
                     <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
                     ${receivables.map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
                     </tbody></table>
-                </div>`}
+                `}
+                </div>
             `;
             Modal.show('Histórico do Cliente', historyHtml);
         },
@@ -2912,27 +2968,29 @@
                         </div>
                     </div>
 
-                    <table class="receipt-items-table">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th class="text-center">Qtd.</th>
-                                <th class="text-right">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${sale.products.map(p => `
-                            <tr>
-                                <td>
-                                    ${p.name}
-                                    <small style="display: block; color: #6c757d;">(${Utils.formatCurrency(p.price)} / un.)</small>
-                                </td>
-                                <td class="text-center">${p.quantity}</td>
-                                <td class="text-right">${Utils.formatCurrency(p.price * p.quantity)}</td>
-                            </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="receipt-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Qtd.</th>
+                                    <th class="text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sale.products.map(p => `
+                                <tr>
+                                    <td>
+                                        ${p.name}
+                                        <small style="display: block; color: #6c757d;">(${Utils.formatCurrency(p.price)} / un.)</small>
+                                    </td>
+                                    <td class="text-center">${p.quantity}</td>
+                                    <td class="text-right">${Utils.formatCurrency(p.price * p.quantity)}</td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="receipt-summary">
                         <table>
@@ -2966,17 +3024,17 @@
         },
         shareOnWhatsApp(saleId) {
              const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-               const sale = sales.find(s => s.id === saleId);
-               const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-               const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
+                  const sale = sales.find(s => s.id === saleId);
+                  const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+                  const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
 
             if (!client.phone) {
                 return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
             }
-               const phoneNumber = client.phone.replace(/\D/g, '');
-               const message = this.generateWhatsAppText(sale, client);
-               const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
-               window.open(whatsappUrl, '_blank');
+                  const phoneNumber = client.phone.replace(/\D/g, '');
+                  const message = this.generateWhatsAppText(sale, client);
+                  const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
+                  window.open(whatsappUrl, '_blank');
         },
         printReceipt() {
             const printContent = document.getElementById('receiptToPrint').innerHTML;
@@ -3555,10 +3613,10 @@
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
                  let status = r.status;
-                   const today = new Date();
-                   today.setHours(0,0,0,0);
+                      const today = new Date();
+                      today.setHours(0,0,0,0);
                  if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                       status = 'Vencido';
+                        status = 'Vencido';
                  }
                 return [
                     client ? client.name : 'N/A',
@@ -3576,11 +3634,11 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (r.status === 'Pago') {
-                       statusSummary['Pago'] += r.value;
+                         statusSummary['Pago'] += r.value;
                  } else if (new Date(r.dueDate) < today) {
-                       statusSummary['Vencido'] += r.value;
+                         statusSummary['Vencido'] += r.value;
                  } else {
-                       statusSummary['Pendente'] += r.value;
+                         statusSummary['Pendente'] += r.value;
                  }
             });
             
@@ -3703,10 +3761,10 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                             <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                                 <span>${name}</span>
-                                 <span style="font-weight: bold;">${value}</span>
-                             </div>`).join('') :
+                               <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                   <span>${name}</span>
+                                   <span style="font-weight: bold;">${value}</span>
+                               </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
