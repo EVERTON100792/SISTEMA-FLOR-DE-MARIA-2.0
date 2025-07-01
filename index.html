@@ -149,10 +149,24 @@
             flex-direction: column;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
+        /* Otimização para mobile: remove efeito de hover que pode ser "pegajoso" */
+        @media (hover: none) {
+            .card:hover {
+                transform: none;
+                box-shadow: var(--shadow-lg);
+            }
+            .btn-primary:hover:not(:disabled) {
+                transform: none;
+                box-shadow: var(--shadow-md);
+            }
         }
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+            }
+        }
+
 
         .card-header {
             display: flex;
@@ -162,7 +176,7 @@
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 16px; /* Aumentado o gap para melhor espaçamento quando quebrar linha */
+            gap: 16px; 
         }
 
         .card-title {
@@ -225,7 +239,7 @@
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; /* Evita que o conteúdo da célula quebre linha */
+            white-space: nowrap; 
         }
 
         .table th {
@@ -422,9 +436,9 @@
         
         .chart-container {
             position: relative;
-            height: 350px; /* Definindo uma altura fixa */
+            height: 350px;
             width: 100%;
-            flex-grow: 1; /* Permite que o container do gráfico cresça */
+            flex-grow: 1; 
         }
 
 
@@ -432,20 +446,20 @@
         .mobile-menu-toggle {
             display: none;
             position: fixed;
-            top: 15px; /* Ajustado */
-            left: 15px; /* Ajustado */
+            top: 15px;
+            left: 15px; 
             z-index: 1001;
-            background: var(--surface-bg); /* Mudado para melhor contraste */
+            background: var(--surface-bg); 
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 10px 12px; /* Ajustado */
+            padding: 10px 12px; 
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
             box-shadow: var(--shadow-md);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 800px) { /* Aumentado o breakpoint para cobrir mais tablets */
             body {
                 font-size: 14px;
             }
@@ -464,7 +478,7 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 80px 15px 20px; /* Aumentado padding-top para não sobrepor o botão */
+                padding: 80px 15px 20px; 
             }
 
             .login-card {
@@ -484,7 +498,7 @@
                 font-size: 24px;
             }
             
-            /* Ajustes para botões e inputs em forms */
+            /* Garante que grupos de botões em formulários empilhem verticalmente */
             .form-group .flex.gap-2 {
                 flex-direction: column;
                 align-items: stretch;
@@ -493,6 +507,7 @@
                 width: 100%;
             }
             
+            /* Empilha o total e o botão de finalizar na página de vendas */
             #salesPage .flex-between.mt-3 {
                 flex-direction: column;
                 align-items: stretch;
@@ -503,15 +518,23 @@
                 width: 100%;
             }
             
+            /* Empilha o conteúdo dos cabeçalhos dos cards */
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
+            }
+            .card-header .flex.gap-2 {
+                 flex-direction: column;
+                 width: 100%;
+                 align-items: stretch;
             }
             
             /* Melhorando a visualização do recibo no modal */
-            .receipt-professional-header, .flex-between {
+            .receipt-professional-header, .receipt-sale-info .text-right {
                 flex-direction: column;
                 align-items: flex-start;
+                text-align: left;
                 gap: 16px;
             }
             .receipt-company-details {
@@ -521,9 +544,7 @@
             .receipt-sale-info {
                 grid-template-columns: 1fr;
             }
-            .receipt-sale-info .receipt-info-block.text-right {
-                text-align: left;
-            }
+            
             .receipt-summary {
                 justify-content: flex-start;
             }
@@ -533,7 +554,7 @@
             }
             
             .btn {
-                padding: 12px 18px; /* Aumentando padding para toque mais fácil */
+                padding: 12px 18px; 
                 font-size: 14px;
             }
 
@@ -548,7 +569,7 @@
 
             .modal-content {
                 width: 95%;
-                padding: 24px;
+                padding: 24px 16px;
             }
 
             .modal-title {
@@ -676,16 +697,16 @@
             padding: 32px;
             max-width: 600px;
             width: 90%;
-            max-height: 85vh; /* Ajustado */
-            display: flex; /* Adicionado para layout interno */
-            flex-direction: column; /* Adicionado para layout interno */
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column; 
             border: 1px solid var(--border-color);
             transform: scale(0.9);
             transition: var(--transition);
         }
         
         #modalBody {
-            overflow-y: auto; /* Permite scroll apenas no corpo do modal */
+            overflow-y: auto; 
         }
 
 
@@ -800,7 +821,7 @@
             border-bottom: 2px solid #dee2e6;
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap; /* Adicionado para quebrar em mobile */
+            flex-wrap: wrap; 
         }
         .receipt-logo-container {
             font-size: 2.5rem;
@@ -2021,7 +2042,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.8 (FINAL) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9 (Mobile Fix) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2154,46 +2175,57 @@
     // Sistema de Navegação
     const Navigation = {
         init() {
+            const sidebar = document.getElementById('sidebar');
+
             document.querySelectorAll('.sidebar-nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
+                    
+                    // CORREÇÃO: Fecha a sidebar no clique, antes de qualquer outra ação
+                    if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+
                     const page = link.getAttribute('data-page');
-                    if (page) this.navigateTo(page);
+                    if (page) {
+                        this.navigateTo(page);
+                    }
                 });
             });
 
             const mobileToggle = document.getElementById('mobileMenuToggle');
-            const sidebar = document.getElementById('sidebar');
-            
             mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
 
+            // Fecha a sidebar se clicar fora dela
             document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
                     sidebar.classList.remove('active');
                 }
             });
         },
         navigateTo(page) {
-            if (!document.getElementById(`${page}Page`)) {
-                console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
-                page = 'dashboard';
-            }
-            
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`${page}Page`).classList.remove('hidden');
+            try {
+                if (!document.getElementById(`${page}Page`)) {
+                    console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
+                    page = 'dashboard';
+                }
+                
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`${page}Page`).classList.remove('hidden');
 
-            document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('active');
+                document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+                
+                localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
+                
+                this.loadPageData(page);
+            } catch (error) {
+                console.error(`Erro ao navegar para a página ${page}:`, error);
+                Notification.error("Ocorreu um erro ao carregar a página.");
             }
-            
-            localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
-            
-            this.loadPageData(page);
         },
         loadPageData(page) {
+            // O conteúdo desta função permanece o mesmo
             switch (page) {
                 case 'dashboard': Dashboard.loadData(); break;
                 case 'clients': Clients.loadClients(); break;
@@ -2209,7 +2241,7 @@
         }
     };
 
-    // Sistema de Autenticação
+    // Autenticação (sem alterações)
     const Auth = {
         init() {
             document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -2255,7 +2287,7 @@
         }
     };
     
-    // Dashboard
+    // Dashboard (sem alterações)
     const Dashboard = {
         chart: null,
         loadData() {
@@ -2341,7 +2373,7 @@
                     const daysOverdue = Math.floor((today - new Date(account.dueDate)) / (1000 * 60 * 60 * 24));
                     return `
                         <div style="padding: 12px; border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 8px; border-radius: 4px;">
-                            <div class="flex-between">
+                            <div class="flex-between" style="flex-direction: row; align-items: center;">
                                 <div>
                                     <strong>${client ? client.name : 'N/A'}</strong><br>
                                     <small style="color: var(--text-muted);">${daysOverdue} dia(s) em atraso</small>
@@ -2412,16 +2444,17 @@
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.clientId === id);
             
             const totalSpent = sales.reduce((sum, sale) => sum + sale.total, 0);
-            const totalDebt = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+            const totalDebt = receivables.filter(r => r.status === 'Pendente' || (r.status !== 'Pago' && new Date(r.dueDate) < new Date())).reduce((sum, r) => sum + r.value, 0);
 
+            // CORREÇÃO: Adicionado .table-responsive em volta de cada tabela no modal
             let historyHtml = `
                 <h4>Histórico de Compras - ${client.name}</h4>
                 <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${sales.length} compra(s).</p>
                 <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                <div class="table-responsive" style="max-height: 150px;">
                 ${sales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
                     <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
-                    ${sales.map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
+                    ${sales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
                     </tbody></table>
                 `}
                 </div>
@@ -2429,10 +2462,10 @@
                 <h4 class="mt-3">Contas (Crediário)</h4>
                 <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
                 <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                <div class="table-responsive" style="max-height: 150px;">
                 ${receivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
                     <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-                    ${receivables.map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
+                    ${receivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
                     </tbody></table>
                 `}
                 </div>
@@ -2499,6 +2532,10 @@
         }
     };
     
+    // O restante do código JS (Products, Sales, etc.) permanece o mesmo do HTML anterior,
+    // pois as correções principais foram no CSS e na função de Navegação.
+    // Incluindo o resto do JS para garantir a completude do script.
+
     // Módulo de Produtos
     const Products = {
         currentEditId: null,
@@ -2567,9 +2604,14 @@
             this.renderProducts(filtered);
         },
         loadProducts() {
-            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            this.renderProducts(products);
-            this.updateStats(products);
+            try {
+                const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+                this.renderProducts(products);
+                this.updateStats(products);
+            } catch (error) {
+                 console.error("Erro ao carregar produtos:", error);
+                 Notification.error("Não foi possível carregar os produtos.");
+            }
         },
         updateStats(products) {
             document.getElementById('totalProducts').textContent = products.length;
@@ -3956,11 +3998,11 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.8', timestamp: new Date().toISOString(),
+                version: '2.9', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
-                if (key !== 'lastActivePage') { // Não precisa salvar a última página no backup geral
+                if (key !== 'lastActivePage') {
                     backupData.data[key] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
                 }
             }
@@ -4026,7 +4068,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.8 iniciado!');
+        console.log('SGI - Flor de Maria v2.9 (Mobile Fix) iniciado!');
     });
     </script>
 </body>
