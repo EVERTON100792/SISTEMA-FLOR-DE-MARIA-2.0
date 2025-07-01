@@ -19,18 +19,18 @@
 
         :root {
             /* Paleta de Cores Moderna */
-            --primary-bg: #0F172A;      /* Azul escuro profundo */
-            --secondary-bg: #1E293B;    /* Azul acinzentado */
-            --surface-bg: #334155;      /* Superfície elevada */
-            --primary-color: #3B82F6;   /* Azul vibrante */
-            --accent-color: #10B981;    /* Verde neon */
-            --danger-color: #EF4444;    /* Vermelho */
-            --warning-color: #F59E0B;   /* Amarelo */
-            --text-primary: #FFFFFF;    /* Branco puro */
-            --text-secondary: #F1F5F9;  /* Cinza claro */
-            --text-muted: #94A3B8;      /* Cinza médio */
-            --border-color: #475569;    /* Borda */
-            --hover-bg: #475569;        /* Hover */
+            --primary-bg: #0F172A;     /* Azul escuro profundo */
+            --secondary-bg: #1E293B;   /* Azul acinzentado */
+            --surface-bg: #334155;     /* Superfície elevada */
+            --primary-color: #3B82F6;  /* Azul vibrante */
+            --accent-color: #10B981;   /* Verde neon */
+            --danger-color: #EF4444;   /* Vermelho */
+            --warning-color: #F59E0B;  /* Amarelo */
+            --text-primary: #FFFFFF;   /* Branco puro */
+            --text-secondary: #F1F5F9; /* Cinza claro */
+            --text-muted: #94A3B8;     /* Cinza médio */
+            --border-color: #475569;   /* Borda */
+            --hover-bg: #475569;       /* Hover */
             
             /* Gradientes */
             --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -423,7 +423,6 @@
             font-size: 18px;
         }
 
-        /* ALTERAÇÃO 4: CSS de responsividade melhorado */
         @media (max-width: 768px) {
             .mobile-menu-toggle {
                 display: block;
@@ -478,18 +477,18 @@
                  margin-top: 16px;
             }
             .receipt-sale-info {
-                grid-template-columns: 1fr;
+                 grid-template-columns: 1fr;
             }
             .receipt-sale-info .receipt-info-block.text-right {
-                text-align: left;
+                 text-align: left;
             }
             .receipt-summary {
-                justify-content: flex-start;
+                 justify-content: flex-start;
             }
              .receipt-summary table {
-                width: 100%;
-                max-width: none;
-            }
+                 width: 100%;
+                 max-width: none;
+             }
         }
 
         /* ===== UTILITÁRIOS ===== */
@@ -1774,7 +1773,14 @@
                                 <option value="contas_a_receber">Contas a Receber</option>
                             </select>
                         </div>
-
+                        
+                        <div class="form-group hidden" id="reportClientFilterContainer">
+                             <label class="form-label" for="reportReceivableClient">Cliente</label>
+                             <select id="reportReceivableClient" class="form-select">
+                                 <option value="">Todos os Clientes</option>
+                             </select>
+                         </div>
+                        
                         <div class="form-group hidden" id="reportStatusFilterContainer">
                             <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
                             <select id="reportReceivableStatus" class="form-select">
@@ -1788,8 +1794,8 @@
                         <div class="form-group">
                             <label class="form-label">&nbsp;</label>
                             <button class="btn btn-primary" id="generateReport" style="width: 100%;">
-                                <i class="fas fa-chart-line"></i>
-                                Gerar Relatório
+                                <i class="fas fa-sync-alt"></i>
+                                Atualizar Relatório
                             </button>
                         </div>
                     </div>
@@ -1981,7 +1987,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.4 (MODIFICADO) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.5 (CORRIGIDO) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2792,7 +2798,7 @@
                 }
             }
              if (dateFilter) {
-                sales = sales.filter(s => s.date.startsWith(dateFilter));
+                 sales = sales.filter(s => s.date.startsWith(dateFilter));
             }
 
             const tbody = document.getElementById('receiptsTableBody');
@@ -2957,7 +2963,7 @@
             const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
             const newEntry = {
                 id: this.currentEditId || Utils.generateUUID(),
-                date: new Date(date).toISOString(), type, description, value
+                date: new Date(date + 'T00:00:00').toISOString(), type, description, value
             };
 
             if (this.currentEditId) {
@@ -3086,7 +3092,7 @@
             
             const expense = {
                 id: this.currentEditId || Utils.generateUUID(),
-                description, category, value, date: new Date(date).toISOString()
+                description, category, value, date: new Date(date + 'T00:00:00').toISOString()
             };
             
             if (this.currentEditId) {
@@ -3220,7 +3226,7 @@
             const receivable = {
                 id: this.currentEditId || Utils.generateUUID(),
                 clientId, description, value, status: 'Pendente',
-                dueDate: new Date(dueDate).toISOString(),
+                dueDate: new Date(dueDate + 'T00:00:00').toISOString(),
                 createdAt: this.currentEditId ? receivables.find(r=>r.id===this.currentEditId).createdAt : new Date().toISOString()
             };
 
@@ -3352,7 +3358,10 @@
                 
                 let matchesStatus = true;
                 if(status) {
-                    if (status === 'Vencido') matchesStatus = r.status === 'Pendente' && new Date(r.dueDate) < new Date();
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    if (status === 'Vencido') matchesStatus = r.status === 'Pendente' && new Date(r.dueDate) < today;
+                    else if (status === 'Pendente') matchesStatus = r.status === 'Pendente' && new Date(r.dueDate) >= today;
                     else matchesStatus = r.status === status;
                 }
                 return matchesSearch && matchesStatus;
@@ -3383,35 +3392,49 @@
             document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
-            // ALTERAÇÃO 2: Listener para o filtro dinâmico
+            // Listeners para auto-gerar relatório
             document.getElementById('reportType').addEventListener('change', () => this.generateReport());
+            document.getElementById('reportReceivableStatus').addEventListener('change', () => this.generateReport());
+            document.getElementById('reportReceivableClient').addEventListener('change', () => this.generateReport());
         },
         initPage() {
             const endDate = new Date();
-            // ALTERAÇÃO 3: Data inicial padrão para o primeiro dia do mês atual
-            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); // Primeiro dia do mês
             document.getElementById('reportStartDate').valueAsDate = startDate;
             document.getElementById('reportEndDate').valueAsDate = endDate;
+            this.loadClientFilter();
             this.generateReport();
+        },
+        loadClientFilter() {
+             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+             const select = document.getElementById('reportReceivableClient');
+             select.innerHTML = '<option value="">Todos os Clientes</option>';
+             clients.forEach(c => {
+                 select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+             });
         },
         generateReport() {
             const startDateStr = document.getElementById('reportStartDate').value;
             const endDateStr = document.getElementById('reportEndDate').value;
             this.currentReportType = document.getElementById('reportType').value;
             
-            // ALTERAÇÃO 2: Gerencia a visibilidade do filtro de status
             const statusFilterContainer = document.getElementById('reportStatusFilterContainer');
+            const clientFilterContainer = document.getElementById('reportClientFilterContainer');
+
             if (this.currentReportType === 'contas_a_receber') {
                 statusFilterContainer.classList.remove('hidden');
+                clientFilterContainer.classList.remove('hidden');
             } else {
                 statusFilterContainer.classList.add('hidden');
+                clientFilterContainer.classList.add('hidden');
             }
 
             if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
             
-            const startDate = new Date(startDateStr);
-            const endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999);
+            // CORREÇÃO: Interpreta a data no timezone local, evitando bugs com UTC
+            const startDate = new Date(startDateStr + 'T00:00:00');
+            const endDate = new Date(endDateStr + 'T23:59:59');
+            
             if (startDate > endDate) return Notification.error('Data inicial maior que a final!');
 
             const allSales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
@@ -3437,19 +3460,18 @@
                 case 'financeiro': this.generateFinancialReport(sales, expenses, startDate, endDate); break;
                 case 'produtos': this.generateProductsReport(sales, allProducts); break;
                 case 'clientes': this.generateClientsReport(sales, allClients); break;
-                // ALTERAÇÃO 2: Novo case para o relatório
                 case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate, allClients); break;
             }
         },
         
-        // ALTERAÇÃO 2: Nova função para o relatório de contas a receber
         generateReceivablesReport(startDate, endDate, clients) {
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             const statusFilter = document.getElementById('reportReceivableStatus').value;
+            const clientFilter = document.getElementById('reportReceivableClient').value; // NOVO
 
             const filteredReceivables = receivables.filter(r => {
                 const dueDate = new Date(r.dueDate);
-                let matchesDate = dueDate >= startDate && dueDate <= endDate;
+                const matchesDate = dueDate >= startDate && dueDate <= endDate;
 
                 let currentStatus = 'Pendente';
                 if (r.status === 'Pago') {
@@ -3459,15 +3481,18 @@
                 }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
-                
-                return matchesDate && matchesStatus;
+                let matchesClient = !clientFilter || r.clientId === clientFilter; // NOVO
+
+                return matchesDate && matchesStatus && matchesClient;
             });
 
             const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
                 let status = r.status;
-                if (status === 'Pendente' && new Date(r.dueDate) < new Date()) {
+                 const today = new Date();
+                 today.setHours(0,0,0,0);
+                if (status === 'Pendente' && new Date(r.dueDate) < today) {
                     status = 'Vencido';
                 }
                 return [
@@ -3483,9 +3508,11 @@
 
             const statusSummary = { 'Pagas': 0, 'Pendentes': 0, 'Vencidas': 0 };
             filteredReceivables.forEach(r => {
+                 const today = new Date();
+                 today.setHours(0,0,0,0);
                 if (r.status === 'Pago') {
                     statusSummary['Pagas'] += r.value;
-                } else if (new Date(r.dueDate) < new Date() && r.status !== 'Pago') {
+                } else if (new Date(r.dueDate) < today) {
                     statusSummary['Vencidas'] += r.value;
                 } else {
                     statusSummary['Pendentes'] += r.value;
@@ -3500,7 +3527,7 @@
             );
             
             const debtors = {};
-            receivables.filter(r => r.status !== 'Pago').forEach(r => {
+            filteredReceivables.filter(r => r.status !== 'Pago').forEach(r => {
                 const clientName = (clients.find(c => c.id === r.clientId) || {name: 'N/A'}).name;
                 debtors[clientName] = (debtors[clientName] || 0) + r.value;
             });
@@ -3513,7 +3540,7 @@
                         <span>${name}</span>
                         <span style="font-weight: bold;">${value}</span>
                     </div>`).join('') :
-                '<p class="text-center" style="color: var(--text-muted);">Nenhum devedor no período.</p>';
+                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum devedor no período.</p>';
 
             Notification.success('Relatório de contas a receber gerado!');
         },
@@ -3541,7 +3568,7 @@
             this.updateReportTable(headers, rows);
             this.currentReportData = { headers, rows };
             
-            document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted);">N/A para este relatório.</p>';
+            document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">N/A para este relatório.</p>';
 
             this.createFinancialChart(sales, expenses);
             Notification.success('Relatório financeiro gerado!');
@@ -3596,26 +3623,26 @@
         updateTopList(sales, type, clients = []) {
             let topList = [];
             if (type === 'products') {
-                 const productSales = {};
-                 sales.forEach(sale => sale.products.forEach(p => productSales[p.name] = (productSales[p.name] || 0) + p.quantity));
-                 topList = Object.entries(productSales).sort(([, a], [, b]) => b - a).slice(0, 5);
+                const productSales = {};
+                sales.forEach(sale => sale.products.forEach(p => productSales[p.name] = (productSales[p.name] || 0) + p.quantity));
+                topList = Object.entries(productSales).sort(([, a], [, b]) => b - a).slice(0, 5);
             } else { // clients
-                 const clientSales = {};
-                 sales.forEach(sale => {
-                     if(sale.clientId) clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
-                 });
-                 topList = Object.entries(clientSales).sort(([,a],[,b])=>b-a).slice(0,5).map(([id, total]) => {
-                     const client = clients.find(c => c.id === id);
-                     return [client ? client.name : 'Excluído', Utils.formatCurrency(total)];
-                 });
+                const clientSales = {};
+                sales.forEach(sale => {
+                    if(sale.clientId) clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
+                });
+                topList = Object.entries(clientSales).sort(([,a],[,b])=>b-a).slice(0,5).map(([id, total]) => {
+                    const client = clients.find(c => c.id === id);
+                    return [client ? client.name : 'Excluído', Utils.formatCurrency(total)];
+                });
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                     <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                         <span>${name}</span>
-                         <span style="font-weight: bold;">${value}</span>
-                     </div>`).join('') :
-                 '<p class="text-center" style="color: var(--text-muted);">Nenhum dado no período.</p>';
+                       <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                           <span>${name}</span>
+                           <span style="font-weight: bold;">${value}</span>
+                       </div>`).join('') :
+                 '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
         createSalesChart(sales, startDate, endDate) {
@@ -3670,12 +3697,12 @@
             tbody.innerHTML = rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
         },
         
-        // ALTERAÇÃO 1: Função para exportar PDF implementada
         exportToPDF() {
             if (!this.currentReportData || this.currentReportData.rows.length === 0) {
                 return Notification.warning('Gere um relatório primeiro para exportar.');
             }
 
+            // CORREÇÃO: Acessar jsPDF e autoTable da maneira correta
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const { headers, rows } = this.currentReportData;
@@ -3693,7 +3720,8 @@
             const chartImage = chartCanvas.toDataURL('image/png', 1.0);
             doc.addImage(chartImage, 'PNG', 14, 40, 180, 90);
 
-            autoTable(doc, {
+            // CORREÇÃO: Chamar doc.autoTable()
+            doc.autoTable({
                 head: [headers],
                 body: rows.map(row => row.map(cell => String(cell).replace(/R\$\s/g, ''))), // Remove R$ para PDF
                 startY: 140,
@@ -3736,7 +3764,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.4', timestamp: new Date().toISOString(),
+                version: '2.5', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -3803,7 +3831,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.4 iniciado!');
+        console.log('SGI - Flor de Maria v2.5 iniciado!');
     });
     </script>
 </body>
