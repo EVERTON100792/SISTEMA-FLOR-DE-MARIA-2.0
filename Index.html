@@ -6,6 +6,9 @@
     <title>SGI - Flor de Maria | Sistema de Gestão Integrado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf-autotable.min.js"></script>
+
     <style>
         /* ===== RESET E VARIÁVEIS CSS ===== */
         * {
@@ -420,6 +423,7 @@
             font-size: 18px;
         }
 
+        /* ALTERAÇÃO 4: CSS de responsividade melhorado */
         @media (max-width: 768px) {
             .mobile-menu-toggle {
                 display: block;
@@ -431,11 +435,12 @@
 
             .sidebar.active {
                 transform: translateX(0);
+                box-shadow: var(--shadow-xl); /* Adiciona sombra quando aberto */
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 80px 20px 20px;
+                padding: 80px 15px 20px; /* Reduz padding lateral */
             }
 
             .login-card {
@@ -443,15 +448,47 @@
             }
 
             .card {
-                padding: 20px;
+                padding: 16px; /* Reduz padding do card */
+            }
+            
+            .grid-2, .grid-3, .grid-4, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 28px; /* Reduz o tamanho da fonte do título */
             }
 
             .table-responsive {
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
             }
 
             .table {
                 min-width: 600px;
+            }
+
+            .receipt-professional-header, .flex-between {
+                 flex-direction: column;
+                 align-items: flex-start;
+                 gap: 16px;
+            }
+            .receipt-company-details {
+                 text-align: left;
+                 margin-top: 16px;
+            }
+            .receipt-sale-info {
+                grid-template-columns: 1fr;
+            }
+            .receipt-sale-info .receipt-info-block.text-right {
+                text-align: left;
+            }
+            .receipt-summary {
+                justify-content: flex-start;
+            }
+             .receipt-summary table {
+                width: 100%;
+                max-width: none;
             }
         }
 
@@ -1311,7 +1348,7 @@
                                 </tr>
                             </thead>
                             <tbody id="receiptsTableBody">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -1734,6 +1771,17 @@
                                 <option value="financeiro">Financeiro</option>
                                 <option value="produtos">Produtos</option>
                                 <option value="clientes">Clientes</option>
+                                <option value="contas_a_receber">Contas a Receber</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group hidden" id="reportStatusFilterContainer">
+                            <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
+                            <select id="reportReceivableStatus" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="Pendente">Pendentes</option>
+                                <option value="Pago">Pagas</option>
+                                <option value="Vencido">Vencidas</option>
                             </select>
                         </div>
                         
@@ -1780,7 +1828,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-trophy"></i>
-                                Top 5 (Produtos/Clientes)
+                                Top 5 (Produtos/Clientes/Devedores)
                             </h3>
                         </div>
                         
@@ -1933,7 +1981,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.3 =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.4 (MODIFICADO) =====
     
     // Configurações globais
     const CONFIG = {
@@ -1947,7 +1995,7 @@
             accountsReceivable: 'sgi_accounts_receivable'
         },
         company: { // Informações da empresa para o recibo
-            name: 'Flor de Maria', // <<== NOME ALTERADO AQUI
+            name: 'Flor de Maria',
             address: 'Rua das Flores, 123 - Centro',
             phone: '(11) 98765-4321',
             cnpj: '12.345.678/0001-99'
@@ -1956,7 +2004,6 @@
 
     // Utilitários
     const Utils = {
-        // Gerar UUID
         generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0;
@@ -1964,25 +2011,18 @@
                 return v.toString(16);
             });
         },
-
-        // Formatar moeda
         formatCurrency(value) {
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL'
             }).format(value);
         },
-
-        // Formatar data
         formatDate(dateStr) {
             if (!dateStr) return 'N/A';
             const date = new Date(dateStr);
-            // Corrige o problema do fuso horário que pode mudar o dia
             const userTimezoneOffset = date.getTimezoneOffset() * 60000;
             return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
         },
-
-        // Formatar data e hora
         formatDateTime(date) {
             if (!date) return 'N/A';
             return new Intl.DateTimeFormat('pt-BR', {
@@ -1993,8 +2033,6 @@
                 minute: '2-digit'
             }).format(new Date(date));
         },
-
-        // Salvar no localStorage
         saveToStorage(key, data) {
             try {
                 localStorage.setItem(key, JSON.stringify(data));
@@ -2005,8 +2043,6 @@
                 return false;
             }
         },
-
-        // Carregar do localStorage
         loadFromStorage(key) {
             try {
                 const data = localStorage.getItem(key);
@@ -2033,7 +2069,6 @@
                 notification.classList.remove('show');
             }, 3000);
         },
-
         success(message) { this.show(message, 'success'); },
         error(message) { this.show(message, 'error'); },
         warning(message) { this.show(message, 'warning'); }
@@ -2045,24 +2080,22 @@
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalBody').innerHTML = content;
             
-            // Limpa ações antigas e adiciona novas se houver
             const existingActions = document.getElementById('modalActions');
             if (existingActions) existingActions.remove();
             
             if (actionsHtml) {
-                 const modalContent = document.querySelector('.modal-content');
-                 const actionsContainer = document.createElement('div');
-                 actionsContainer.id = 'modalActions';
-                 actionsContainer.style.marginTop = '24px';
-                 actionsContainer.style.paddingTop = '16px';
-                 actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
-                 actionsContainer.innerHTML = actionsHtml;
-                 modalContent.appendChild(actionsContainer);
+                const modalContent = document.querySelector('.modal-content');
+                const actionsContainer = document.createElement('div');
+                actionsContainer.id = 'modalActions';
+                actionsContainer.style.marginTop = '24px';
+                actionsContainer.style.paddingTop = '16px';
+                actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
+                actionsContainer.innerHTML = actionsHtml;
+                modalContent.appendChild(actionsContainer);
             }
             
             document.getElementById('modal').classList.add('show');
         },
-
         hide() {
             document.getElementById('modal').classList.remove('show');
         }
@@ -2090,7 +2123,6 @@
                 }
             });
         },
-
         navigateTo(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`${page}Page`).classList.remove('hidden');
@@ -2103,7 +2135,6 @@
             }
             this.loadPageData(page);
         },
-
         loadPageData(page) {
             switch (page) {
                 case 'dashboard': Dashboard.loadData(); break;
@@ -2686,7 +2717,6 @@
             });
             Utils.saveToStorage(CONFIG.storageKeys.products, products);
 
-            // Lógica financeira
             if (paymentMethod === 'Crediário') {
                 const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
                 const installmentValue = total / installments;
@@ -2720,7 +2750,7 @@
                 Notification.success('Venda finalizada com sucesso!');
             }
             
-            Receipts.showReceipt(sale.id); // Mostra o recibo após a venda
+            Receipts.showReceipt(sale.id);
 
             this.cart = [];
             this.updateCartDisplay();
@@ -2805,7 +2835,6 @@
             `;
             Modal.show(`Recibo da Venda`, `<div id="receiptToPrint">${receiptHtml}</div>`, actionsHtml);
         },
-        // <<== FUNÇÃO DO RECIBO ATUALIZADA
         generateReceiptHTML(sale, client) {
             return `
                 <div class="receipt-professional-container">
@@ -2891,7 +2920,7 @@
              const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
 
             if (!client.phone) {
-                 return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
+                return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
             }
              const phoneNumber = client.phone.replace(/\D/g, ''); // Remove non-digits
              const message = this.generateWhatsAppText(sale, client);
@@ -2904,7 +2933,6 @@
             document.body.innerHTML = printContent;
             window.print();
             document.body.innerHTML = originalContent;
-            // Recarrega os scripts e listeners, pois o innerHTML os remove
             location.reload();
         }
     };
@@ -3065,7 +3093,6 @@
                 const index = expenses.findIndex(exp => exp.id === this.currentEditId);
                 if (index !== -1) {
                     expenses[index] = expense;
-                    // Atualizar fluxo de caixa se existir
                     const cfIndex = cashFlow.findIndex(cf => cf.relatedExpenseId === this.currentEditId);
                     if (cfIndex !== -1) {
                         cashFlow[cfIndex].description = `Despesa: ${description}`;
@@ -3356,11 +3383,13 @@
             document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
+            // ALTERAÇÃO 2: Listener para o filtro dinâmico
+            document.getElementById('reportType').addEventListener('change', () => this.generateReport());
         },
         initPage() {
             const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(endDate.getDate() - 30);
+            // ALTERAÇÃO 3: Data inicial padrão para o primeiro dia do mês atual
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
             document.getElementById('reportStartDate').valueAsDate = startDate;
             document.getElementById('reportEndDate').valueAsDate = endDate;
             this.generateReport();
@@ -3369,12 +3398,20 @@
             const startDateStr = document.getElementById('reportStartDate').value;
             const endDateStr = document.getElementById('reportEndDate').value;
             this.currentReportType = document.getElementById('reportType').value;
+            
+            // ALTERAÇÃO 2: Gerencia a visibilidade do filtro de status
+            const statusFilterContainer = document.getElementById('reportStatusFilterContainer');
+            if (this.currentReportType === 'contas_a_receber') {
+                statusFilterContainer.classList.remove('hidden');
+            } else {
+                statusFilterContainer.classList.add('hidden');
+            }
 
             if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
             
             const startDate = new Date(startDateStr);
             const endDate = new Date(endDateStr);
-            endDate.setHours(23, 59, 59, 999); // Incluir o dia final completo
+            endDate.setHours(23, 59, 59, 999);
             if (startDate > endDate) return Notification.error('Data inicial maior que a final!');
 
             const allSales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
@@ -3385,7 +3422,6 @@
             const sales = allSales.filter(s => { const d = new Date(s.date); return d >= startDate && d <= endDate; });
             const expenses = allExpenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
             
-            // Update summary cards
             const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
             const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
             const profit = totalSales - totalExpenses;
@@ -3396,17 +3432,93 @@
             document.getElementById('reportProfit').style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
             document.getElementById('reportSalesCount').textContent = sales.length;
             
-            // Generate specific report
             switch (this.currentReportType) {
                 case 'vendas': this.generateSalesReport(sales, startDate, endDate, allClients); break;
                 case 'financeiro': this.generateFinancialReport(sales, expenses, startDate, endDate); break;
                 case 'produtos': this.generateProductsReport(sales, allProducts); break;
                 case 'clientes': this.generateClientsReport(sales, allClients); break;
+                // ALTERAÇÃO 2: Novo case para o relatório
+                case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate, allClients); break;
             }
         },
         
+        // ALTERAÇÃO 2: Nova função para o relatório de contas a receber
+        generateReceivablesReport(startDate, endDate, clients) {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const statusFilter = document.getElementById('reportReceivableStatus').value;
+
+            const filteredReceivables = receivables.filter(r => {
+                const dueDate = new Date(r.dueDate);
+                let matchesDate = dueDate >= startDate && dueDate <= endDate;
+
+                let currentStatus = 'Pendente';
+                if (r.status === 'Pago') {
+                    currentStatus = 'Pago';
+                } else if (new Date(r.dueDate) < new Date() && r.status !== 'Pago') {
+                    currentStatus = 'Vencido';
+                }
+                
+                let matchesStatus = !statusFilter || currentStatus === statusFilter;
+                
+                return matchesDate && matchesStatus;
+            });
+
+            const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
+            const rows = filteredReceivables.map(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                let status = r.status;
+                if (status === 'Pendente' && new Date(r.dueDate) < new Date()) {
+                    status = 'Vencido';
+                }
+                return [
+                    client ? client.name : 'N/A',
+                    r.description,
+                    Utils.formatCurrency(r.value),
+                    Utils.formatDate(r.dueDate),
+                    status
+                ];
+            });
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows };
+
+            const statusSummary = { 'Pagas': 0, 'Pendentes': 0, 'Vencidas': 0 };
+            filteredReceivables.forEach(r => {
+                if (r.status === 'Pago') {
+                    statusSummary['Pagas'] += r.value;
+                } else if (new Date(r.dueDate) < new Date() && r.status !== 'Pago') {
+                    statusSummary['Vencidas'] += r.value;
+                } else {
+                    statusSummary['Pendentes'] += r.value;
+                }
+            });
+            
+            this.renderChart('pie', 
+                ['Pagas', 'Pendentes', 'Vencidas'], 
+                'Valor (R$)', 
+                [statusSummary.Pagas, statusSummary.Pendentes, statusSummary.Vencidas],
+                ['#10B981', '#F59E0B', '#EF4444']
+            );
+            
+            const debtors = {};
+            receivables.filter(r => r.status !== 'Pago').forEach(r => {
+                const clientName = (clients.find(c => c.id === r.clientId) || {name: 'N/A'}).name;
+                debtors[clientName] = (debtors[clientName] || 0) + r.value;
+            });
+            const topDebtors = Object.entries(debtors).sort(([, a], [, b]) => b - a).slice(0, 5)
+                .map(([name, value]) => [name, Utils.formatCurrency(value)]);
+
+            document.getElementById('topProductsList').innerHTML = topDebtors.length > 0 ?
+                topDebtors.map(([name, value]) => `
+                    <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>${name}</span>
+                        <span style="font-weight: bold;">${value}</span>
+                    </div>`).join('') :
+                '<p class="text-center" style="color: var(--text-muted);">Nenhum devedor no período.</p>';
+
+            Notification.success('Relatório de contas a receber gerado!');
+        },
+
         generateSalesReport(sales, startDate, endDate, clients) {
-            // Update table
             const headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
             const rows = sales.map(s => {
                 const client = s.clientId ? clients.find(c => c.id === s.clientId) : null;
@@ -3414,15 +3526,10 @@
             });
             this.updateReportTable(headers, rows);
             this.currentReportData = { headers, rows };
-
-            // Update top list (re-use product logic)
             this.updateTopList(sales, 'products');
-
-            // Update chart
             this.createSalesChart(sales, startDate, endDate);
             Notification.success('Relatório de vendas gerado!');
         },
-
         generateFinancialReport(sales, expenses, startDate, endDate) {
             const data = [
                 ...sales.map(s => ({ date: s.date, type: 'Entrada', description: `Venda #${s.id.substring(0,6)}`, value: s.total })),
@@ -3434,7 +3541,6 @@
             this.updateReportTable(headers, rows);
             this.currentReportData = { headers, rows };
             
-            // Top list N/A for financial
             document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted);">N/A para este relatório.</p>';
 
             this.createFinancialChart(sales, expenses);
@@ -3446,8 +3552,8 @@
             sales.forEach(sale => {
                 sale.products.forEach(item => {
                     if (!productStats[item.productId]) {
-                         const pInfo = products.find(p => p.id === item.productId);
-                         productStats[item.productId] = { name: pInfo ? pInfo.name : 'Produto Excluído', quantity: 0, revenue: 0 };
+                        const pInfo = products.find(p => p.id === item.productId);
+                        productStats[item.productId] = { name: pInfo ? pInfo.name : 'Produto Excluído', quantity: 0, revenue: 0 };
                     }
                     productStats[item.productId].quantity += item.quantity;
                     productStats[item.productId].revenue += item.price * item.quantity;
@@ -3462,10 +3568,9 @@
             this.currentReportData = { headers, rows };
 
             this.updateTopList(sales, 'products');
-            this.createProductChart(sortedProducts.slice(0, 10)); // Top 10 products
+            this.createProductChart(sortedProducts.slice(0, 10));
             Notification.success('Relatório de produtos gerado!');
         },
-
         generateClientsReport(sales, clients) {
             const clientStats = {};
             sales.forEach(sale => {
@@ -3488,7 +3593,6 @@
             this.createClientChart(sortedClients.slice(0, 10));
             Notification.success('Relatório de clientes gerado!');
         },
-
         updateTopList(sales, type, clients = []) {
             let topList = [];
             if (type === 'products') {
@@ -3507,10 +3611,10 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                       <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                            <span>${name}</span>
-                            <span style="font-weight: bold;">${value}</span>
-                       </div>`).join('') :
+                     <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                         <span>${name}</span>
+                         <span style="font-weight: bold;">${value}</span>
+                     </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted);">Nenhum dado no período.</p>';
         },
         
@@ -3534,11 +3638,9 @@
         createProductChart(products) {
             this.renderChart('bar', products.map(p => p.name), 'Receita (R$)', products.map(p => p.revenue), '#10B981');
         },
-
         createClientChart(clients) {
             this.renderChart('bar', clients.map(c => c.name), 'Total Gasto (R$)', clients.map(c => c.total), '#3B82F6');
         },
-
         renderChart(type, labels, label, data, color) {
             const ctx = document.getElementById('reportChart').getContext('2d');
             if (this.chart) this.chart.destroy();
@@ -3552,13 +3654,12 @@
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#F1F5F9' } } },
                     scales: {
-                        y: { display: type !== 'doughnut', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        x: { display: type !== 'doughnut', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                        y: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                        x: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
                     }
                 }
             });
         },
-
         updateReportTable(headers, rows) {
             document.getElementById('reportTableHead').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
             const tbody = document.getElementById('reportTableBody');
@@ -3569,8 +3670,39 @@
             tbody.innerHTML = rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
         },
         
+        // ALTERAÇÃO 1: Função para exportar PDF implementada
         exportToPDF() {
-            Notification.warning('Exportação PDF ainda não implementada.');
+            if (!this.currentReportData || this.currentReportData.rows.length === 0) {
+                return Notification.warning('Gere um relatório primeiro para exportar.');
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const { headers, rows } = this.currentReportData;
+            
+            const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
+            const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
+            const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
+
+            doc.setFontSize(18);
+            doc.text(`Relatório de ${reportType}`, 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Período: ${startDate} a ${endDate}`, 14, 30);
+
+            const chartCanvas = document.getElementById('reportChart');
+            const chartImage = chartCanvas.toDataURL('image/png', 1.0);
+            doc.addImage(chartImage, 'PNG', 14, 40, 180, 90);
+
+            autoTable(doc, {
+                head: [headers],
+                body: rows.map(row => row.map(cell => String(cell).replace(/R\$\s/g, ''))), // Remove R$ para PDF
+                startY: 140,
+                theme: 'grid',
+                headStyles: { fillColor: [59, 130, 246] }
+            });
+
+            doc.save(`relatorio_${this.currentReportType}_${new Date().toISOString().split('T')[0]}.pdf`);
+            Notification.success('Relatório PDF gerado com sucesso!');
         },
 
         exportToCSV() {
@@ -3604,7 +3736,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.3', timestamp: new Date().toISOString(),
+                version: '2.4', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -3671,7 +3803,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.3 iniciado!');
+        console.log('SGI - Flor de Maria v2.4 iniciado!');
     });
     </script>
 </body>
