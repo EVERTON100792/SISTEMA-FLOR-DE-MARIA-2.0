@@ -1884,10 +1884,12 @@
                             </button>
                         </div>
                     </div>
+                    
                     <div class="chart-container">
                         <canvas id="reportChart"></canvas>
                     </div>
-                    </div>
+                    
+                </div>
 
                 <div class="card mt-4">
                     <div class="card-header">
@@ -2009,12 +2011,14 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.6 (CORRIGIDO) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.7 (CORRIGIDO) =====
    
     // Configurações globais
     const CONFIG = {
         users: { username: 'maria', password: 'flor123' },
         storageKeys: {
+            // <-- CORREÇÃO: Adicionada chave para a última página ativa
+            lastActivePage: 'sgi_last_active_page', 
             clients: 'sgi_clients',
             products: 'sgi_products',
             sales: 'sgi_sales',
@@ -2081,7 +2085,6 @@
                 return [];
             }
         },
-        // NOVO: Função de debounce para otimizar campos de busca
         debounce(func, delay = 300) {
             let timeout;
             return function(...args) {
@@ -2171,6 +2174,10 @@
             if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('active');
             }
+            
+            // <-- CORREÇÃO: Salva a página atual no localStorage para lembrar após recarregar
+            localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
+            
             this.loadPageData(page);
         },
         loadPageData(page) {
@@ -2215,6 +2222,8 @@
         },
         logout() {
             localStorage.removeItem('sgi_logged_in');
+            // <-- CORREÇÃO: Remove a página salva ao fazer logout, para o próximo login começar no dashboard
+            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
             this.showLogin();
             Notification.success('Logout realizado com sucesso!');
         },
@@ -2228,7 +2237,10 @@
         showApp() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appLayout').classList.remove('hidden');
-            Navigation.navigateTo('dashboard');
+            
+            // <-- CORREÇÃO: Carrega a última página visitada ou o dashboard como padrão
+            const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
+            Navigation.navigateTo(lastPage || 'dashboard');
         }
     };
    
@@ -2339,7 +2351,6 @@
         init() {
             document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
             document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
-            // CORREÇÃO: Aplicando debounce na busca
             document.getElementById('clientSearch').addEventListener('input', Utils.debounce((e) => this.filterClients(e.target.value), 300));
             document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
         },
@@ -2480,7 +2491,6 @@
         init() {
             document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
             document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
-            // CORREÇÃO: Aplicando debounce na busca
             document.getElementById('productSearch').addEventListener('input', Utils.debounce(e => this.filterProducts(e.target.value), 300));
             document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
         },
@@ -2597,7 +2607,6 @@
         cart: [],
         init() {
             document.getElementById('productSuggestions').addEventListener('click', (e) => this.handleSuggestionClick(e));
-             // CORREÇÃO: Aplicando debounce na busca de produtos no PDV
             document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(e => this.searchProducts(e.target.value), 300));
             document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
             document.getElementById('finalizeSale').addEventListener('click', () => this.finalizeSale());
@@ -2864,7 +2873,6 @@
                 `;
             }).join('');
         },
-        // NOVO: Função para excluir a venda e todas as suas dependências
         deleteReceipt(saleId) {
             const confirmation = confirm('ATENÇÃO!\n\nDeseja excluir esta venda permanentemente?\n\nEsta ação irá:\n- Excluir a venda e seu recibo.\n- Remover o lançamento do caixa (se houver).\n- Excluir todas as parcelas em "Contas a Receber".\n- Devolver os produtos ao estoque.\n\nEsta ação não pode ser desfeita.');
 
@@ -2906,7 +2914,7 @@
             Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
 
             Notification.success('Venda excluída com sucesso! O estoque foi restaurado.');
-            this.loadReceipts(); // Recarregar a lista de recibos
+            this.loadReceipts(); 
         },
         showReceipt(saleId) {
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
@@ -3033,7 +3041,6 @@
          init() {
             document.getElementById('cashFlowForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveEntry(); });
             document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
-            // CORREÇÃO: Aplicando debounce na busca
             document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce((e) => this.filterEntries(e.target.value), 300));
             document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
         },
@@ -3161,7 +3168,6 @@
         init() {
             document.getElementById('expenseForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveExpense(); });
             document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
-            // CORREÇÃO: Aplicando debounce na busca
             document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.filterExpenses(), 300));
             document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
             document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
@@ -3291,7 +3297,6 @@
         init() {
             document.getElementById('receivableForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveReceivable(); });
             document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
-            // CORREÇÃO: Aplicando debounce na busca
             document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
             document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
             document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
@@ -3419,7 +3424,6 @@
             }
         },
         deleteReceivable(id) {
-            // NOVO: Libera a exclusão de contas de vendas com um aviso mais forte.
             let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
             const receivable = receivables.find(r => r.id === id);
@@ -3434,7 +3438,6 @@
             }
 
             if (canDelete) {
-                // Se a conta estava paga, remove o lançamento do caixa.
                 if (receivable.status === 'Pago') {
                     cashFlow = cashFlow.filter(cf => cf.relatedAccountId !== id);
                     Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
@@ -3501,7 +3504,6 @@
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
            
-            // Listeners para auto-gerar relatório em filtros importantes
             document.getElementById('reportType').addEventListener('change', () => this.generateReport());
             document.getElementById('reportStartDate').addEventListener('input', () => this.generateReport());
             document.getElementById('reportEndDate').addEventListener('input', () => this.generateReport());
@@ -3510,7 +3512,7 @@
         },
         initPage() {
             const endDate = new Date();
-            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); // Primeiro dia do mês
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); 
             document.getElementById('reportStartDate').valueAsDate = startDate;
             document.getElementById('reportEndDate').valueAsDate = endDate;
             this.loadClientFilter();
@@ -3579,9 +3581,8 @@
             const statusFilter = document.getElementById('reportReceivableStatus').value;
             const clientFilter = document.getElementById('reportReceivableClient').value;
 
-            // CORREÇÃO: Filtra pela DATA DE CRIAÇÃO da conta, não pela de vencimento.
             const filteredReceivables = receivables.filter(r => {
-                const creationDate = new Date(r.createdAt); // Usando a data de criação
+                const creationDate = new Date(r.createdAt); 
                 const matchesDate = creationDate >= startDate && creationDate <= endDate;
 
                 let currentStatus = r.status;
@@ -3789,7 +3790,7 @@
                     datasets: [{ label, data, backgroundColor: color, borderColor: color, fill: type === 'line' }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false, // <-- CORREÇÃO PRINCIPAL AQUI
+                    responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#F1F5F9' } } },
                     scales: {
                         y: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
@@ -3812,10 +3813,10 @@
             if (!this.currentReportData || this.currentReportData.rows.length === 0) {
                 return Notification.warning('Gere um relatório primeiro para exportar.');
             }
-
-            // CORREÇÃO: Assegura que jsPDF e autoTable estão disponíveis no escopo global
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            
+            // <-- CORREÇÃO: Chamada mais robusta para a biblioteca jsPDF.
+            const doc = new window.jspdf.jsPDF();
+            
             const { headers, rows } = this.currentReportData;
            
             const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
@@ -3836,10 +3837,9 @@
                 Notification.error("Não foi possível adicionar o gráfico ao PDF.");
             }
 
-            // CORREÇÃO: Limpa os dados para o autoTable
             const bodyData = rows.map(row => 
                 row.map(cell => 
-                    String(cell).replace(/<[^>]*>/g, '').replace(/R\$\s/g, '') // Remove HTML e R$
+                    String(cell).replace(/<[^>]*>/g, '').replace(/R\$\s/g, '')
                 )
             );
 
@@ -3886,7 +3886,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.6', timestamp: new Date().toISOString(),
+                version: '2.7', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -3928,6 +3928,10 @@
                 return Notification.warning('Ação cancelada.');
             }
             Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
+            
+            // <-- CORREÇÃO: Limpa também a última página ativa
+            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
+            
             this.updateBackupStats();
             Navigation.navigateTo('dashboard');
             Notification.success('Todos os dados foram limpos!');
@@ -3953,7 +3957,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.6 iniciado!');
+        console.log('SGI - Flor de Maria v2.7 iniciado!');
     });
     </script>
 </body>
