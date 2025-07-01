@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf-autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         /* ===== RESET E VARIÁVEIS CSS ===== */
@@ -19,18 +19,18 @@
 
         :root {
             /* Paleta de Cores Moderna */
-            --primary-bg: #0F172A;   /* Azul escuro profundo */
-            --secondary-bg: #1E293B;   /* Azul acinzentado */
-            --surface-bg: #334155;   /* Superfície elevada */
-            --primary-color: #3B82F6;  /* Azul vibrante */
-            --accent-color: #10B981;   /* Verde neon */
-            --danger-color: #EF4444;   /* Vermelho */
-            --warning-color: #F59E0B;  /* Amarelo */
-            --text-primary: #FFFFFF;   /* Branco puro */
+            --primary-bg: #0F172A;  /* Azul escuro profundo */
+            --secondary-bg: #1E293B;  /* Azul acinzentado */
+            --surface-bg: #334155;  /* Superfície elevada */
+            --primary-color: #3B82F6; /* Azul vibrante */
+            --accent-color: #10B981;  /* Verde neon */
+            --danger-color: #EF4444;  /* Vermelho */
+            --warning-color: #F59E0B; /* Amarelo */
+            --text-primary: #FFFFFF;  /* Branco puro */
             --text-secondary: #F1F5F9; /* Cinza claro */
-            --text-muted: #94A3B8;   /* Cinza médio */
-            --border-color: #475569;   /* Borda */
-            --hover-bg: #475569;     /* Hover */
+            --text-muted: #94A3B8;  /* Cinza médio */
+            --border-color: #475569;  /* Borda */
+            --hover-bg: #475569;    /* Hover */
             
             /* Gradientes */
             --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -2966,17 +2966,17 @@
         },
         shareOnWhatsApp(saleId) {
              const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-             const sale = sales.find(s => s.id === saleId);
-             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-             const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
+               const sale = sales.find(s => s.id === saleId);
+               const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+               const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
 
             if (!client.phone) {
                 return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
             }
-             const phoneNumber = client.phone.replace(/\D/g, '');
-             const message = this.generateWhatsAppText(sale, client);
-             const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
-             window.open(whatsappUrl, '_blank');
+               const phoneNumber = client.phone.replace(/\D/g, '');
+               const message = this.generateWhatsAppText(sale, client);
+               const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
+               window.open(whatsappUrl, '_blank');
         },
         printReceipt() {
             const printContent = document.getElementById('receiptToPrint').innerHTML;
@@ -3542,8 +3542,8 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                     currentStatus = 'Vencido';
-                }
+                      currentStatus = 'Vencido';
+                 }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
                 let matchesClient = !clientFilter || r.clientId === clientFilter;
@@ -3555,10 +3555,10 @@
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
                  let status = r.status;
-                  const today = new Date();
-                  today.setHours(0,0,0,0);
+                   const today = new Date();
+                   today.setHours(0,0,0,0);
                  if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                      status = 'Vencido';
+                       status = 'Vencido';
                  }
                 return [
                     client ? client.name : 'N/A',
@@ -3576,11 +3576,11 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (r.status === 'Pago') {
-                      statusSummary['Pago'] += r.value;
+                       statusSummary['Pago'] += r.value;
                  } else if (new Date(r.dueDate) < today) {
-                      statusSummary['Vencido'] += r.value;
+                       statusSummary['Vencido'] += r.value;
                  } else {
-                      statusSummary['Pendente'] += r.value;
+                       statusSummary['Pendente'] += r.value;
                  }
             });
             
@@ -3703,10 +3703,10 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                           <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                               <span>${name}</span>
-                               <span style="font-weight: bold;">${value}</span>
-                           </div>`).join('') :
+                             <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                 <span>${name}</span>
+                                 <span style="font-weight: bold;">${value}</span>
+                             </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
@@ -3767,13 +3767,13 @@
         exportToPDF() {
             try {
                 if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-                    throw new Error('A biblioteca jsPDF não está carregada.');
+                    return Notification.error('Biblioteca jsPDF não carregada.');
                 }
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
                 if (typeof doc.autoTable !== 'function') {
-                    throw new Error('O plugin jsPDF-AutoTable não está funcionando.');
+                    return Notification.error('Plugin jsPDF-AutoTable não está funcionando. Recarregue a página.');
                 }
                 
                 if (!this.currentReportData || this.currentReportData.rows.length === 0) {
@@ -3834,8 +3834,6 @@
                 
                 finalY += 5;
 
-                // CORREÇÃO: Remove tags HTML e formatações complexas que podem quebrar o PDF.
-                // A biblioteca autoTable pode lidar com os dados como strings simples.
                 const bodyData = rows.map(row => row.map(cell => String(cell).replace(/<[^>]*>/g, '')));
 
                 doc.autoTable({
