@@ -19,18 +19,18 @@
 
         :root {
             /* Paleta de Cores Moderna */
-            --primary-bg: #0F172A;     /* Azul escuro profundo */
+            --primary-bg: #0F172A;   /* Azul escuro profundo */
             --secondary-bg: #1E293B;   /* Azul acinzentado */
-            --surface-bg: #334155;     /* Superfície elevada */
+            --surface-bg: #334155;   /* Superfície elevada */
             --primary-color: #3B82F6;  /* Azul vibrante */
             --accent-color: #10B981;   /* Verde neon */
             --danger-color: #EF4444;   /* Vermelho */
             --warning-color: #F59E0B;  /* Amarelo */
             --text-primary: #FFFFFF;   /* Branco puro */
             --text-secondary: #F1F5F9; /* Cinza claro */
-            --text-muted: #94A3B8;     /* Cinza médio */
+            --text-muted: #94A3B8;   /* Cinza médio */
             --border-color: #475569;   /* Borda */
-            --hover-bg: #475569;       /* Hover */
+            --hover-bg: #475569;     /* Hover */
             
             /* Gradientes */
             --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -159,6 +159,8 @@
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap; /* NOVO: Garante que os botões quebrem a linha no mobile */
+            gap: 10px; /* NOVO: Espaçamento para o caso de quebra de linha */
         }
 
         .card-title {
@@ -424,6 +426,9 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                font-size: 14px; /* NOVO: Reduz o tamanho da fonte base */
+            }
             .mobile-menu-toggle {
                 display: block;
             }
@@ -439,7 +444,7 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 80px 15px 20px; /* Reduz padding lateral */
+                padding: 70px 15px 20px; /* CORREÇÃO: Reduz padding e aumenta topo */
             }
 
             .login-card {
@@ -455,7 +460,7 @@
             }
             
             .page-title {
-                font-size: 28px; /* Reduz o tamanho da fonte do título */
+                font-size: 24px; /* CORREÇÃO: Reduz o tamanho da fonte do título */
             }
 
             .table-responsive {
@@ -464,7 +469,7 @@
             }
 
             .table {
-                min-width: 600px;
+                min-width: 600px; /* Garante que tabelas complexas tenham rolagem */
             }
 
             .receipt-professional-header, .flex-between {
@@ -489,6 +494,15 @@
                  width: 100%;
                  max-width: none;
              }
+            
+            .btn { /* NOVO: Botões menores em telas pequenas */
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .form-input, .form-select { /* NOVO: Campos de formulário com fonte menor */
+                font-size: 13px;
+            }
         }
 
         /* ===== UTILITÁRIOS ===== */
@@ -1779,7 +1793,7 @@
                              <select id="reportReceivableClient" class="form-select">
                                  <option value="">Todos os Clientes</option>
                              </select>
-                         </div>
+                        </div>
                         
                         <div class="form-group hidden" id="reportStatusFilterContainer">
                             <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
@@ -1987,7 +2001,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.5 (CORRIGIDO) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.6 (CORRIGIDO) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2058,6 +2072,16 @@
                 Notification.error('Erro ao carregar dados. Verifique o console.');
                 return [];
             }
+        },
+        // NOVO: Função de debounce para otimizar campos de busca
+        debounce(func, delay = 300) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
         }
     };
 
@@ -2224,7 +2248,7 @@
                 .reduce((total, s) => total + s.total, 0);
                 
             const monthlyExpenses = cashFlow
-                .filter(cf => cf.type === 'saida' && (cf.relatedExpenseId || (cf.description && cf.description.includes('Despesa:'))))
+                .filter(cf => cf.type === 'saida' && (cf.relatedExpenseId || (cf.description && cf.description.toLowerCase().includes('despesa:'))))
                 .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
                 .reduce((total, cf) => total + cf.value, 0);
 
@@ -2307,7 +2331,8 @@
         init() {
             document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
             document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('clientSearch').addEventListener('input', (e) => this.filterClients(e.target.value));
+            // CORREÇÃO: Aplicando debounce na busca
+            document.getElementById('clientSearch').addEventListener('input', Utils.debounce((e) => this.filterClients(e.target.value), 300));
             document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
         },
         saveClient() {
@@ -2447,7 +2472,8 @@
         init() {
             document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
             document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('productSearch').addEventListener('input', e => this.filterProducts(e.target.value));
+            // CORREÇÃO: Aplicando debounce na busca
+            document.getElementById('productSearch').addEventListener('input', Utils.debounce(e => this.filterProducts(e.target.value), 300));
             document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
         },
         saveProduct() {
@@ -2563,7 +2589,8 @@
         cart: [],
         init() {
             document.getElementById('productSuggestions').addEventListener('click', (e) => this.handleSuggestionClick(e));
-            document.getElementById('productSearchPDV').addEventListener('input', e => this.searchProducts(e.target.value));
+             // CORREÇÃO: Aplicando debounce na busca de produtos no PDV
+            document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(e => this.searchProducts(e.target.value), 300));
             document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
             document.getElementById('finalizeSale').addEventListener('click', () => this.finalizeSale());
             document.getElementById('salePaymentMethod').addEventListener('change', () => this.updatePaymentOptions());
@@ -2586,7 +2613,7 @@
 
             if (paymentMethod === 'Crediário' || paymentMethod === 'Cartão de Crédito') {
                 installmentsGroup.classList.remove('hidden');
-                installmentsInput.max = (paymentMethod === 'Crediário') ? 3 : 12;
+                installmentsInput.max = (paymentMethod === 'Crediário') ? 12 : 12; // Aumentado o limite do crediário
             } else {
                 installmentsGroup.classList.add('hidden');
             }
@@ -2798,7 +2825,7 @@
                 }
             }
              if (dateFilter) {
-                 sales = sales.filter(s => s.date.startsWith(dateFilter));
+                  sales = sales.filter(s => s.date.startsWith(dateFilter));
             }
 
             const tbody = document.getElementById('receiptsTableBody');
@@ -2816,13 +2843,62 @@
                         <td>${client ? client.name : 'Consumidor Final'}</td>
                         <td>${Utils.formatCurrency(sale.total)}</td>
                         <td>
-                            <button class="btn btn-primary btn-sm" onclick="Receipts.showReceipt('${sale.id}')">
-                                <i class="fas fa-eye"></i> Visualizar Recibo
-                            </button>
+                           <div class="flex gap-1">
+                                <button class="btn btn-primary btn-sm" onclick="Receipts.showReceipt('${sale.id}')" title="Visualizar">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="Receipts.deleteReceipt('${sale.id}')" title="Excluir Venda">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                           </div>
                         </td>
                     </tr>
                 `;
             }).join('');
+        },
+        // NOVO: Função para excluir a venda e todas as suas dependências
+        deleteReceipt(saleId) {
+            const confirmation = confirm('ATENÇÃO!\n\nDeseja excluir esta venda permanentemente?\n\nEsta ação irá:\n- Excluir a venda e seu recibo.\n- Remover o lançamento do caixa (se houver).\n- Excluir todas as parcelas em "Contas a Receber".\n- Devolver os produtos ao estoque.\n\nEsta ação não pode ser desfeita.');
+
+            if (!confirmation) {
+                return Notification.warning('Exclusão cancelada.');
+            }
+
+            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            let products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+
+            const saleToDelete = sales.find(s => s.id === saleId);
+            if (!saleToDelete) {
+                return Notification.error('Venda não encontrada.');
+            }
+
+            // 1. Restaurar estoque
+            saleToDelete.products.forEach(item => {
+                const productIndex = products.findIndex(p => p.id === item.productId);
+                if (productIndex > -1) {
+                    products[productIndex].quantity += item.quantity;
+                }
+            });
+
+            // 2. Remover do caixa, se aplicável
+            cashFlow = cashFlow.filter(cf => cf.relatedSaleId !== saleId);
+
+            // 3. Remover de contas a receber, se aplicável
+            receivables = receivables.filter(r => r.saleId !== saleId);
+
+            // 4. Remover a venda
+            sales = sales.filter(s => s.id !== saleId);
+
+            // Salvar tudo
+            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
+
+            Notification.success('Venda excluída com sucesso! O estoque foi restaurado.');
+            this.loadReceipts(); // Recarregar a lista de recibos
         },
         showReceipt(saleId) {
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
@@ -2949,7 +3025,8 @@
          init() {
             document.getElementById('cashFlowForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveEntry(); });
             document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('cashFlowSearch').addEventListener('input', (e) => this.filterEntries(e.target.value));
+            // CORREÇÃO: Aplicando debounce na busca
+            document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce((e) => this.filterEntries(e.target.value), 300));
             document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
         },
          saveEntry() {
@@ -3076,7 +3153,8 @@
         init() {
             document.getElementById('expenseForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveExpense(); });
             document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('expenseSearch').addEventListener('input', () => this.filterExpenses());
+            // CORREÇÃO: Aplicando debounce na busca
+            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.filterExpenses(), 300));
             document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
             document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
         },
@@ -3205,7 +3283,8 @@
         init() {
             document.getElementById('receivableForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveReceivable(); });
             document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('receivableSearch').addEventListener('input', () => this.filterReceivables());
+            // CORREÇÃO: Aplicando debounce na busca
+            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
             document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
             document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
         },
@@ -3253,7 +3332,7 @@
         updateSummary(receivables) {
             const today = new Date();
             today.setHours(0,0,0,0);
-            const pending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+            const pending = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) >= today).reduce((sum, r) => sum + r.value, 0);
             const overdue = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) < today).reduce((sum, r) => sum + r.value, 0);
             const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
 
@@ -3271,7 +3350,9 @@
             const sorted = [...receivables].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             tbody.innerHTML = sorted.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
-                const isOverdue = r.status === 'Pendente' && new Date(r.dueDate) < new Date();
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const isOverdue = r.status === 'Pendente' && new Date(r.dueDate) < today;
                 let statusBadge;
                 if (r.status === 'Pago') statusBadge = '<span class="badge badge-success">Pago</span>';
                 else if (isOverdue) statusBadge = '<span class="badge badge-danger">Vencido</span>';
@@ -3286,8 +3367,8 @@
                         <td>${statusBadge}</td>
                         <td>
                             <div class="flex gap-1">
-                                ${r.status === 'Pendente' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
-                                ${!r.saleId ? `<button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${r.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
+                                ${r.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
+                                ${!r.saleId && r.status !== 'Pago' ? `<button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${r.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
                                 <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${r.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
@@ -3330,15 +3411,33 @@
             }
         },
         deleteReceivable(id) {
-            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
-            if(receivable.saleId) {
-                return Notification.error('Contas de vendas não podem ser excluídas. Cancele a venda se necessário.');
+            // NOVO: Libera a exclusão de contas de vendas com um aviso mais forte.
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const receivable = receivables.find(r => r.id === id);
+
+            if (!receivable) return Notification.error("Conta não encontrada.");
+
+            let canDelete = false;
+            if (receivable.saleId) {
+                canDelete = confirm('ATENÇÃO: Esta conta faz parte de uma venda. Excluí-la pode gerar inconsistências nos relatórios. Deseja mesmo excluir?');
+            } else {
+                canDelete = confirm('Tem certeza que deseja excluir esta conta?');
             }
-            if (confirm('Excluir esta conta?')) {
-                const filtered = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, filtered);
+
+            if (canDelete) {
+                // Se a conta estava paga, remove o lançamento do caixa.
+                if (receivable.status === 'Pago') {
+                    cashFlow = cashFlow.filter(cf => cf.relatedAccountId !== id);
+                    Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                }
+
+                receivables = receivables.filter(r => r.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
                 this.loadReceivables();
                 Notification.success('Conta excluída!');
+            } else {
+                 Notification.warning('Exclusão cancelada.');
             }
         },
         clearForm() {
@@ -3356,14 +3455,15 @@
                 const clientName = client ? client.name.toLowerCase() : '';
                 const matchesSearch = r.description.toLowerCase().includes(searchTerm) || clientName.includes(searchTerm);
                 
-                let matchesStatus = true;
-                if(status) {
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
-                    if (status === 'Vencido') matchesStatus = r.status === 'Pendente' && new Date(r.dueDate) < today;
-                    else if (status === 'Pendente') matchesStatus = r.status === 'Pendente' && new Date(r.dueDate) >= today;
-                    else matchesStatus = r.status === status;
+                let currentStatus = r.status;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
+                    currentStatus = 'Vencido';
                 }
+
+                const matchesStatus = !status || currentStatus === status;
+
                 return matchesSearch && matchesStatus;
             });
             this.displayReceivables(filtered);
@@ -3392,8 +3492,11 @@
             document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
-            // Listeners para auto-gerar relatório
+            
+            // Listeners para auto-gerar relatório em filtros importantes
             document.getElementById('reportType').addEventListener('change', () => this.generateReport());
+            document.getElementById('reportStartDate').addEventListener('input', () => this.generateReport());
+            document.getElementById('reportEndDate').addEventListener('input', () => this.generateReport());
             document.getElementById('reportReceivableStatus').addEventListener('change', () => this.generateReport());
             document.getElementById('reportReceivableClient').addEventListener('change', () => this.generateReport());
         },
@@ -3431,7 +3534,6 @@
 
             if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
             
-            // CORREÇÃO: Interpreta a data no timezone local, evitando bugs com UTC
             const startDate = new Date(startDateStr + 'T00:00:00');
             const endDate = new Date(endDateStr + 'T23:59:59');
             
@@ -3467,21 +3569,22 @@
         generateReceivablesReport(startDate, endDate, clients) {
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             const statusFilter = document.getElementById('reportReceivableStatus').value;
-            const clientFilter = document.getElementById('reportReceivableClient').value; // NOVO
+            const clientFilter = document.getElementById('reportReceivableClient').value;
 
+            // CORREÇÃO: Filtra pela DATA DE CRIAÇÃO da conta, não pela de vencimento.
             const filteredReceivables = receivables.filter(r => {
-                const dueDate = new Date(r.dueDate);
-                const matchesDate = dueDate >= startDate && dueDate <= endDate;
+                const creationDate = new Date(r.createdAt); // Usando a data de criação
+                const matchesDate = creationDate >= startDate && creationDate <= endDate;
 
-                let currentStatus = 'Pendente';
-                if (r.status === 'Pago') {
-                    currentStatus = 'Pago';
-                } else if (new Date(r.dueDate) < new Date() && r.status !== 'Pago') {
+                let currentStatus = r.status;
+                 const today = new Date();
+                 today.setHours(0,0,0,0);
+                 if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
                     currentStatus = 'Vencido';
                 }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
-                let matchesClient = !clientFilter || r.clientId === clientFilter; // NOVO
+                let matchesClient = !clientFilter || r.clientId === clientFilter;
 
                 return matchesDate && matchesStatus && matchesClient;
             });
@@ -3489,12 +3592,12 @@
             const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
-                let status = r.status;
-                 const today = new Date();
-                 today.setHours(0,0,0,0);
-                if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                    status = 'Vencido';
-                }
+                 let status = r.status;
+                  const today = new Date();
+                  today.setHours(0,0,0,0);
+                 if (status === 'Pendente' && new Date(r.dueDate) < today) {
+                     status = 'Vencido';
+                 }
                 return [
                     client ? client.name : 'N/A',
                     r.description,
@@ -3506,23 +3609,23 @@
             this.updateReportTable(headers, rows);
             this.currentReportData = { headers, rows };
 
-            const statusSummary = { 'Pagas': 0, 'Pendentes': 0, 'Vencidas': 0 };
+            const statusSummary = { 'Pago': 0, 'Pendente': 0, 'Vencido': 0 };
             filteredReceivables.forEach(r => {
                  const today = new Date();
                  today.setHours(0,0,0,0);
-                if (r.status === 'Pago') {
-                    statusSummary['Pagas'] += r.value;
-                } else if (new Date(r.dueDate) < today) {
-                    statusSummary['Vencidas'] += r.value;
-                } else {
-                    statusSummary['Pendentes'] += r.value;
-                }
+                 if (r.status === 'Pago') {
+                     statusSummary['Pago'] += r.value;
+                 } else if (new Date(r.dueDate) < today) {
+                     statusSummary['Vencido'] += r.value;
+                 } else {
+                     statusSummary['Pendente'] += r.value;
+                 }
             });
             
             this.renderChart('pie', 
                 ['Pagas', 'Pendentes', 'Vencidas'], 
                 'Valor (R$)', 
-                [statusSummary.Pagas, statusSummary.Pendentes, statusSummary.Vencidas],
+                [statusSummary.Pago, statusSummary.Pendente, statusSummary.Vencido],
                 ['#10B981', '#F59E0B', '#EF4444']
             );
             
@@ -3638,10 +3741,10 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                       <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                           <span>${name}</span>
-                           <span style="font-weight: bold;">${value}</span>
-                       </div>`).join('') :
+                        <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <span>${name}</span>
+                            <span style="font-weight: bold;">${value}</span>
+                        </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
@@ -3702,7 +3805,7 @@
                 return Notification.warning('Gere um relatório primeiro para exportar.');
             }
 
-            // CORREÇÃO: Acessar jsPDF e autoTable da maneira correta
+            // CORREÇÃO: Assegura que jsPDF e autoTable estão disponíveis no escopo global
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const { headers, rows } = this.currentReportData;
@@ -3716,15 +3819,26 @@
             doc.setFontSize(11);
             doc.text(`Período: ${startDate} a ${endDate}`, 14, 30);
 
-            const chartCanvas = document.getElementById('reportChart');
-            const chartImage = chartCanvas.toDataURL('image/png', 1.0);
-            doc.addImage(chartImage, 'PNG', 14, 40, 180, 90);
+            try {
+                const chartCanvas = document.getElementById('reportChart');
+                const chartImage = chartCanvas.toDataURL('image/png', 1.0);
+                doc.addImage(chartImage, 'PNG', 14, 40, 180, 90);
+            } catch(e) {
+                console.error("Erro ao adicionar gráfico ao PDF:", e);
+                Notification.error("Não foi possível adicionar o gráfico ao PDF.");
+            }
 
-            // CORREÇÃO: Chamar doc.autoTable()
+            // CORREÇÃO: Limpa os dados para o autoTable
+            const bodyData = rows.map(row => 
+                row.map(cell => 
+                    String(cell).replace(/<[^>]*>/g, '').replace(/R\$\s/g, '') // Remove HTML e R$
+                )
+            );
+
             doc.autoTable({
                 head: [headers],
-                body: rows.map(row => row.map(cell => String(cell).replace(/R\$\s/g, ''))), // Remove R$ para PDF
-                startY: 140,
+                body: bodyData, 
+                startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 140,
                 theme: 'grid',
                 headStyles: { fillColor: [59, 130, 246] }
             });
@@ -3740,7 +3854,7 @@
             const { headers, rows } = this.currentReportData;
             const csvContent = [
                 headers.join(','),
-                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""').replace(/<[^>]*>/g, '')}"`).join(','))
             ].join('\n');
             Clients.downloadCSV(csvContent, `relatorio_${this.currentReportType}`);
         }
@@ -3764,7 +3878,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.5', timestamp: new Date().toISOString(),
+                version: '2.6', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -3831,7 +3945,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.5 iniciado!');
+        console.log('SGI - Flor de Maria v2.6 iniciado!');
     });
     </script>
 </body>
