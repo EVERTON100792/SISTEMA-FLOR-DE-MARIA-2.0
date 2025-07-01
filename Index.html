@@ -159,8 +159,8 @@
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap; /* NOVO: Garante que os botões quebrem a linha no mobile */
-            gap: 10px; /* NOVO: Espaçamento para o caso de quebra de linha */
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .card-title {
@@ -427,7 +427,7 @@
 
         @media (max-width: 768px) {
             body {
-                font-size: 14px; /* NOVO: Reduz o tamanho da fonte base */
+                font-size: 14px;
             }
             .mobile-menu-toggle {
                 display: block;
@@ -439,12 +439,12 @@
 
             .sidebar.active {
                 transform: translateX(0);
-                box-shadow: var(--shadow-xl); /* Adiciona sombra quando aberto */
+                box-shadow: var(--shadow-xl);
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 70px 15px 20px; /* CORREÇÃO: Reduz padding e aumenta topo */
+                padding: 70px 15px 20px;
             }
 
             .login-card {
@@ -452,7 +452,7 @@
             }
 
             .card {
-                padding: 16px; /* Reduz padding do card */
+                padding: 16px;
             }
            
             .grid-2, .grid-3, .grid-4, .stats-grid {
@@ -460,16 +460,16 @@
             }
            
             .page-title {
-                font-size: 24px; /* CORREÇÃO: Reduz o tamanho da fonte do título */
+                font-size: 24px;
             }
 
             .table-responsive {
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+                -webkit-overflow-scrolling: touch;
             }
 
             .table {
-                min-width: 600px; /* Garante que tabelas complexas tenham rolagem */
+                min-width: 600px;
             }
 
             .receipt-professional-header, .flex-between {
@@ -495,19 +495,18 @@
                 max-width: none;
             }
            
-            .btn { /* NOVO: Botões menores em telas pequenas */
+            .btn {
                 padding: 10px 18px;
                 font-size: 13px;
             }
 
-            .form-input, .form-select { /* NOVO: Campos de formulário com fonte menor */
+            .form-input, .form-select {
                 font-size: 13px;
             }
 
-            /* ===== CORREÇÃO DO GRÁFICO ===== */
             .chart-container {
                 position: relative;
-                max-height: 350px; /* Define uma altura máxima para o gráfico */
+                max-height: 350px;
                 width: 100%;
             }
         }
@@ -737,8 +736,8 @@
         /* ===== NOVO ESTILO DE RECIBO PROFISSIONAL ===== */
         .receipt-professional-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa; /* Fundo branco levemente acinzentado */
-            color: #212529; /* Cor de texto escura */
+            background-color: #f8f9fa;
+            color: #212529;
             padding: 2rem;
             border-radius: 8px;
             border: 1px solid #dee2e6;
@@ -986,7 +985,9 @@
                                 Vendas por Método de Pagamento (Mês Atual)
                             </h3>
                         </div>
-                        <canvas id="paymentMethodChart" width="400" height="200"></canvas>
+                        <div class="chart-container">
+                            <canvas id="paymentMethodChart"></canvas>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -1085,13 +1086,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="clientsTableBody">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Nenhum cliente cadastrado
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="clientsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1205,13 +1200,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="productsTableBody">
-                                <tr>
-                                    <td colspan="8" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Nenhum produto cadastrado
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="productsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1298,13 +1287,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="cartTableBody">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Carrinho vazio
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="cartTableBody"></tbody>
                         </table>
                     </div>
                    
@@ -1367,8 +1350,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="receiptsTableBody">
-                            </tbody>
+                            <tbody id="receiptsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1480,13 +1462,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="cashFlowTableBody">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Nenhum lançamento encontrado
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="cashFlowTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1621,13 +1597,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="expensesTableBody">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Nenhuma despesa encontrada
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="expensesTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1747,13 +1717,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="receivablesTableBody">
-                                <tr>
-                                    <td colspan="6" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Nenhuma conta encontrada
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="receivablesTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1901,16 +1865,8 @@
                    
                     <div class="table-responsive">
                         <table class="table" id="reportDetailTable">
-                            <thead id="reportTableHead">
-                                <tr></tr>
-                            </thead>
-                            <tbody id="reportTableBody">
-                                <tr>
-                                    <td colspan="4" class="text-center" style="color: var(--text-muted); padding: 40px;">
-                                        Gere um relatório para visualizar os dados.
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <thead id="reportTableHead"></thead>
+                            <tbody id="reportTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -2011,13 +1967,12 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.7 (CORRIGIDO) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.8 (FINAL) =====
    
     // Configurações globais
     const CONFIG = {
         users: { username: 'maria', password: 'flor123' },
         storageKeys: {
-            // <-- CORREÇÃO: Adicionada chave para a última página ativa
             lastActivePage: 'sgi_last_active_page', 
             clients: 'sgi_clients',
             products: 'sgi_products',
@@ -2026,7 +1981,7 @@
             expenses: 'sgi_expenses',
             accountsReceivable: 'sgi_accounts_receivable'
         },
-        company: { // Informações da empresa para o recibo
+        company: { 
             name: 'Flor de Maria',
             address: 'Rua das Flores, 123 - Centro',
             phone: '(11) 98765-4321',
@@ -2159,12 +2114,17 @@
             mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
 
             document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
                     sidebar.classList.remove('active');
                 }
             });
         },
         navigateTo(page) {
+            if (!document.getElementById(`${page}Page`)) {
+                console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
+                page = 'dashboard';
+            }
+            
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`${page}Page`).classList.remove('hidden');
 
@@ -2175,7 +2135,6 @@
                 document.getElementById('sidebar').classList.remove('active');
             }
             
-            // <-- CORREÇÃO: Salva a página atual no localStorage para lembrar após recarregar
             localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
             
             this.loadPageData(page);
@@ -2222,7 +2181,6 @@
         },
         logout() {
             localStorage.removeItem('sgi_logged_in');
-            // <-- CORREÇÃO: Remove a página salva ao fazer logout, para o próximo login começar no dashboard
             localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
             this.showLogin();
             Notification.success('Logout realizado com sucesso!');
@@ -2238,7 +2196,6 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appLayout').classList.remove('hidden');
             
-            // <-- CORREÇÃO: Carrega a última página visitada ou o dashboard como padrão
             const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
             Navigation.navigateTo(lastPage || 'dashboard');
         }
@@ -2268,7 +2225,7 @@
                 .reduce((total, s) => total + s.total, 0);
                
             const monthlyExpenses = cashFlow
-                .filter(cf => cf.type === 'saida' && (cf.relatedExpenseId || (cf.description && cf.description.toLowerCase().includes('despesa:'))))
+                .filter(cf => cf.type === 'saida')
                 .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
                 .reduce((total, cf) => total + cf.value, 0);
 
@@ -2304,6 +2261,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#F1F5F9' } } },
                     scales: {
                         y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
@@ -2316,7 +2274,7 @@
             const accountsReceivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Comparar apenas a data
+            today.setHours(0, 0, 0, 0);
            
             const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
 
@@ -2437,7 +2395,7 @@
         loadClients() {
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             this.renderClients(clients);
-            document.getElementById('clientCount').textContent = `${clients.length} clientes cadastrados`;
+            document.getElementById('clientCount').textContent = `${clients.length} clientes`;
         },
         renderClients(clients) {
             const tbody = document.getElementById('clientsTableBody');
@@ -2446,7 +2404,7 @@
                 return;
             }
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            tbody.innerHTML = clients.map(client => {
+            tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
                 const purchaseCount = sales.filter(s => s.clientId === client.id).length;
                 return `
                     <tr>
@@ -2481,7 +2439,7 @@
             link.href = URL.createObjectURL(blob);
             link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
-            Notification.success('Relatório exportado!');
+            Notification.success('Relatório CSV exportado!');
         }
     };
    
@@ -2505,7 +2463,7 @@
             if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return;
 
             const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            if (!this.currentEditId && products.some(p => p.refCode === refCode)) {
+            if (!this.currentEditId && products.some(p => p.refCode.toLowerCase() === refCode.toLowerCase())) {
                 return Notification.error('Código de referência já existe!');
             }
 
@@ -2567,9 +2525,9 @@
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`;
                 return;
             }
-            tbody.innerHTML = products.map(product => {
+            tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
                 const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
-                const statusClass = product.quantity > 0 ? 'badge-success' : 'badge-danger';
+                const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
                 const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
                 return `
                     <tr>
@@ -2621,7 +2579,7 @@
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             const select = document.getElementById('saleClient');
             select.innerHTML = '<option value="">1 - Consumidor Final</option>';
-            clients.forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
         },
         updatePaymentOptions() {
             const paymentMethod = document.getElementById('salePaymentMethod').value;
@@ -2630,7 +2588,7 @@
 
             if (paymentMethod === 'Crediário' || paymentMethod === 'Cartão de Crédito') {
                 installmentsGroup.classList.remove('hidden');
-                installmentsInput.max = (paymentMethod === 'Crediário') ? 12 : 12; // Aumentado o limite do crediário
+                installmentsInput.max = (paymentMethod === 'Crediário') ? 12 : 12;
             } else {
                 installmentsGroup.classList.add('hidden');
             }
@@ -2646,11 +2604,12 @@
             const filtered = products.filter(p => (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.refCode.toLowerCase().includes(searchTerm.toLowerCase())) && p.quantity > 0);
            
             if (filtered.length === 0) {
-                suggestions.classList.add('hidden');
+                suggestions.innerHTML = `<div class="suggestion-item" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum produto encontrado</div>`;
+                suggestions.classList.remove('hidden');
                 return;
             }
            
-            suggestions.innerHTML = filtered.map(p => `
+            suggestions.innerHTML = filtered.slice(0, 10).map(p => `
                 <div class="suggestion-item" data-product-id="${p.id}" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                     <div style="font-weight: 500; pointer-events: none;">${p.name}</div>
                     <small style="color: var(--text-muted); pointer-events: none;">Cód: ${p.refCode} | Estoque: ${p.quantity} | Preço: ${Utils.formatCurrency(p.salePrice)}</small>
@@ -2807,7 +2766,8 @@
             document.getElementById('saleClient').value = '';
         }
     };
-     // Módulo de Recibos
+
+    // Módulo de Recibos
     const Receipts = {
         init() {
             document.getElementById('receiptClientFilter').addEventListener('change', () => this.filterReceipts());
@@ -2821,7 +2781,7 @@
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             const select = document.getElementById('receiptClientFilter');
             select.innerHTML = '<option value="">Todos os Clientes</option><option value="guest">Consumidor Final</option>';
-            clients.forEach(c => {
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
                 select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
             });
         },
@@ -2847,7 +2807,7 @@
 
             const tbody = document.getElementById('receiptsTableBody');
             if (sales.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum recibo encontrado para os filtros selecionados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum recibo encontrado.</td></tr>`;
                 return;
             }
 
@@ -2890,7 +2850,6 @@
                 return Notification.error('Venda não encontrada.');
             }
 
-            // 1. Restaurar estoque
             saleToDelete.products.forEach(item => {
                 const productIndex = products.findIndex(p => p.id === item.productId);
                 if (productIndex > -1) {
@@ -2898,16 +2857,10 @@
                 }
             });
 
-            // 2. Remover do caixa, se aplicável
             cashFlow = cashFlow.filter(cf => cf.relatedSaleId !== saleId);
-
-            // 3. Remover de contas a receber, se aplicável
             receivables = receivables.filter(r => r.saleId !== saleId);
-
-            // 4. Remover a venda
             sales = sales.filter(s => s.id !== saleId);
 
-            // Salvar tudo
             Utils.saveToStorage(CONFIG.storageKeys.products, products);
             Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
             Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
@@ -3020,7 +2973,7 @@
             if (!client.phone) {
                 return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
             }
-             const phoneNumber = client.phone.replace(/\D/g, ''); // Remove non-digits
+             const phoneNumber = client.phone.replace(/\D/g, '');
              const message = this.generateWhatsAppText(sale, client);
              const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
              window.open(whatsappUrl, '_blank');
@@ -3305,7 +3258,7 @@
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             const select = document.getElementById('receivableClient');
             select.innerHTML = '<option value="">Selecione um cliente</option>';
-            clients.forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
         },
         saveReceivable() {
             const clientId = document.getElementById('receivableClient').value;
@@ -3413,7 +3366,7 @@
         },
         editReceivable(id) {
             const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
-            if (receivable && !receivable.saleId) { // Só permite editar manuais
+            if (receivable && !receivable.saleId) {
                 document.getElementById('receivableClient').value = receivable.clientId;
                 document.getElementById('receivableDescription').value = receivable.description;
                 document.getElementById('receivableValue').value = receivable.value;
@@ -3493,7 +3446,7 @@
         }
     };
    
-    // Módulo Relatórios
+    // Módulo Relatórios (VERSÃO PROFISSIONAL PDF)
     const Reports = {
         chart: null,
         currentReportData: [],
@@ -3522,7 +3475,7 @@
              const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
              const select = document.getElementById('reportReceivableClient');
              select.innerHTML = '<option value="">Todos os Clientes</option>';
-             clients.forEach(c => {
+             clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
                  select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
              });
         },
@@ -3582,7 +3535,7 @@
             const clientFilter = document.getElementById('reportReceivableClient').value;
 
             const filteredReceivables = receivables.filter(r => {
-                const creationDate = new Date(r.createdAt); 
+                const creationDate = new Date(r.createdAt || r.date); 
                 const matchesDate = creationDate >= startDate && creationDate <= endDate;
 
                 let currentStatus = r.status;
@@ -3800,8 +3753,10 @@
             });
         },
         updateReportTable(headers, rows) {
-            document.getElementById('reportTableHead').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            const thead = document.getElementById('reportTableHead');
             const tbody = document.getElementById('reportTableBody');
+            
+            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
             if (rows.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado</td></tr>`;
                 return;
@@ -3810,49 +3765,106 @@
         },
        
         exportToPDF() {
-            if (!this.currentReportData || this.currentReportData.rows.length === 0) {
-                return Notification.warning('Gere um relatório primeiro para exportar.');
-            }
-            
-            // <-- CORREÇÃO: Chamada mais robusta para a biblioteca jsPDF.
-            const doc = new window.jspdf.jsPDF();
-            
-            const { headers, rows } = this.currentReportData;
-           
-            const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
-            const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
-            const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
-
-            doc.setFontSize(18);
-            doc.text(`Relatório de ${reportType}`, 14, 22);
-            doc.setFontSize(11);
-            doc.text(`Período: ${startDate} a ${endDate}`, 14, 30);
-
             try {
-                const chartCanvas = document.getElementById('reportChart');
-                const chartImage = chartCanvas.toDataURL('image/png', 1.0);
-                doc.addImage(chartImage, 'PNG', 14, 40, 180, 90);
-            } catch(e) {
-                console.error("Erro ao adicionar gráfico ao PDF:", e);
-                Notification.error("Não foi possível adicionar o gráfico ao PDF.");
+                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+                    throw new Error('A biblioteca jsPDF não está carregada.');
+                }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+                if (typeof doc.autoTable !== 'function') {
+                    throw new Error('O plugin jsPDF-AutoTable não está funcionando.');
+                }
+                
+                if (!this.currentReportData || this.currentReportData.rows.length === 0) {
+                    return Notification.warning('Gere um relatório com dados para poder exportar.');
+                }
+                
+                const { headers, rows } = this.currentReportData;
+                const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
+                const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
+                const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const margin = 15;
+                let finalY = margin;
+
+                const drawFooter = () => {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+                        doc.text(`Gerado em: ${Utils.formatDateTime(new Date())}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+                    }
+                };
+                
+                doc.setFontSize(18);
+                doc.setFont('helvetica', 'bold');
+                doc.text(CONFIG.company.name, margin, finalY);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100);
+                doc.text(`Relatório de ${reportType}`, margin, finalY + 8);
+                doc.text(`Período: ${startDate} a ${endDate}`, margin, finalY + 14);
+
+                finalY += 25;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Resumo do Período', margin, finalY);
+                doc.setLineWidth(0.2);
+                doc.line(margin, finalY + 1, pageWidth - margin, finalY + 1);
+                finalY += 8;
+                
+                doc.setFont('helvetica', 'normal');
+                const summary = [
+                    ['Total de Vendas:', document.getElementById('reportTotalSales').textContent],
+                    ['Total de Despesas:', document.getElementById('reportTotalExpenses').textContent],
+                    ['Lucro Líquido:', document.getElementById('reportProfit').textContent],
+                    ['Nº de Vendas:', document.getElementById('reportSalesCount').textContent + ' venda(s)']
+                ];
+
+                summary.forEach(item => {
+                    doc.text(item[0], margin, finalY);
+                    doc.text(item[1], pageWidth / 2, finalY, { align: 'left' });
+                    finalY += 6;
+                });
+                
+                finalY += 5;
+
+                const bodyData = rows.map(row => row.map(cell => String(cell).replace(/R\$\s/g, '').replace(/,/g, '.')));
+
+                doc.autoTable({
+                    head: [headers],
+                    body: bodyData,
+                    startY: finalY,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [59, 130, 246],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 245, 245]
+                    },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2.5
+                    },
+                    margin: { left: margin, right: margin },
+                });
+                
+                drawFooter();
+
+                doc.save(`relatorio_${this.currentReportType}_${new Date().toISOString().split('T')[0]}.pdf`);
+                Notification.success('Relatório PDF gerado com sucesso!');
+
+            } catch (error) {
+                console.error("ERRO AO GERAR PDF:", error);
+                Notification.error(`Falha ao gerar o PDF: ${error.message}`);
             }
-
-            const bodyData = rows.map(row => 
-                row.map(cell => 
-                    String(cell).replace(/<[^>]*>/g, '').replace(/R\$\s/g, '')
-                )
-            );
-
-            doc.autoTable({
-                head: [headers],
-                body: bodyData, 
-                startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 140,
-                theme: 'grid',
-                headStyles: { fillColor: [59, 130, 246] }
-            });
-
-            doc.save(`relatorio_${this.currentReportType}_${new Date().toISOString().split('T')[0]}.pdf`);
-            Notification.success('Relatório PDF gerado com sucesso!');
         },
 
         exportToCSV() {
@@ -3886,11 +3898,13 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.7', timestamp: new Date().toISOString(),
+                version: '2.8', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
-                backupData.data[key] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
+                if (key !== 'lastActivePage') { // Não precisa salvar a última página no backup geral
+                    backupData.data[key] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
+                }
             }
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const link = document.createElement('a');
@@ -3909,8 +3923,8 @@
                 try {
                     const backupData = JSON.parse(e.target.result);
                     if (!backupData.data) throw new Error('Formato inválido.');
-                    for (const key in CONFIG.storageKeys) {
-                        if (backupData.data[key]) {
+                    for (const key in backupData.data) {
+                        if (CONFIG.storageKeys[key]) {
                             Utils.saveToStorage(CONFIG.storageKeys[key], backupData.data[key]);
                         }
                     }
@@ -3928,9 +3942,6 @@
                 return Notification.warning('Ação cancelada.');
             }
             Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
-            
-            // <-- CORREÇÃO: Limpa também a última página ativa
-            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
             
             this.updateBackupStats();
             Navigation.navigateTo('dashboard');
@@ -3957,7 +3968,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.7 iniciado!');
+        console.log('SGI - Flor de Maria v2.8 iniciado!');
     });
     </script>
 </body>
