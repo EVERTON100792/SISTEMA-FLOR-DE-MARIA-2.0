@@ -2042,7 +2042,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9 (Mobile Fix) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.1 (PDF Report Fix) =====
     
     // Configurações globais
     const CONFIG = {
@@ -3549,7 +3549,7 @@
     // Módulo Relatórios (VERSÃO PROFISSIONAL PDF)
     const Reports = {
         chart: null,
-        currentReportData: [],
+        currentReportData: { headers: [], rows: [], rawData: [] }, // Inicializado corretamente
         currentReportType: '',
 
         init() {
@@ -3642,7 +3642,7 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                      currentStatus = 'Vencido';
+                       currentStatus = 'Vencido';
                  }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
@@ -3655,10 +3655,10 @@
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
                  let status = r.status;
-                      const today = new Date();
-                      today.setHours(0,0,0,0);
+                       const today = new Date();
+                       today.setHours(0,0,0,0);
                  if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                        status = 'Vencido';
+                         status = 'Vencido';
                  }
                 return [
                     client ? client.name : 'N/A',
@@ -3669,18 +3669,18 @@
                 ];
             });
             this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows };
+            this.currentReportData = { headers, rows, rawData: filteredReceivables };
 
             const statusSummary = { 'Pago': 0, 'Pendente': 0, 'Vencido': 0 };
             filteredReceivables.forEach(r => {
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (r.status === 'Pago') {
-                         statusSummary['Pago'] += r.value;
+                       statusSummary['Pago'] += r.value;
                  } else if (new Date(r.dueDate) < today) {
-                         statusSummary['Vencido'] += r.value;
+                       statusSummary['Vencido'] += r.value;
                  } else {
-                         statusSummary['Pendente'] += r.value;
+                       statusSummary['Pendente'] += r.value;
                  }
             });
             
@@ -3717,7 +3717,7 @@
                 return [Utils.formatDate(s.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(s.total), s.paymentMethod];
             });
             this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows };
+            this.currentReportData = { headers, rows, rawData: sales };
             this.updateTopList(sales, 'products');
             this.createSalesChart(sales, startDate, endDate);
             Notification.success('Relatório de vendas gerado!');
@@ -3731,7 +3731,7 @@
             const headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
             const rows = data.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
             this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows };
+            this.currentReportData = { headers, rows, rawData: data };
             
             document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">N/A para este relatório.</p>';
 
@@ -3757,7 +3757,7 @@
             const headers = ['Produto', 'Qtd. Vendida', 'Receita Total'];
             const rows = sortedProducts.map(p => [p.name, p.quantity, Utils.formatCurrency(p.revenue)]);
             this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows };
+            this.currentReportData = { headers, rows, rawData: sortedProducts };
 
             this.updateTopList(sales, 'products');
             this.createProductChart(sortedProducts.slice(0, 10));
@@ -3779,7 +3779,7 @@
             const headers = ['Cliente', 'Nº de Compras', 'Total Gasto'];
             const rows = sortedClients.map(c => [c.name, c.purchases, Utils.formatCurrency(c.total)]);
             this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows };
+            this.currentReportData = { headers, rows, rawData: sortedClients };
 
             this.updateTopList(sales, 'clients', clients);
             this.createClientChart(sortedClients.slice(0, 10));
@@ -3926,6 +3926,22 @@
                     ['Nº de Vendas:', document.getElementById('reportSalesCount').textContent + ' venda(s)']
                 ];
 
+                // AJUSTE PARA TOTAL PENDENTE DO CLIENTE
+                if (this.currentReportType === 'contas_a_receber') {
+                    const clientId = document.getElementById('reportReceivableClient').value;
+                    if (clientId && this.currentReportData.rawData) {
+                        const clientName = document.getElementById('reportReceivableClient').options[document.getElementById('reportReceivableClient').selectedIndex].text;
+                        
+                        const clientTotalPending = this.currentReportData.rawData
+                            .filter(r => r.status !== 'Pago')
+                            .reduce((sum, item) => sum + item.value, 0);
+
+                        if (clientTotalPending > 0) {
+                            summary.push([`Total a Receber (${clientName.split(' ')[0]}):`, Utils.formatCurrency(clientTotalPending)]);
+                        }
+                    }
+                }
+
                 summary.forEach(item => {
                     doc.text(item[0], margin, finalY);
                     doc.text(item[1], pageWidth / 2, finalY, { align: 'left' });
@@ -3998,7 +4014,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.9', timestamp: new Date().toISOString(),
+                version: '2.9.1', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -4068,7 +4084,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.9 (Mobile Fix) iniciado!');
+        console.log('SGI - Flor de Maria v2.9.1 (PDF Report Fix) iniciado!');
     });
     </script>
 </body>
