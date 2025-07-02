@@ -239,7 +239,7 @@
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; 
+            /* white-space: nowrap; REMOVIDO PARA MELHORAR RESPONSIVIDADE */
         }
 
         .table th {
@@ -575,6 +575,45 @@
             .modal-title {
                 font-size: 20px;
             }
+
+            /* --- RELATÓRIOS: Ajustes para responsividade --- */
+            /* Garante que as colunas da tabela quebrem o texto em mobile */
+            .table th, .table td {
+                white-space: normal; /* Permite que o texto quebre */
+            }
+
+            /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
+            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição */
+            .table th:nth-child(2), .table td:nth-child(2) { width: 30%; } /* Ex: Telefone/Qtd/Tipo */
+            .table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Ex: Cadastro/Valor/Categoria */
+            .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* Ex: Compras/Vencimento/Status */
+            /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
+
+            /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
+            #reportsPage .grid-4 {
+                grid-template-columns: 1fr; /* Força empilhamento em uma única coluna */
+            }
+
+            /* Reduz o padding para filtros para usar melhor o espaço */
+            #reportsPage .form-group {
+                margin-bottom: 15px;
+            }
+
+            /* Garante que o botão de atualizar relatório ocupe a largura total */
+            #reportsPage #generateReport {
+                width: 100%;
+            }
+
+            /* Ajusta a disposição dos botões de exportar em mobile */
+            #reportsPage .card-header .flex.gap-2 {
+                flex-direction: column;
+                width: 100%;
+                align-items: stretch;
+            }
+            #reportsPage .card-header .flex.gap-2 .btn {
+                width: 100%;
+            }
+            /* --- FIM: RELATÓRIOS --- */
         }
 
         /* ===== UTILITÁRIOS ===== */
@@ -869,13 +908,13 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             color: #495057;
-            white-space: nowrap;
+            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
         }
         .receipt-items-table td {
             padding: 0.75rem;
             border-bottom: 1px solid #dee2e6;
             font-size: 0.95rem;
-            white-space: nowrap;
+            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
         }
         .receipt-items-table .text-right { text-align: right; }
         .receipt-items-table .text-center { text-align: center; }
@@ -977,7 +1016,7 @@
                         <span>PDV</span>
                     </a>
                 </li>
-                 <li class="sidebar-nav-item">
+                <li class="sidebar-nav-item">
                     <a href="#receipts" class="sidebar-nav-link" data-page="receipts">
                         <i class="fas fa-receipt"></i>
                         <span>Recibos</span>
@@ -1382,7 +1421,7 @@
                 </div>
             </div>
 
-             <div id="receiptsPage" class="page hidden">
+            <div id="receiptsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Recibos</h1>
                     <p class="page-subtitle">Visualize e gerencie os recibos de vendas</p>
@@ -1395,26 +1434,26 @@
                         </h3>
                     </div>
                     <div class="grid grid-2">
-                         <div class="form-group">
+                           <div class="form-group">
                             <label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label>
                             <select id="receiptClientFilter" class="form-select">
                                 <option value="">Todos os Clientes</option>
                             </select>
                         </div>
-                         <div class="form-group">
+                           <div class="form-group">
                             <label class="form-label" for="receiptDateFilter">Filtrar por Data</label>
                             <input type="date" id="receiptDateFilter" class="form-input">
                         </div>
                     </div>
                 </div>
-                 <div class="card mt-4">
+                   <div class="card mt-4">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
                             Lista de Vendas
                         </h3>
                     </div>
-                     <div class="table-responsive">
+                       <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -2609,8 +2648,8 @@
                 this.renderProducts(products);
                 this.updateStats(products);
             } catch (error) {
-                 console.error("Erro ao carregar produtos:", error);
-                 Notification.error("Não foi possível carregar os produtos.");
+                console.error("Erro ao carregar produtos:", error);
+                Notification.error("Não foi possível carregar os produtos.");
             }
         },
         updateStats(products) {
@@ -2899,8 +2938,8 @@
                     sales = sales.filter(s => s.clientId === clientIdFilter);
                 }
             }
-             if (dateFilter) {
-                 sales = sales.filter(s => s.date.startsWith(dateFilter));
+            if (dateFilter) {
+                sales = sales.filter(s => s.date.startsWith(dateFilter));
             }
 
             const tbody = document.getElementById('receiptsTableBody');
@@ -2978,8 +3017,8 @@
             const receiptHtml = this.generateReceiptHTML(sale, client);
             const actionsHtml = `
                 <div class="flex gap-2 justify-content-end">
-                     <button class="btn btn-success" onclick="Receipts.shareOnWhatsApp('${sale.id}')"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button>
-                     <button class="btn btn-secondary" onclick="Receipts.printReceipt()"><i class="fas fa-print"></i> Imprimir</button>
+                    <button class="btn btn-success" onclick="Receipts.shareOnWhatsApp('${sale.id}')"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button>
+                    <button class="btn btn-secondary" onclick="Receipts.printReceipt()"><i class="fas fa-print"></i> Imprimir</button>
                 </div>
             `;
             Modal.show(`Recibo da Venda`, `<div id="receiptToPrint">${receiptHtml}</div>`, actionsHtml);
@@ -3066,17 +3105,17 @@
         },
         shareOnWhatsApp(saleId) {
              const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-                  const sale = sales.find(s => s.id === saleId);
-                  const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-                  const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
+             const sale = sales.find(s => s.id === saleId);
+             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+             const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
 
             if (!client.phone) {
                 return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
             }
-                  const phoneNumber = client.phone.replace(/\D/g, '');
-                  const message = this.generateWhatsAppText(sale, client);
-                  const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
-                  window.open(whatsappUrl, '_blank');
+             const phoneNumber = client.phone.replace(/\D/g, '');
+             const message = this.generateWhatsAppText(sale, client);
+             const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
+             window.open(whatsappUrl, '_blank');
         },
         printReceipt() {
             const printContent = document.getElementById('receiptToPrint').innerHTML;
@@ -3090,14 +3129,14 @@
     
     // Módulo Fluxo de Caixa
     const CashFlow = {
-         currentEditId: null,
-         init() {
+        currentEditId: null,
+        init() {
             document.getElementById('cashFlowForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveEntry(); });
             document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
             document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce((e) => this.filterEntries(e.target.value), 300));
             document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
         },
-         saveEntry() {
+        saveEntry() {
             const type = document.getElementById('cashFlowType').value;
             const description = document.getElementById('cashFlowDescription').value.trim();
             const value = parseFloat(document.getElementById('cashFlowValue').value) || 0;
@@ -3128,13 +3167,13 @@
             this.loadCashFlow();
             this.clearForm();
         },
-         loadCashFlow() {
+        loadCashFlow() {
             const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
             this.updateSummary(entries);
             this.displayEntries(entries);
             document.getElementById('cashFlowDate').valueAsDate = new Date();
         },
-         updateSummary(entries) {
+        updateSummary(entries) {
             const totalEntradas = entries.filter(e => e.type === 'entrada').reduce((sum, e) => sum + e.value, 0);
             const totalSaidas = entries.filter(e => e.type === 'saida').reduce((sum, e) => sum + e.value, 0);
             const saldoAtual = totalEntradas - totalSaidas;
@@ -3144,7 +3183,7 @@
             document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
             document.getElementById('saldoAtual').style.color = saldoAtual >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
         },
-         displayEntries(entries) {
+        displayEntries(entries) {
             const tbody = document.getElementById('cashFlowTableBody');
             if (entries.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado</td></tr>`;
@@ -3172,7 +3211,7 @@
                     </tr>`;
             }).join('');
         },
-         editEntry(id) {
+        editEntry(id) {
             const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
             if(entry) {
                 document.getElementById('cashFlowType').value = entry.type;
@@ -3182,7 +3221,7 @@
                 this.currentEditId = id;
             }
         },
-         deleteEntry(id) {
+        deleteEntry(id) {
             const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
             if(entry && (entry.relatedSaleId || entry.relatedExpenseId || entry.relatedAccountId)) {
                 return Notification.error('Lançamentos automáticos não podem ser excluídos.');
@@ -3194,17 +3233,17 @@
                 Notification.success('Lançamento excluído!');
             }
         },
-         clearForm() {
+        clearForm() {
             document.getElementById('cashFlowForm').reset();
             document.getElementById('cashFlowDate').valueAsDate = new Date();
             this.currentEditId = null;
         },
-         filterEntries(searchTerm) {
+        filterEntries(searchTerm) {
             const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
             const filtered = entries.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase()));
             this.displayEntries(filtered);
         },
-         exportToCSV() {
+        exportToCSV() {
             const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
             if(entries.length === 0) return Notification.warning('Nenhum dado para exportar.');
             Clients.downloadCSV(
@@ -3501,7 +3540,7 @@
                 this.loadReceivables();
                 Notification.success('Conta excluída!');
             } else {
-                 Notification.warning('Exclusão cancelada.');
+                Notification.warning('Exclusão cancelada.');
             }
         },
         clearForm() {
@@ -3642,7 +3681,7 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                       currentStatus = 'Vencido';
+                        currentStatus = 'Vencido';
                  }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
@@ -3655,10 +3694,10 @@
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
                  let status = r.status;
-                       const today = new Date();
-                       today.setHours(0,0,0,0);
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
                  if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                         status = 'Vencido';
+                            status = 'Vencido';
                  }
                 return [
                     client ? client.name : 'N/A',
@@ -3676,11 +3715,11 @@
                  const today = new Date();
                  today.setHours(0,0,0,0);
                  if (r.status === 'Pago') {
-                       statusSummary['Pago'] += r.value;
+                        statusSummary['Pago'] += r.value;
                  } else if (new Date(r.dueDate) < today) {
-                       statusSummary['Vencido'] += r.value;
+                        statusSummary['Vencido'] += r.value;
                  } else {
-                       statusSummary['Pendente'] += r.value;
+                        statusSummary['Pendente'] += r.value;
                  }
             });
             
@@ -3804,8 +3843,8 @@
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
                                <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                                   <span>${name}</span>
-                                   <span style="font-weight: bold;">${value}</span>
+                                       <span>${name}</span>
+                                       <span style="font-weight: bold;">${value}</span>
                                </div>`).join('') :
                  '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
