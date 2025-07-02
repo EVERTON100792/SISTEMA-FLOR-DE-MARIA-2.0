@@ -239,7 +239,7 @@
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            /* white-space: nowrap; REMOVIDO PARA MELHORAR RESPONSIVIDADE */
+            /* white-space: nowrap; Removido para melhor responsividade em mobile */
         }
 
         .table th {
@@ -576,18 +576,29 @@
                 font-size: 20px;
             }
 
-            /* --- RELATÓRIOS: Ajustes para responsividade --- */
+            /* --- RELATÓRIOS & TABELAS GERAIS: Ajustes para responsividade --- */
             /* Garante que as colunas da tabela quebrem o texto em mobile */
             .table th, .table td {
                 white-space: normal; /* Permite que o texto quebre */
             }
 
             /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
-            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição */
+            /* Isso é uma otimização, mas `overflow-x: auto` ainda é necessário para tabelas muito grandes */
+            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição/Produto */
             .table th:nth-child(2), .table td:nth-child(2) { width: 30%; } /* Ex: Telefone/Qtd/Tipo */
             .table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Ex: Cadastro/Valor/Categoria */
             .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* Ex: Compras/Vencimento/Status */
             /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
+            .table td:last-child, .table th:last-child {
+                width: auto; /* Deixa o navegador ajustar a última coluna */
+            }
+
+            /* Ajusta o input de quantidade no carrinho do PDV */
+            #salesPage .table input[type="number"].form-input {
+                width: 55px; /* Mais compacto */
+                padding: 4px;
+                font-size: 13px;
+            }
 
             /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
             #reportsPage .grid-4 {
@@ -613,7 +624,7 @@
             #reportsPage .card-header .flex.gap-2 .btn {
                 width: 100%;
             }
-            /* --- FIM: RELATÓRIOS --- */
+            /* --- FIM: RELATÓRIOS & TABELAS GERAIS --- */
         }
 
         /* ===== UTILITÁRIOS ===== */
@@ -2081,7 +2092,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.1 (PDF Report Fix) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.2 (Responsiveness Fix) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2571,10 +2582,6 @@
         }
     };
     
-    // O restante do código JS (Products, Sales, etc.) permanece o mesmo do HTML anterior,
-    // pois as correções principais foram no CSS e na função de Navegação.
-    // Incluindo o resto do JS para garantir a completude do script.
-
     // Módulo de Produtos
     const Products = {
         currentEditId: null,
@@ -4053,7 +4060,7 @@
         },
         downloadBackup() {
             const backupData = {
-                version: '2.9.1', timestamp: new Date().toISOString(),
+                version: '2.9.2', timestamp: new Date().toISOString(),
                 data: {}
             };
             for (const key in CONFIG.storageKeys) {
@@ -4123,7 +4130,7 @@
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v2.9.1 (PDF Report Fix) iniciado!');
+        console.log('SGI - Flor de Maria v2.9.2 (Responsiveness Fix) iniciado!');
     });
     </script>
 </body>
