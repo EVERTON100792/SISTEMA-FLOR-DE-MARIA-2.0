@@ -176,7 +176,7 @@
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 16px; 
+            gap: 16px;  
         }
 
         .card-title {
@@ -438,7 +438,7 @@
             position: relative;
             height: 350px;
             width: 100%;
-            flex-grow: 1; 
+            flex-grow: 1;  
         }
 
 
@@ -447,12 +447,12 @@
             display: none;
             position: fixed;
             top: 15px;
-            left: 15px; 
+            left: 15px;  
             z-index: 1001;
-            background: var(--surface-bg); 
+            background: var(--surface-bg);  
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 10px 12px; 
+            padding: 10px 12px;  
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
@@ -478,7 +478,7 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 80px 15px 20px; 
+                padding: 80px 15px 20px;  
             }
 
             .login-card {
@@ -525,9 +525,9 @@
                 gap: 12px;
             }
             .card-header .flex.gap-2 {
-                 flex-direction: column;
-                 width: 100%;
-                 align-items: stretch;
+                flex-direction: column;
+                width: 100%;
+                align-items: stretch;
             }
             
             /* Melhorando a visualização do recibo no modal */
@@ -554,7 +554,7 @@
             }
             
             .btn {
-                padding: 12px 18px; 
+                padding: 12px 18px;  
                 font-size: 14px;
             }
 
@@ -747,16 +747,16 @@
             padding: 32px;
             max-width: 600px;
             width: 90%;
-            max-height: 85vh; 
-            display: flex; 
-            flex-direction: column; 
+            max-height: 85vh;  
+            display: flex;  
+            flex-direction: column;  
             border: 1px solid var(--border-color);
             transform: scale(0.9);
             transition: var(--transition);
         }
         
         #modalBody {
-            overflow-y: auto; 
+            overflow-y: auto;  
         }
 
 
@@ -871,7 +871,7 @@
             border-bottom: 2px solid #dee2e6;
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap; 
+            flex-wrap: wrap;  
         }
         .receipt-logo-container {
             font-size: 2.5rem;
@@ -1887,7 +1887,7 @@
                         <div class="form-group hidden" id="reportClientFilterContainer">
                              <label class="form-label" for="reportReceivableClient">Cliente</label>
                              <select id="reportReceivableClient" class="form-select">
-                                  <option value="">Todos os Clientes</option>
+                                 <option value="">Todos os Clientes</option>
                              </select>
                         </div>
                         
@@ -2070,7 +2070,7 @@
                             Backup e Restauração
                         </h3>
                     </div>
-                     <div class="grid grid-2">
+                   <div class="grid grid-2">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
@@ -2094,10 +2094,10 @@
                                      <div class="stat-label">Vendas</div>
                                  </div>
                                   <div class="text-center">
-                                       <div class="stat-value" id="backupReceivablesCount">0</div>
-                                       <div class="stat-label">Contas a Receber</div>
-                                   </div>
-                             </div>
+                                     <div class="stat-value" id="backupReceivablesCount">0</div>
+                                     <div class="stat-label">Contas a Receber</div>
+                                </div>
+                            </div>
                             <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
                                 <i class="fas fa-download"></i> Baixar Backup Completo
                             </button>
@@ -2124,7 +2124,7 @@
                                  </button>
                              </div>
                          </div>
-                     </div>
+                   </div>
                 </div>
 
             </div>
@@ -2156,7 +2156,7 @@
     const CONFIG = {
         users: { username: 'maria', password: 'flor123' },
         storageKeys: {
-            lastActivePage: 'sgi_last_active_page', 
+            lastActivePage: 'sgi_last_active_page',  
             company: 'sgi_company_info', // Chave para dados da loja
             credentials: 'sgi_credentials', // Chave para credenciais de login
             clients: 'sgi_clients',
@@ -3072,7 +3072,7 @@
             Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
 
             Notification.success('Venda excluída com sucesso! O estoque foi restaurado.');
-            this.loadReceipts(); 
+            this.loadReceipts();  
         },
         showReceipt(saleId) {
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales) || [];
@@ -3673,7 +3673,7 @@
         },
         initPage() {
             const endDate = new Date();
-            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); 
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);  
             document.getElementById('reportStartDate').valueAsDate = startDate;
             document.getElementById('reportEndDate').valueAsDate = endDate;
             this.loadClientFilter();
@@ -3743,15 +3743,15 @@
             const clientFilter = document.getElementById('reportReceivableClient').value;
 
             const filteredReceivables = receivables.filter(r => {
-                const creationDate = new Date(r.createdAt || r.date); 
+                const creationDate = new Date(r.createdAt || r.date);  
                 const matchesDate = creationDate >= startDate && creationDate <= endDate;
 
                 let currentStatus = r.status;
-                 const today = new Date();
-                 today.setHours(0,0,0,0);
-                 if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                         currentStatus = 'Vencido';
-                 }
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
+                    currentStatus = 'Vencido';
+                }
                 
                 let matchesStatus = !statusFilter || currentStatus === statusFilter;
                 let matchesClient = !clientFilter || r.clientId === clientFilter;
@@ -3762,12 +3762,12 @@
             const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
             const rows = filteredReceivables.map(r => {
                 const client = clients.find(c => c.id === r.clientId);
-                 let status = r.status;
-                            const today = new Date();
-                            today.setHours(0,0,0,0);
-                 if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                                status = 'Vencido';
-                 }
+                let status = r.status;
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                if (status === 'Pendente' && new Date(r.dueDate) < today) {
+                        status = 'Vencido';
+                }
                 return [
                     client ? client.name : 'N/A',
                     r.description,
@@ -3781,15 +3781,15 @@
 
             const statusSummary = { 'Pago': 0, 'Pendente': 0, 'Vencido': 0 };
             filteredReceivables.forEach(r => {
-                 const today = new Date();
-                 today.setHours(0,0,0,0);
-                 if (r.status === 'Pago') {
-                         statusSummary['Pago'] += r.value;
-                 } else if (new Date(r.dueDate) < today) {
-                         statusSummary['Vencido'] += r.value;
-                 } else {
-                         statusSummary['Pendente'] += r.value;
-                 }
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if (r.status === 'Pago') {
+                    statusSummary['Pago'] += r.value;
+                } else if (new Date(r.dueDate) < today) {
+                    statusSummary['Vencido'] += r.value;
+                } else {
+                    statusSummary['Pendente'] += r.value;
+                }
             });
             
             this.renderChart('pie', 
@@ -3911,10 +3911,10 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                                     <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                                             <span>${name}</span>
-                                             <span style="font-weight: bold;">${value}</span>
-                                     </div>`).join('') :
+                                    <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                            <span>${name}</span>
+                                            <span style="font-weight: bold;">${value}</span>
+                                    </div>`).join('') :
                 '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
@@ -4250,9 +4250,9 @@
                 return Notification.warning('Ação cancelada.');
             }
             Object.values(CONFIG.storageKeys).forEach(key => {
-                 // Não remove as credenciais nem os dados da loja ao limpar
+                // Não remove as credenciais nem os dados da loja ao limpar
                 if (key !== CONFIG.storageKeys.credentials && key !== CONFIG.storageKeys.company) {
-                     localStorage.removeItem(key);
+                    localStorage.removeItem(key);
                 }
             });
             
