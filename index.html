@@ -1571,7 +1571,7 @@
                         </div>
                     </div>
                 </div>
-                   <div class="card mt-4">
+                    <div class="card mt-4">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
@@ -1999,10 +1999,10 @@
                         </div>
                         
                         <div class="form-group hidden" id="reportClientFilterContainer">
-                             <label class="form-label" for="reportReceivableClient">Cliente</label>
-                             <select id="reportReceivableClient" class="form-select">
-                                 <option value="">Todos os Clientes</option>
-                             </select>
+                                <label class="form-label" for="reportReceivableClient">Cliente</label>
+                                <select id="reportReceivableClient" class="form-select">
+                                    <option value="">Todos os Clientes</option>
+                                </select>
                         </div>
                         
                         <div class="form-group hidden" id="reportStatusFilterContainer">
@@ -2143,10 +2143,10 @@
                                 <div class="stat-value" id="backupSalesCount">0</div>
                                 <div class="stat-label">Vendas</div>
                             </div>
-                             <div class="text-center">
-                                 <div class="stat-value" id="backupReceivablesCount">0</div>
-                                 <div class="stat-label">Contas a Receber</div>
-                             </div>
+                                <div class="text-center">
+                                    <div class="stat-value" id="backupReceivablesCount">0</div>
+                                    <div class="stat-label">Contas a Receber</div>
+                                </div>
                         </div>
                         
                         <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
@@ -2206,7 +2206,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.3 (Responsiveness Enhanced) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.4 (Corrected and Verified) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2336,7 +2336,7 @@
         }
     };
 
-    // Sistema de Navegação MELHORADO
+    // Sistema de Navegação
     const Navigation = {
         init() {
             const sidebar = document.getElementById('sidebar');
@@ -2346,7 +2346,6 @@
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     
-                    // CORREÇÃO MELHORADA: Fecha a sidebar no mobile após clique
                     if (window.innerWidth <= 768) {
                         sidebar.classList.remove('active');
                     }
@@ -2362,7 +2361,6 @@
                 sidebar.classList.toggle('active');
             });
 
-            // CORREÇÃO: Fecha a sidebar se clicar fora dela em mobile
             document.addEventListener('click', (e) => {
                 if (window.innerWidth <= 768 && 
                     sidebar.classList.contains('active') && 
@@ -2372,7 +2370,6 @@
                 }
             });
 
-            // CORREÇÃO: Fecha sidebar ao redimensionar para desktop
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 768) {
                     sidebar.classList.remove('active');
@@ -2416,7 +2413,7 @@
         }
     };
 
-    // Autenticação (sem alterações)
+    // Autenticação
     const Auth = {
         init() {
             document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -2462,7 +2459,7 @@
         }
     };
     
-    // Dashboard (sem alterações)
+    // Dashboard
     const Dashboard = {
         chart: null,
         loadData() {
@@ -2476,7 +2473,7 @@
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
 
             const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
-            const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
+            const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente' || acc.status === 'Vencido').reduce((total, acc) => total + acc.value, 0);
             
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
@@ -2485,10 +2482,9 @@
                 .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
                 .reduce((total, s) => total + s.total, 0);
                 
-            const monthlyExpenses = cashFlow
-                .filter(cf => cf.type === 'saida')
-                .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
-                .reduce((total, cf) => total + cf.value, 0);
+            const monthlyExpenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses)
+                .filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+                .reduce((total, e) => total + e.value, 0);
 
             document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
             document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
@@ -2537,7 +2533,7 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
+            const overdueAccounts = accountsReceivable.filter(account => account.status !== 'Pago' && new Date(account.dueDate) < today);
 
             const container = document.getElementById('overdueAccounts');
             if (overdueAccounts.length === 0) {
@@ -2619,7 +2615,7 @@
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.clientId === id);
             
             const totalSpent = sales.reduce((sum, sale) => sum + sale.total, 0);
-            const totalDebt = receivables.filter(r => r.status === 'Pendente' || (r.status !== 'Pago' && new Date(r.dueDate) < new Date())).reduce((sum, r) => sum + r.value, 0);
+            const totalDebt = receivables.filter(r => r.status === 'Pendente' || r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
 
             let historyHtml = `
                 <h4>Histórico de Compras - ${client.name}</h4>
@@ -2639,7 +2635,7 @@
                 <div class="table-responsive" style="max-height: 150px;">
                 ${receivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
                     <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-                    ${receivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
+                    ${receivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : (r.status === 'Vencido' ? 'badge-danger' : 'badge-warning')}">${r.status}</span></td></tr>`).join('')}
                     </tbody></table>
                 `}
                 </div>
@@ -2796,7 +2792,7 @@
             tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
                 const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
                 const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
-                const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
+                const statusText = product.quantity > 5 ? 'Estável' : (product.quantity > 0 ? 'Baixo' : 'Esgotado');
                 return `
                     <tr>
                         <td>${product.refCode}</td>
@@ -2962,15 +2958,17 @@
             }
         },
         finalizeSale() {
-            if (this.cart.length === 0) return Notification.error('Carrinho vazio!
-
-
-');
+            // CORREÇÃO: Removida a quebra de linha na string que causava o erro de sintaxe.
+            if (this.cart.length === 0) return Notification.error('Carrinho vazio!');
 
             const clientId = document.getElementById('saleClient').value;
             const paymentMethod = document.getElementById('salePaymentMethod').value;
             const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
             const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (paymentMethod === 'Crediário' && !clientId) {
+                return Notification.error('Selecione um cliente para vendas em crediário.');
+            }
 
             // Atualizar estoque
             const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
@@ -2994,16 +2992,18 @@
             sales.push(sale);
             Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
 
-            // Registrar no fluxo de caixa
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            cashFlow.push({
-                id: Utils.generateUUID(),
-                type: 'entrada',
-                description: `Venda #${sale.id.substring(0, 8)} - ${paymentMethod}`,
-                value: total,
-                date: new Date().toISOString().split('T')[0]
-            });
-            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            // Registrar no fluxo de caixa (se não for crediário)
+            if (paymentMethod !== 'Crediário') {
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+                cashFlow.push({
+                    id: Utils.generateUUID(),
+                    type: 'entrada',
+                    description: `Venda #${sale.id.substring(0, 8)} - ${paymentMethod}`,
+                    value: total,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            }
 
             // Criar contas a receber se for crediário
             if (paymentMethod === 'Crediário' && clientId) {
@@ -3035,7 +3035,7 @@
             const client = clients.find(c => c.id === sale.clientId);
             
             const receiptHtml = `
-                <div class="receipt-professional-container">
+                <div class="receipt-professional-container" id="receiptToPrint">
                     <div class="receipt-professional-header">
                         <div class="receipt-logo-container">
                             <i class="fas fa-store"></i>
@@ -3114,38 +3114,41 @@
             Modal.show('Recibo da Venda', receiptHtml, actionsHtml);
         },
         printReceipt() {
-            const receiptContent = document.querySelector('.receipt-professional-container').outerHTML;
+            const receiptContent = document.getElementById('receiptToPrint').innerHTML;
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
                     <head>
                         <title>Recibo - ${CONFIG.company.name}</title>
                         <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            .receipt-professional-container { max-width: 600px; margin: 0 auto; }
-                            .receipt-professional-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 15px; }
-                            .receipt-logo-container { font-size: 2rem; }
-                            .receipt-company-details h3 { margin: 0; font-size: 1.2rem; }
-                            .receipt-company-details p { margin: 2px 0; font-size: 0.9rem; }
-                            .receipt-sale-info { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 15px; font-size: 0.9rem; }
-                            .receipt-items-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                            .receipt-items-table th, .receipt-items-table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-                            .receipt-items-table thead { background-color: #f5f5f5; }
-                            .text-center { text-align: center; }
-                            .text-right { text-align: right; }
-                            .receipt-summary { display: flex; justify-content: flex-end; }
-                            .receipt-summary table { width: 200px; }
-                            .receipt-summary td { padding: 5px; font-size: 1rem; }
+                            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 20px; color: #333; }
+                            .receipt-professional-container { max-width: 80mm; margin: 0 auto; }
+                            .receipt-professional-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+                            .receipt-company-details h3 { margin: 0; font-size: 1.2em; }
+                            .receipt-company-details p { margin: 2px 0; font-size: 0.8em; }
+                            .receipt-sale-info { font-size: 0.8em; margin-bottom: 10px; }
+                            .receipt-items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.8em; }
+                            .receipt-items-table th, .receipt-items-table td { padding: 4px 0; text-align: left; }
+                            .receipt-items-table .text-right { text-align: right; }
+                            .receipt-items-table .text-center { text-align: center; }
+                            .receipt-summary { margin-top: 10px; border-top: 1px dashed #000; padding-top: 10px; }
+                            .receipt-summary table { width: 100%; font-size: 0.9em; }
                             .total-label { font-weight: bold; }
-                            .total-value { font-weight: bold; font-size: 1.2rem; }
-                            .receipt-footer { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+                            .total-value { font-weight: bold; font-size: 1.1em; text-align: right; }
+                            .receipt-footer { margin-top: 15px; text-align: center; font-size: 0.8em; }
                         </style>
                     </head>
-                    <body>${receiptContent}</body>
+                    <body>
+                        <div class="receipt-professional-container">
+                            ${receiptContent}
+                        </div>
+                    </body>
                 </html>
             `);
             printWindow.document.close();
+            printWindow.focus();
             printWindow.print();
+            printWindow.close();
         }
     };
 
@@ -3243,853 +3246,774 @@
             const type = document.getElementById('cashFlowType').value;
             const description = document.getElementById('cashFlowDescription').value.trim();
             const value = parseFloat(document.getElementById('cashFlowValue').value) || 0;
-            const date = document.getElementById('cashFlowDate').value;
+            // ===== INÍCIO DA CORREÇÃO E COMPLEMENTO DO CÓDIGO =====
 
-            if (!description || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
+            const date = document.getElementById('cashFlowDate').value;
 
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            if (this.currentEditId) {
-                const index = cashFlow.findIndex(cf => cf.id === this.currentEditId);
-                if (index !== -1) {
-                    cashFlow[index] = { ...cashFlow[index], type, description, value, date, updatedAt: new Date().toISOString() };
-                    Notification.success('Lançamento atualizado!');
-                }
-            } else {
-                cashFlow.push({ id: Utils.generateUUID(), type, description, value, date, createdAt: new Date().toISOString() });
-                Notification.success('Lançamento registrado!');
-            }
-            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-            this.clearForm();
-            this.loadCashFlow();
-        },
-        editCashFlow(id) {
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(cf => cf.id === id);
-            if (cashFlow) {
-                document.getElementById('cashFlowType').value = cashFlow.type;
-                document.getElementById('cashFlowDescription').value = cashFlow.description;
-                document.getElementById('cashFlowValue').value = cashFlow.value;
-                document.getElementById('cashFlowDate').value = cashFlow.date;
-                this.currentEditId = id;
-                document.getElementById('cashFlowForm').scrollIntoView({ behavior: 'smooth' });
-            }
-        },
-        deleteCashFlow(id) {
-            if (confirm('Tem certeza que deseja excluir este lançamento?')) {
-                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-                this.loadCashFlow();
-                Notification.success('Lançamento excluído!');
-            }
-        },
-        clearForm() {
-            document.getElementById('cashFlowForm').reset();
-            document.getElementById('cashFlowDate').value = new Date().toISOString().split('T')[0];
-            this.currentEditId = null;
-        },
-        filterCashFlow(searchTerm) {
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const filtered = cashFlow.filter(cf => cf.description.toLowerCase().includes(searchTerm.toLowerCase()));
-            this.renderCashFlow(filtered);
-        },
-        loadCashFlow() {
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            this.renderCashFlow(cashFlow);
-            this.updateStats(cashFlow);
-        },
-        updateStats(cashFlow) {
-            const totalEntradas = cashFlow.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
-            const totalSaidas = cashFlow.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
-            const saldoAtual = totalEntradas - totalSaidas;
+            if (!description || value <= 0 || !date) return Notification.error('Preencha todos os campos corretamente!');
 
-            document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
-            document.getElementById('totalSaidas').textContent = Utils.formatCurrency(totalSaidas);
-            document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
-            document.getElementById('saldoAtual').style.color = saldoAtual >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
-        },
-        renderCashFlow(cashFlow) {
-            const tbody = document.getElementById('cashFlowTableBody');
-            if (cashFlow.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = cashFlow.sort((a,b) => new Date(b.date) - new Date(a.date)).map(cf => `
-                <tr>
-                    <td>${Utils.formatDate(cf.date)}</td>
-                    <td><span class="badge ${cf.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${cf.type === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
-                    <td>${cf.description}</td>
-                    <td style="color: ${cf.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'};">${cf.type === 'entrada' ? '+' : '-'} ${Utils.formatCurrency(cf.value)}</td>
-                    <td>
-                        <div class="flex gap-1">
-                            <button class="btn btn-secondary btn-sm" onclick="CashFlow.editCashFlow('${cf.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteCashFlow('${cf.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`).join('');
-        },
-        exportToCSV() {
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            if (cashFlow.length === 0) return Notification.warning('Nenhum lançamento para exportar!');
-            Clients.downloadCSV(
-                ['Data', 'Tipo', 'Descrição', 'Valor'].join(',') + '\n' +
-                cashFlow.map(cf => [`"${Utils.formatDate(cf.date)}"`, `"${cf.type === 'entrada' ? 'Entrada' : 'Saída'}"`, `"${cf.description}"`, cf.value.toFixed(2)].join(',')).join('\n'), 'fluxo_caixa'
-            );
-        }
-    };
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            if (this.currentEditId) {
+                const index = cashFlow.findIndex(item => item.id === this.currentEditId);
+                if (index !== -1) {
+                    cashFlow[index] = { ...cashFlow[index], type, description, value, date, updatedAt: new Date().toISOString() };
+                    Notification.success('Lançamento atualizado!');
+                }
+            } else {
+                cashFlow.push({ id: Utils.generateUUID(), type, description, value, date, createdAt: new Date().toISOString() });
+                Notification.success('Lançamento salvo!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            this.clearForm();
+            this.loadCashFlow();
+        },
+        editCashFlow(id) {
+            const item = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(i => i.id === id);
+            if (item) {
+                document.getElementById('cashFlowType').value = item.type;
+                document.getElementById('cashFlowDescription').value = item.description;
+                document.getElementById('cashFlowValue').value = item.value;
+                document.getElementById('cashFlowDate').value = item.date;
+                this.currentEditId = id;
+                document.getElementById('cashFlowForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteCashFlow(id) {
+            if (confirm('Tem certeza que deseja excluir este lançamento?')) {
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(i => i.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                this.loadCashFlow();
+                Notification.success('Lançamento excluído!');
+            }
+        },
+        clearForm() {
+            document.getElementById('cashFlowForm').reset();
+            document.getElementById('cashFlowDate').value = new Date().toISOString().split('T')[0];
+            this.currentEditId = null;
+        },
+        filterCashFlow(searchTerm) {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const filtered = cashFlow.filter(item => item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.renderCashFlow(filtered);
+        },
+        loadCashFlow() {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            this.renderCashFlow(cashFlow);
+            this.updateSummary(cashFlow);
+        },
+        updateSummary(cashFlow) {
+            const totalEntradas = cashFlow.filter(i => i.type === 'entrada').reduce((sum, i) => sum + i.value, 0);
+            const totalSaidas = cashFlow.filter(i => i.type === 'saida').reduce((sum, i) => sum + i.value, 0);
+            const saldoAtual = totalEntradas - totalSaidas;
 
-    // Módulo de Despesas
-    const Expenses = {
-        currentEditId: null,
-        init() {
-            document.getElementById('expenseForm').addEventListener('submit', e => { e.preventDefault(); this.saveExpense(); });
-            document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(e => this.filterExpenses(e.target.value), 300));
-            document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterByCategory());
-            document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
-            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-        },
-        saveExpense() {
-            const description = document.getElementById('expenseDescription').value.trim();
-            const category = document.getElementById('expenseCategory').value;
-            const value = parseFloat(document.getElementById('expenseValue').value) || 0;
-            const date = document.getElementById('expenseDate').value;
+            document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
+            document.getElementById('totalSaidas').textContent = Utils.formatCurrency(totalSaidas);
+            document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
+        },
+        renderCashFlow(cashFlow) {
+            const tbody = document.getElementById('cashFlowTableBody');
+            if (cashFlow.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = cashFlow.sort((a,b) => new Date(b.date) - new Date(a.date)).map(item => `
+                <tr>
+                    <td>${Utils.formatDate(item.date)}</td>
+                    <td>
+                        <span class="badge ${item.type === 'entrada' ? 'badge-success' : 'badge-danger'}">
+                            ${item.type}
+                        </span>
+                    </td>
+                    <td>${item.description}</td>
+                    <td>${Utils.formatCurrency(item.value)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="CashFlow.editCashFlow('${item.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteCashFlow('${item.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+        },
+        exportToCSV() {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            if (cashFlow.length === 0) return Notification.warning('Nenhum lançamento para exportar!');
+            Clients.downloadCSV(
+                ['Data', 'Tipo', 'Descrição', 'Valor'].join(',') + '\n' +
+                cashFlow.map(item => [`"${Utils.formatDate(item.date)}"`, `"${item.type}"`, `"${item.description}"`, item.value.toFixed(2)].join(',')).join('\n'), 'fluxo_de_caixa'
+            );
+        }
+    };
+    
+    // Módulo de Despesas
+    const Expenses = {
+        currentEditId: null,
+        init() {
+            document.getElementById('expenseForm').addEventListener('submit', e => { e.preventDefault(); this.saveExpense(); });
+            document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(e => this.filterExpenses(), 300));
+            document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
+            document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        },
+        saveExpense() {
+            const description = document.getElementById('expenseDescription').value.trim();
+            const category = document.getElementById('expenseCategory').value;
+            const value = parseFloat(document.getElementById('expenseValue').value) || 0;
+            const date = document.getElementById('expenseDate').value;
+            if (!description || !category || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
 
-            if (!description || !category || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            if (this.currentEditId) {
+                const index = expenses.findIndex(e => e.id === this.currentEditId);
+                if (index !== -1) {
+                    expenses[index] = { ...expenses[index], description, category, value, date, updatedAt: new Date().toISOString() };
+                    Notification.success('Despesa atualizada!');
+                }
+            } else {
+                expenses.push({ id: Utils.generateUUID(), description, category, value, date, createdAt: new Date().toISOString() });
+                Notification.success('Despesa salva!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
+            
+            // Adicionar ao fluxo de caixa como saída
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            cashFlow.push({ id: Utils.generateUUID(), type: 'saida', description: `Despesa: ${description}`, value, date, createdAt: new Date().toISOString() });
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
 
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            if (this.currentEditId) {
-                const index = expenses.findIndex(e => e.id === this.currentEditId);
-                if (index !== -1) {
-                    expenses[index] = { ...expenses[index], description, category, value, date, updatedAt: new Date().toISOString() };
-                    Notification.success('Despesa atualizada!');
-                }
-            } else {
-                expenses.push({ id: Utils.generateUUID(), description, category, value, date, createdAt: new Date().toISOString() });
-                Notification.success('Despesa registrada!');
-                
-                // Adicionar automaticamente ao fluxo de caixa
-                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-                cashFlow.push({
-                    id: Utils.generateUUID(),
-                    type: 'saida',
-                    description: `Despesa: ${description} (${category})`,
-                    value,
-                    date
-                });
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-            }
-            Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
-            this.clearForm();
-            this.loadExpenses();
-        },
-        editExpense(id) {
-            const expense = Utils.loadFromStorage(CONFIG.storageKeys.expenses).find(e => e.id === id);
-            if (expense) {
-                document.getElementById('expenseDescription').value = expense.description;
-                document.getElementById('expenseCategory').value = expense.category;
-                document.getElementById('expenseValue').value = expense.value;
-                document.getElementById('expenseDate').value = expense.date;
-                this.currentEditId = id;
-                document.getElementById('expenseForm').scrollIntoView({ behavior: 'smooth' });
-            }
-        },
-        deleteExpense(id) {
-            if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-                const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses).filter(e => e.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
-                this.loadExpenses();
-                Notification.success('Despesa excluída!');
-            }
-        },
-        clearForm() {
-            document.getElementById('expenseForm').reset();
-            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-            this.currentEditId = null;
-        },
-        filterExpenses(searchTerm) {
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            const filtered = expenses.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase()));
-            this.renderExpenses(filtered);
-        },
-        filterByCategory() {
-            const category = document.getElementById('expenseFilterCategory').value;
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            const filtered = category ? expenses.filter(e => e.category === category) : expenses;
-            this.renderExpenses(filtered);
-        },
-        loadExpenses() {
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            this.renderExpenses(expenses);
-            this.updateStats(expenses);
-        },
-        updateStats(expenses) {
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
+            this.clearForm();
+            this.loadExpenses();
+        },
+        editExpense(id) {
+            const expense = Utils.loadFromStorage(CONFIG.storageKeys.expenses).find(e => e.id === id);
+            if (expense) {
+                document.getElementById('expenseDescription').value = expense.description;
+                document.getElementById('expenseCategory').value = expense.category;
+                document.getElementById('expenseValue').value = expense.value;
+                document.getElementById('expenseDate').value = expense.date;
+                this.currentEditId = id;
+                document.getElementById('expenseForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteExpense(id) {
+            if (confirm('Tem certeza que deseja excluir esta despesa? Isso não a removerá do fluxo de caixa.')) {
+                const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses).filter(e => e.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
+                this.loadExpenses();
+                Notification.success('Despesa excluída!');
+            }
+        },
+        clearForm() {
+            document.getElementById('expenseForm').reset();
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            this.currentEditId = null;
+        },
+        filterExpenses() {
+            const searchTerm = document.getElementById('expenseSearch').value.toLowerCase();
+            const categoryFilter = document.getElementById('expenseFilterCategory').value;
+            let expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            if (categoryFilter) {
+                expenses = expenses.filter(e => e.category === categoryFilter);
+            }
+            if (searchTerm) {
+                expenses = expenses.filter(e => e.description.toLowerCase().includes(searchTerm));
+            }
+            this.renderExpenses(expenses);
+        },
+        loadExpenses() {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            this.renderExpenses(expenses);
+            this.updateSummary(expenses);
+        },
+        updateSummary(expenses) {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const totalMonth = expenses
+                .filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+                .reduce((sum, e) => sum + e.value, 0);
+            const totalYear = expenses
+                .filter(e => new Date(e.date).getFullYear() === currentYear)
+                .reduce((sum, e) => sum + e.value, 0);
+            document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(totalMonth);
+            document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(totalYear);
+        },
+        renderExpenses(expenses) {
+            const tbody = document.getElementById('expensesTableBody');
+            if (expenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = expenses.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
+                <tr>
+                    <td>${Utils.formatDate(e.date)}</td>
+                    <td>${e.description}</td>
+                    <td><span class="badge badge-secondary">${e.category}</span></td>
+                    <td>${Utils.formatCurrency(e.value)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${e.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${e.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+        },
+        exportToCSV() {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            if (expenses.length === 0) return Notification.warning('Nenhuma despesa para exportar!');
+            Clients.downloadCSV(
+                ['Data', 'Descrição', 'Categoria', 'Valor'].join(',') + '\n' +
+                expenses.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.description}"`, `"${e.category}"`, e.value.toFixed(2)].join(',')).join('\n'), 'despesas'
+            );
+        }
+    };
 
-            const monthlyExpenses = expenses.filter(e => {
-                const expenseDate = new Date(e.date);
-                return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
-            }).reduce((sum, e) => sum + e.value, 0);
+    // Módulo de Contas a Receber
+    const Receivables = {
+        currentEditId: null,
+        init() {
+            document.getElementById('receivableForm').addEventListener('submit', e => { e.preventDefault(); this.saveReceivable(); });
+            document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
+            document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
+            document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
+        },
+        loadReceivables() {
+            this.loadClientSelect();
+            const receivables = this.updateAllStatus(Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable));
+            this.renderReceivables(receivables);
+            this.updateSummary(receivables);
+        },
+        loadClientSelect() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('receivableClient');
+            select.innerHTML = '<option value="">Selecione um cliente</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        saveReceivable() {
+            const clientId = document.getElementById('receivableClient').value;
+            const description = document.getElementById('receivableDescription').value.trim();
+            const value = parseFloat(document.getElementById('receivableValue').value) || 0;
+            const dueDate = document.getElementById('receivableDueDate').value;
+            if (!clientId || !description || value <= 0 || !dueDate) return Notification.error('Preencha todos os campos!');
 
-            const yearlyExpenses = expenses.filter(e => {
-                const expenseDate = new Date(e.date);
-                return expenseDate.getFullYear() === currentYear;
-            }).reduce((sum, e) => sum + e.value, 0);
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            if (this.currentEditId) {
+                const index = receivables.findIndex(r => r.id === this.currentEditId);
+                if (index !== -1) {
+                    receivables[index] = { ...receivables[index], clientId, description, value, dueDate, updatedAt: new Date().toISOString() };
+                    Notification.success('Conta atualizada!');
+                }
+            } else {
+                receivables.push({ id: Utils.generateUUID(), clientId, description, value, dueDate, status: 'Pendente', createdAt: new Date().toISOString() });
+                Notification.success('Conta salva!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            this.clearForm();
+            this.loadReceivables();
+        },
+        editReceivable(id) {
+            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
+            if (receivable) {
+                document.getElementById('receivableClient').value = receivable.clientId;
+                document.getElementById('receivableDescription').value = receivable.description;
+                document.getElementById('receivableValue').value = receivable.value;
+                document.getElementById('receivableDueDate').value = receivable.dueDate;
+                this.currentEditId = id;
+                document.getElementById('receivableForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteReceivable(id) {
+            if (confirm('Tem certeza que deseja excluir esta conta?')) {
+                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                this.loadReceivables();
+                Notification.success('Conta excluída!');
+            }
+        },
+        markAsPaid(id) {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const index = receivables.findIndex(r => r.id === id);
+            if (index !== -1) {
+                const receivable = receivables[index];
+                receivables[index].status = 'Pago';
+                receivable.paidDate = new Date().toISOString();
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                
+                // Adicionar entrada no fluxo de caixa
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+                const client = Utils.loadFromStorage(CONFIG.storageKeys.clients).find(c => c.id === receivable.clientId);
+                const description = `Recebimento: ${receivable.description} - Cliente: ${client ? client.name : 'N/A'}`;
+                cashFlow.push({ id: Utils.generateUUID(), type: 'entrada', description, value: receivable.value, date: new Date().toISOString().split('T')[0] });
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                
+                this.loadReceivables();
+                Notification.success('Conta marcada como paga!');
+            }
+        },
+        updateAllStatus(receivables) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            receivables.forEach(r => {
+                if (r.status === 'Pendente' && new Date(r.dueDate) < today) {
+                    r.status = 'Vencido';
+                }
+            });
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            return receivables;
+        },
+        clearForm() {
+            document.getElementById('receivableForm').reset();
+            this.currentEditId = null;
+        },
+        filterReceivables() {
+            const searchTerm = document.getElementById('receivableSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('receivableFilterStatus').value;
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
 
-            document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(monthlyExpenses);
-            document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(yearlyExpenses);
-        },
-        renderExpenses(expenses) {
-            const tbody = document.getElementById('expensesTableBody');
-            if (expenses.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = expenses.sort((a,b) => new Date(b.date) - new Date(a.date)).map(expense => `
-                <tr>
-                    <td>${Utils.formatDate(expense.date)}</td>
-                    <td>${expense.description}</td>
-                    <td><span class="badge badge-secondary">${expense.category}</span></td>
-                    <td style="color: var(--danger-color);">${Utils.formatCurrency(expense.value)}</td>
-                    <td>
-                        <div class="flex gap-1">
-                            <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${expense.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${expense.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`).join('');
-        },
-        exportToCSV() {
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            if (expenses.length === 0) return Notification.warning('Nenhuma despesa para exportar!');
-            Clients.downloadCSV(
-                ['Data', 'Descrição', 'Categoria', 'Valor'].join(',') + '\n' +
-                expenses.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.description}"`, `"${e.category}"`, e.value.toFixed(2)].join(',')).join('\n'), 'despesas'
-            );
-        }
-    };
+            if (statusFilter) {
+                receivables = receivables.filter(r => r.status === statusFilter);
+            }
 
-    // Módulo de Contas a Receber
-    const Receivables = {
-        currentEditId: null,
-        init() {
-            document.getElementById('receivableForm').addEventListener('submit', e => { e.preventDefault(); this.saveReceivable(); });
-            document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(e => this.filterReceivables(e.target.value), 300));
-            document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterByStatus());
-            document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
-        },
-        saveReceivable() {
-            const clientId = document.getElementById('receivableClient').value;
-            const description = document.getElementById('receivableDescription').value.trim();
-            const value = parseFloat(document.getElementById('receivableValue').value) || 0;
-            const dueDate = document.getElementById('receivableDueDate').value;
+            if (searchTerm) {
+                receivables = receivables.filter(r => {
+                    const client = clients.find(c => c.id === r.clientId);
+                    const clientName = client ? client.name.toLowerCase() : '';
+                    return r.description.toLowerCase().includes(searchTerm) || clientName.includes(searchTerm);
+                });
+            }
+            this.renderReceivables(receivables);
+        },
+        updateSummary(receivables) {
+            const pending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+            const overdue = receivables.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
+            const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
 
-            if (!clientId || !description || value <= 0 || !dueDate) return Notification.error('Preencha todos os campos!');
+            document.getElementById('totalReceivablesPending').textContent = Utils.formatCurrency(pending);
+            document.getElementById('totalReceivablesOverdue').textContent = Utils.formatCurrency(overdue);
+            document.getElementById('totalReceivablesPaid').textContent = Utils.formatCurrency(paid);
+        },
+        renderReceivables(receivables) {
+            const tbody = document.getElementById('receivablesTableBody');
+            if (receivables.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma conta encontrada</td></tr>`;
+                return;
+            }
+            
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            tbody.innerHTML = receivables.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).map(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                const statusClasses = { 'Pago': 'badge-success', 'Pendente': 'badge-warning', 'Vencido': 'badge-danger' };
+                return `
+                <tr>
+                    <td>${client ? client.name : 'N/A'}</td>
+                    <td>${r.description}</td>
+                    <td>${Utils.formatCurrency(r.value)}</td>
+                    <td>${Utils.formatDate(r.dueDate)}</td>
+                    <td><span class="badge ${statusClasses[r.status]}">${r.status}</span></td>
+                    <td>
+                        <div class="flex gap-1">
+                            ${r.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
+                            <button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${r.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${r.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        },
+        exportToCSV() {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            if (receivables.length === 0) return Notification.warning('Nenhuma conta para exportar!');
+            Clients.downloadCSV(
+                ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'].join(',') + '\n' +
+                receivables.map(r => {
+                    const client = clients.find(c => c.id === r.clientId);
+                    return [`"${client ? client.name : 'N/A'}"`, `"${r.description}"`, r.value.toFixed(2), `"${Utils.formatDate(r.dueDate)}"`, `"${r.status}"`].join(',');
+                }).join('\n'), 'contas_a_receber'
+            );
+        }
+    };
+    
+    // Módulo de Relatórios
+    const Reports = {
+        chart: null,
+        lastReportData: { data: [], headers: [] },
+        init() {
+            document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
+            document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
+            document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
+            document.getElementById('reportType').addEventListener('change', (e) => this.toggleReportFilters(e.target.value));
+        },
+        initPage() {
+            this.loadClientFilter();
+            this.generateReport(); // Gera relatório inicial de vendas
+        },
+        toggleReportFilters(reportType) {
+            const clientFilter = document.getElementById('reportClientFilterContainer');
+            const statusFilter = document.getElementById('reportStatusFilterContainer');
+            clientFilter.classList.add('hidden');
+            statusFilter.classList.add('hidden');
 
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            if (this.currentEditId) {
-                const index = receivables.findIndex(r => r.id === this.currentEditId);
-                if (index !== -1) {
-                    receivables[index] = { ...receivables[index], clientId, description, value, dueDate, updatedAt: new Date().toISOString() };
-                    Notification.success('Conta atualizada!');
-                }
-            } else {
-                receivables.push({
-                    id: Utils.generateUUID(),
-                    clientId,
-                    description,
-                    value,
-                    dueDate,
-                    status: 'Pendente',
-                    createdAt: new Date().toISOString()
-                });
-                Notification.success('Conta registrada!');
-            }
-            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-            this.clearForm();
-            this.loadReceivables();
-        },
-        editReceivable(id) {
-            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
-            if (receivable) {
-                document.getElementById('receivableClient').value = receivable.clientId;
-                document.getElementById('receivableDescription').value = receivable.description;
-                document.getElementById('receivableValue').value = receivable.value;
-                document.getElementById('receivableDueDate').value = receivable.dueDate;
-                this.currentEditId = id;
-                document.getElementById('receivableForm').scrollIntoView({ behavior: 'smooth' });
-            }
-        },
-        deleteReceivable(id) {
-            if (confirm('Tem certeza que deseja excluir esta conta?')) {
-                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-                this.loadReceivables();
-                Notification.success('Conta excluída!');
-            }
-        },
-        markAsPaid(id) {
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const receivable = receivables.find(r => r.id === id);
-            if (receivable && receivable.status !== 'Pago') {
-                receivable.status = 'Pago';
-                receivable.paidAt = new Date().toISOString();
-                
-                // Adicionar ao fluxo de caixa
-                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-                cashFlow.push({
-                    id: Utils.generateUUID(),
-                    type: 'entrada',
-                    description: `Recebimento: ${receivable.description}`,
-                    value: receivable.value,
-                    date: new Date().toISOString().split('T')[0]
-                });
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-                this.loadReceivables();
-                Notification.success('Conta marcada como paga!');
-            }
-        },
-        clearForm() {
-            document.getElementById('receivableForm').reset();
-            this.currentEditId = null;
-        },
-        filterReceivables(searchTerm) {
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const filtered = receivables.filter(r => {
-                const client = clients.find(c => c.id === r.clientId);
-                return r.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       (client && client.name.toLowerCase().includes(searchTerm.toLowerCase()));
-            });
-            this.renderReceivables(filtered);
-        },
-        filterByStatus() {
-            const status = document.getElementById('receivableFilterStatus').value;
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const filtered = status ? receivables.filter(r => r.status === status) : receivables;
-            this.renderReceivables(filtered);
-        },
-        loadReceivables() {
-            this.loadClients();
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            this.updateStatuses(receivables);
-            this.renderReceivables(receivables);
-            this.updateStats(receivables);
-        },
-        loadClients() {
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const select = document.getElementById('receivableClient');
-            select.innerHTML = '<option value="">Selecione um cliente</option>';
-            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
-        },
-        updateStatuses(receivables) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            receivables.forEach(receivable => {
-                if (receivable.status === 'Pendente' && new Date(receivable.dueDate) < today) {
-                    receivable.status = 'Vencido';
-                }
-            });
-            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-        },
-        updateStats(receivables) {
-            const pending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
-            const overdue = receivables.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
-            const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
+            if (reportType === 'contas_a_receber') {
+                clientFilter.classList.remove('hidden');
+                statusFilter.classList.remove('hidden');
+            } else if (reportType === 'clientes' || reportType === 'vendas') {
+                clientFilter.classList.remove('hidden');
+            }
+        },
+        loadClientFilter() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('reportReceivableClient');
+            select.innerHTML = '<option value="">Todos os Clientes</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        getFilters() {
+            return {
+                startDate: document.getElementById('reportStartDate').value,
+                endDate: document.getElementById('reportEndDate').value,
+                type: document.getElementById('reportType').value,
+                clientId: document.getElementById('reportReceivableClient').value,
+                status: document.getElementById('reportReceivableStatus').value
+            };
+        },
+        generateReport() {
+            const filters = this.getFilters();
+            let data, headers, chartData, chartType = 'bar';
 
-            document.getElementById('totalReceivablesPending').textContent = Utils.formatCurrency(pending);
-            document.getElementById('totalReceivablesOverdue').textContent = Utils.formatCurrency(overdue);
-            document.getElementById('totalReceivablesPaid').textContent = Utils.formatCurrency(paid);
-        },
-        renderReceivables(receivables) {
-            const tbody = document.getElementById('receivablesTableBody');
-            if (receivables.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma conta encontrada</td></tr>`;
-                return;
-            }
-            
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            tbody.innerHTML = receivables.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).map(receivable => {
-                const client = clients.find(c => c.id === receivable.clientId);
-                const statusClass = receivable.status === 'Pago' ? 'badge-success' : (receivable.status === 'Vencido' ? 'badge-danger' : 'badge-warning');
-                return `
-                    <tr>
-                        <td>${client ? client.name : 'N/A'}</td>
-                        <td>${receivable.description}</td>
-                        <td>${Utils.formatCurrency(receivable.value)}</td>
-                        <td>${Utils.formatDate(receivable.dueDate)}</td>
-                        <td><span class="badge ${statusClass}">${receivable.status}</span></td>
-                        <td>
-                            <div class="flex gap-1">
-                                ${receivable.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${receivable.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
-                                <button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${receivable.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${receivable.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            }).join('');
-        },
-        exportToCSV() {
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            if (receivables.length === 0) return Notification.warning('Nenhuma conta para exportar!');
-            Clients.downloadCSV(
-                ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'].join(',') + '\n' +
-                receivables.map(r => {
-                    const client = clients.find(c => c.id === r.clientId);
-                    return [`"${client ? client.name : 'N/A'}"`, `"${r.description}"`, r.value.toFixed(2), `"${Utils.formatDate(r.dueDate)}"`, `"${r.status}"`].join(',');
-                }).join('\n'), 'contas_a_receber'
-            );
-        }
-    };
+            const dateFilter = (item) => {
+                const itemDate = new Date(item.date || item.createdAt || item.dueDate);
+                const start = filters.startDate ? new Date(filters.startDate + 'T00:00:00') : null;
+                const end = filters.endDate ? new Date(filters.endDate + 'T23:59:59') : null;
+                if (start && itemDate < start) return false;
+                if (end && itemDate > end) return false;
+                return true;
+            };
 
-    // Módulo de Relatórios
-    const Reports = {
-        chart: null,
-        init() {
-            document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
-            document.getElementById('reportType').addEventListener('change', () => this.updateFilters());
-            document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
-            document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
-        },
-        initPage() {
-            this.loadClients();
-            this.setDefaultDates();
-            this.updateFilters();
-        },
-        loadClients() {
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const select = document.getElementById('reportReceivableClient');
-            select.innerHTML = '<option value="">Todos os Clientes</option>';
-            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
-        },
-        setDefaultDates() {
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            document.getElementById('reportStartDate').value = firstDay.toISOString().split('T')[0];
-            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
-        },
-        updateFilters() {
-            const reportType = document.getElementById('reportType').value;
-            const clientFilter = document.getElementById('reportClientFilterContainer');
-            const statusFilter = document.getElementById('reportStatusFilterContainer');
-            
-            if (reportType === 'contas_a_receber') {
-                clientFilter.classList.remove('hidden');
-                statusFilter.classList.remove('hidden');
-            } else {
-                clientFilter.classList.add('hidden');
-                statusFilter.classList.add('hidden');
-            }
-        },
-        generateReport() {
-            const startDate = document.getElementById('reportStartDate').value;
-            const endDate = document.getElementById('reportEndDate').value;
-            const reportType = document.getElementById('reportType').value;
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
 
-            if (!startDate || !endDate) return Notification.error('Selecione as datas!');
-            if (new Date(startDate) > new Date(endDate)) return Notification.error('Data inicial deve ser menor que a final!');
+            switch (filters.type) {
+                case 'vendas': {
+                    headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
+                    let filteredSales = sales.filter(dateFilter);
+                    if (filters.clientId) {
+                        filteredSales = filteredSales.filter(s => s.clientId === filters.clientId);
+                    }
+                    data = filteredSales.map(s => {
+                        const client = clients.find(c => c.id === s.clientId);
+                        return [Utils.formatDate(s.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(s.total), s.paymentMethod];
+                    });
+                    
+                    const salesByDay = filteredSales.reduce((acc, s) => {
+                        const day = Utils.formatDate(s.date);
+                        acc[day] = (acc[day] || 0) + s.total;
+                        return acc;
+                    }, {});
+                    chartData = { labels: Object.keys(salesByDay), datasets: [{ label: 'Vendas (R$)', data: Object.values(salesByDay), backgroundColor: '#3B82F6' }] };
+                    chartType = 'line';
+                    break;
+                }
+                case 'financeiro': {
+                    headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
+                    const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(dateFilter);
+                    data = cashFlow.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
+                    
+                    const summary = cashFlow.reduce((acc, item) => {
+                        acc[item.type] = (acc[item.type] || 0) + item.value;
+                        return acc;
+                    }, {});
+                    chartData = { labels: ['Entradas', 'Saídas'], datasets: [{ data: [summary.entrada || 0, summary.saida || 0], backgroundColor: ['#10B981', '#EF4444'] }]};
+                    chartType = 'pie';
+                    break;
+                }
+                case 'produtos': {
+                    headers = ['Produto', 'Qtd Vendida', 'Total Faturado'];
+                    const soldProducts = sales.filter(dateFilter).reduce((acc, s) => {
+                        s.items.forEach(item => {
+                            acc[item.productId] = acc[item.productId] || { name: item.name, quantity: 0, total: 0 };
+                            acc[item.productId].quantity += item.quantity;
+                            acc[item.productId].total += item.price * item.quantity;
+                        });
+                        return acc;
+                    }, {});
+                    const sortedProducts = Object.values(soldProducts).sort((a,b) => b.total - a.total);
+                    data = sortedProducts.map(p => [p.name, p.quantity, Utils.formatCurrency(p.total)]);
+                    
+                    const top5 = sortedProducts.slice(0, 5);
+                    chartData = { labels: top5.map(p => p.name), datasets: [{ label: 'Faturamento (R$)', data: top5.map(p => p.total), backgroundColor: '#F59E0B' }] };
+                    break;
+                }
+                case 'clientes': {
+                    headers = ['Cliente', 'Total Gasto', 'Nº de Compras'];
+                    let filteredSales = sales.filter(dateFilter);
+                    if (filters.clientId) {
+                        filteredSales = filteredSales.filter(s => s.clientId === filters.clientId);
+                    }
+                    
+                    const clientSummary = filteredSales.reduce((acc, s) => {
+                        if (s.clientId) {
+                            const client = clients.find(c => c.id === s.clientId);
+                            if (client) {
+                                acc[s.clientId] = acc[s.clientId] || { name: client.name, total: 0, count: 0 };
+                                acc[s.clientId].total += s.total;
+                                acc[s.clientId].count++;
+                            }
+                        }
+                        return acc;
+                    }, {});
+                    const sortedClients = Object.values(clientSummary).sort((a,b) => b.total - a.total);
+                    data = sortedClients.map(c => [c.name, Utils.formatCurrency(c.total), c.count]);
+                    
+                    const top5 = sortedClients.slice(0, 5);
+                    chartData = { labels: top5.map(c => c.name), datasets: [{ label: 'Total Gasto (R$)', data: top5.map(c => c.total), backgroundColor: '#8B5CF6' }] };
+                    break;
+                }
+                case 'contas_a_receber': {
+                    headers = ['Cliente', 'Vencimento', 'Valor', 'Status'];
+                    let receivables = Receivables.updateAllStatus(Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable)).filter(dateFilter);
+                    if (filters.clientId) {
+                        receivables = receivables.filter(r => r.clientId === filters.clientId);
+                    }
+                    if (filters.status) {
+                        receivables = receivables.filter(r => r.status === filters.status);
+                    }
+                    data = receivables.map(r => {
+                        const client = clients.find(c => c.id === r.clientId);
+                        return [client ? client.name : 'N/A', Utils.formatDate(r.dueDate), Utils.formatCurrency(r.value), r.status];
+                    });
+                    
+                    const statusSummary = receivables.reduce((acc, r) => {
+                        acc[r.status] = (acc[r.status] || 0) + r.value;
+                        return acc;
+                    }, {});
+                    chartData = { labels: ['Pagas', 'Pendentes', 'Vencidas'], datasets: [{ data: [statusSummary['Pago'] || 0, statusSummary['Pendente'] || 0, statusSummary['Vencido'] || 0], backgroundColor: ['#10B981', '#F59E0B', '#EF4444'] }] };
+                    chartType = 'doughnut';
+                    break;
+                }
+            }
 
-            switch (reportType) {
-                case 'vendas': this.generateSalesReport(startDate, endDate); break;
-                case 'financeiro': this.generateFinancialReport(startDate, endDate); break;
-                case 'produtos': this.generateProductsReport(startDate, endDate); break;
-                case 'clientes': this.generateClientsReport(startDate, endDate); break;
-                case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate); break;
-            }
-        },
-        generateSalesReport(startDate, endDate) {
-            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
-                const saleDate = s.date.split('T')[0];
-                return saleDate >= startDate && saleDate <= endDate;
-            });
+            this.lastReportData = { data, headers, filters };
+            this.renderReport(headers, data);
+            this.updateChart(chartData, chartType);
+            this.updateSummary();
+            this.updateTopLists();
+            Notification.success('Relatório gerado!');
+        },
+        renderReport(headers, data) {
+            const head = document.getElementById('reportTableHead');
+            const body = document.getElementById('reportTableBody');
+            head.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            if (data.length === 0) {
+                body.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado para os filtros selecionados.</td></tr>`;
+            } else {
+                body.innerHTML = data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
+            }
+        },
+        updateSummary() {
+            const { filters } = this.lastReportData;
+            const dateFilter = item => {
+                const itemDate = new Date(item.date);
+                const start = filters.startDate ? new Date(filters.startDate + 'T00:00:00') : null;
+                const end = filters.endDate ? new Date(filters.endDate + 'T23:59:59') : null;
+                if (start && itemDate < start) return false;
+                if (end && itemDate > end) return false;
+                return true;
+            };
+            
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(dateFilter);
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses).filter(dateFilter);
+            
+            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
+            const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
+            const profit = totalSales - totalExpenses;
+            
+            document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalSales);
+            document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(totalExpenses);
+            document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
+            document.getElementById('reportSalesCount').textContent = sales.length;
+        },
+        updateTopLists() {
+            const { type } = this.lastReportData.filters;
+            const topListContainer = document.getElementById('topProductsList');
+            let content = '';
+            
+            if (type === 'produtos') {
+                const data = this.lastReportData.data.slice(0, 5);
+                content = '<h5>Top 5 Produtos (Faturamento)</h5><ul>' + data.map(p => `<li>${p[0]} - ${p[2]}</li>`).join('') + '</ul>';
+            } else if (type === 'clientes') {
+                const data = this.lastReportData.data.slice(0, 5);
+                content = '<h5>Top 5 Clientes (Valor Gasto)</h5><ul>' + data.map(c => `<li>${c[0]} - ${c[1]}</li>`).join('') + '</ul>';
+            } else if (type === 'contas_a_receber') {
+                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.status === 'Vencido');
+                const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+                const debtors = receivables.reduce((acc, r) => {
+                    const client = clients.find(c => c.id === r.clientId);
+                    if (client) {
+                        acc[client.id] = acc[client.id] || { name: client.name, total: 0 };
+                        acc[client.id].total += r.value;
+                    }
+                    return acc;
+                }, {});
+                const sortedDebtors = Object.values(debtors).sort((a,b) => b.total - a.total).slice(0, 5);
+                content = '<h5>Top 5 Maiores Devedores (Vencido)</h5><ul>' + sortedDebtors.map(d => `<li>${d.name} - ${Utils.formatCurrency(d.total)}</li>`).join('') + '</ul>';
+            } else {
+                content = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Sem destaques para este tipo de relatório.</p>';
+            }
+            
+            topListContainer.innerHTML = content;
+        },
+        updateChart(data, type) {
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            if (this.chart) this.chart.destroy();
+            if (!data) return;
 
-            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
-            const salesCount = sales.length;
+            this.chart = new Chart(ctx, {
+                type,
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
+                    scales: type === 'pie' || type === 'doughnut' ? {} : {
+                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                    }
+                }
+            });
+        },
+        exportToCSV() {
+            const { headers, data, filters } = this.lastReportData;
+            if (data.length === 0) return Notification.warning('Nenhum dado para exportar!');
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            Clients.downloadCSV(csvContent, `relatorio_${filters.type}`);
+        },
+        exportToPDF() {
+            const { headers, data, filters } = this.lastReportData;
+            if (data.length === 0) return Notification.warning('Nenhum dado para exportar!');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const title = `Relatório de ${filters.type.replace('_', ' ')}`;
+            doc.text(title, 14, 16);
+            
+            const period = filters.startDate && filters.endDate ? `Período: ${Utils.formatDate(filters.startDate)} a ${Utils.formatDate(filters.endDate)}` : 'Período: Todos';
+            doc.setFontSize(10);
+            doc.text(period, 14, 22);
 
-            // Produtos mais vendidos
-            const productSales = {};
-            sales.forEach(sale => {
-                sale.items.forEach(item => {
-                    productSales[item.name] = (productSales[item.name] || 0) + item.quantity;
-                });
-            });
-            const topProducts = Object.entries(productSales).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            doc.autoTable({
+                head: [headers],
+                body: data.map(row => row.map(cell => String(cell))),
+                startY: 28
+            });
+            doc.save(`relatorio_${filters.type}_${new Date().toISOString().split('T')[0]}.pdf`);
+            Notification.success('Relatório PDF exportado!');
+        }
+    };
+    
+    // Módulo de Configurações (Backup/Restore)
+    const Settings = {
+        init() {
+            document.getElementById('downloadBackup').addEventListener('click', () => this.downloadBackup());
+            document.getElementById('restoreFile').addEventListener('change', (e) => this.prepareRestore(e));
+            document.getElementById('restoreBackup').addEventListener('click', () => this.restoreBackup());
+            document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
+        },
+        updateBackupStats() {
+            document.getElementById('backupClientsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.clients).length;
+            document.getElementById('backupProductsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.products).length;
+            document.getElementById('backupSalesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.sales).length;
+            document.getElementById('backupReceivablesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).length;
+        },
+        downloadBackup() {
+            const allData = {};
+            for (const key in CONFIG.storageKeys) {
+                allData[CONFIG.storageKeys[key]] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
+            }
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_sgi_flordemaria_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            Notification.success('Backup realizado com sucesso!');
+        },
+        prepareRestore(event) {
+            const file = event.target.files[0];
+            const restoreBtn = document.getElementById('restoreBackup');
+            if (file && file.type === 'application/json') {
+                restoreBtn.disabled = false;
+            } else {
+                restoreBtn.disabled = true;
+                if(file) Notification.error('Selecione um arquivo .json válido!');
+            }
+        },
+        restoreBackup() {
+            if (!confirm('ATENÇÃO: Isso substituirá TODOS os dados atuais. Deseja continuar?')) return;
 
-            this.updateSummary(totalSales, 0, totalSales, salesCount);
-            this.updateTopList(topProducts.map(([name, qty]) => `${name}: ${qty} vendidos`));
-            this.updateChart(sales, 'vendas');
-            this.updateDetailTable(sales, 'vendas');
-        },
-        generateFinancialReport(startDate, endDate) {
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.date >= startDate && cf.date <= endDate);
-            
-            const totalEntradas = cashFlow.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
-            const totalSaidas = cashFlow.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
-            const profit = totalEntradas - totalSaidas;
+            const file = document.getElementById('restoreFile').files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    let restored = false;
+                    for (const key in data) {
+                        // Verifica se a chave do JSON corresponde a uma chave de storage válida
+                        if (Object.values(CONFIG.storageKeys).includes(key)) {
+                            Utils.saveToStorage(key, data[key]);
+                            restored = true;
+                        }
+                    }
+                    if (restored) {
+                        Notification.success('Dados restaurados! A página será recarregada.');
+                        setTimeout(() => window.location.reload(), 2000);
+                    } else {
+                        Notification.error('Arquivo de backup inválido ou não compatível.');
+                    }
+                } catch (error) {
+                    console.error("Erro ao restaurar backup:", error);
+                    Notification.error('Erro ao ler o arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+        },
+        clearAllData() {
+            if (prompt('Esta ação é irreversível e apagará TUDO. Para confirmar, digite "APAGAR TUDO".') === 'APAGAR TUDO') {
+                for (const key in CONFIG.storageKeys) {
+                    localStorage.removeItem(CONFIG.storageKeys[key]);
+                }
+                Notification.success('Todos os dados foram apagados. A página será recarregada.');
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                Notification.warning('Ação cancelada.');
+            }
+        }
+    };
+    
+    // Inicializador Principal da Aplicação
+    const App = {
+        init() {
+            Auth.init();
+            Navigation.init();
+            Dashboard.loadData();
+            Clients.init();
+            Products.init();
+            Sales.init();
+            Receipts.init();
+            CashFlow.init();
+            Expenses.init();
+            Receivables.init();
+            Reports.init();
+            Settings.init();
+            
+            // Configurações do Modal
+            document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target.id === 'modal') Modal.hide();
+            });
+        }
+    };
 
-            this.updateSummary(totalEntradas, totalSaidas, profit, cashFlow.length);
-            this.updateTopList(['Relatório financeiro gerado com sucesso']);
-            this.updateChart(cashFlow, 'financeiro');
-            this.updateDetailTable(cashFlow, 'financeiro');
-        },
-        generateProductsReport(startDate, endDate) {
-            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
-                const saleDate = s.date.split('T')[0];
-                return saleDate >= startDate && saleDate <= endDate;
-            });
-
-            // Produtos com baixo estoque
-            const lowStock = products.filter(p => p.quantity <= 5).slice(0, 5);
-
-            this.updateSummary(0, 0, 0, products.length);
-            this.updateTopList(lowStock.length > 0 ? lowStock.map(p => `${p.name}: ${p.quantity} em estoque`) : ['Todos os produtos com estoque adequado']);
-            this.updateChart(products, 'produtos');
-            this.updateDetailTable(products, 'produtos');
-        },
-        generateClientsReport(startDate, endDate) {
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
-                const saleDate = s.date.split('T')[0];
-                return saleDate >= startDate && saleDate <= endDate;
-            });
-
-            // Clientes que mais compraram
-            const clientSales = {};
-            sales.forEach(sale => {
-                if (sale.clientId) {
-                    clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
-                }
-            });
-            const topClients = Object.entries(clientSales).sort((a,b) => b[1] - a[1]).slice(0, 5);
-            const topClientsNames = topClients.map(([id, total]) => {
-                const client = clients.find(c => c.id === id);
-                return `${client ? client.name : 'N/A'}: ${Utils.formatCurrency(total)}`;
-            });
-
-            this.updateSummary(0, 0, 0, clients.length);
-            this.updateTopList(topClientsNames.length > 0 ? topClientsNames : ['Nenhuma compra no período']);
-            this.updateChart(clients, 'clientes');
-            this.updateDetailTable(clients, 'clientes');
-        },
-        generateReceivablesReport(startDate, endDate) {
-            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.dueDate >= startDate && r.dueDate <= endDate);
-            
-            // Filtros adicionais
-            const clientFilter = document.getElementById('reportReceivableClient').value;
-            const statusFilter = document.getElementById('reportReceivableStatus').value;
-            
-            if (clientFilter) receivables = receivables.filter(r => r.clientId === clientFilter);
-            if (statusFilter) receivables = receivables.filter(r => r.status === statusFilter);
-
-            const totalPending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
-            const totalOverdue = receivables.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
-            const totalPaid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
-
-            // Maiores devedores
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const debtors = {};
-            receivables.filter(r => r.status !== 'Pago').forEach(r => {
-                debtors[r.clientId] = (debtors[r.clientId] || 0) + r.value;
-            });
-            const topDebtors = Object.entries(debtors).sort((a,b) => b[1] - a[1]).slice(0, 5);
-            const topDebtorsNames = topDebtors.map(([id, debt]) => {
-                const client = clients.find(c => c.id === id);
-                return `${client ? client.name : 'N/A'}: ${Utils.formatCurrency(debt)}`;
-            });
-
-            this.updateSummary(totalPaid, totalOverdue, totalPending, receivables.length);
-            this.updateTopList(topDebtorsNames.length > 0 ? topDebtorsNames : ['Nenhum devedor no período']);
-            this.updateChart(receivables, 'contas_a_receber');
-            this.updateDetailTable(receivables, 'contas_a_receber');
-        },
-        updateSummary(sales, expenses, profit, count) {
-            document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(sales);
-            document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(expenses);
-            document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
-            document.getElementById('reportSalesCount').textContent = count;
-            
-            const profitElement = document.getElementById('reportProfit');
-            profitElement.style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
-        },
-        updateTopList(items) {
-            const container = document.getElementById('topProductsList');
-            if (items.length === 0) {
-                container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum destaque encontrado.</p>';
-            } else {
-                container.innerHTML = items.map((item, index) => `
-                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                        <span style="color: var(--primary-color); font-weight: 600;">${index + 1}.</span> ${item}
-                    </div>
-                `).join('');
-            }
-        },
-        updateChart(data, type) {
-            const ctx = document.getElementById('reportChart').getContext('2d');
-            if (this.chart) this.chart.destroy();
-
-            let chartData = {};
-            switch (type) {
-                case 'vendas':
-                    const salesByDay = {};
-                    data.forEach(sale => {
-                        const day = Utils.formatDate(sale.date.split('T')[0]);
-                        salesByDay[day] = (salesByDay[day] || 0) + sale.total;
-                    });
-                    chartData = { labels: Object.keys(salesByDay), datasets: [{ label: 'Vendas (R$)', data: Object.values(salesByDay), backgroundColor: '#3B82F6' }] };
-                    break;
-                case 'financeiro':
-                    const entradas = data.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
-                    const saidas = data.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
-                    chartData = { labels: ['Entradas', 'Saídas'], datasets: [{ data: [entradas, saidas], backgroundColor: ['#10B981', '#EF4444'] }] };
-                    break;
-                case 'produtos':
-                    const inStock = data.filter(p => p.quantity > 0).length;
-                    const outOfStock = data.filter(p => p.quantity <= 0).length;
-                    chartData = { labels: ['Em Estoque', 'Esgotados'], datasets: [{ data: [inStock, outOfStock], backgroundColor: ['#10B981', '#EF4444'] }] };
-                    break;
-                case 'clientes':
-                    chartData = { labels: ['Total de Clientes'], datasets: [{ label: 'Clientes', data: [data.length], backgroundColor: '#3B82F6' }] };
-                    break;
-                case 'contas_a_receber':
-                    const pending = data.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
-                    const overdue = data.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
-                    const paid = data.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
-                    chartData = { labels: ['Pendentes', 'Vencidas', 'Pagas'], datasets: [{ data: [pending, overdue, paid], backgroundColor: ['#F59E0B', '#EF4444', '#10B981'] }] };
-                    break;
-            }
-
-            this.chart = new Chart(ctx, {
-                type: type === 'vendas' || type === 'clientes' ? 'bar' : 'doughnut',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
-                    scales: type === 'vendas' || type === 'clientes' ? {
-                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
-                    } : {}
-                }
-            });
-        },
-        updateDetailTable(data, type) {
-            const thead = document.getElementById('reportTableHead');
-            const tbody = document.getElementById('reportTableBody');
-
-            let headers = [];
-            let rows = [];
-
-            switch (type) {
-                case 'vendas':
-                    headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
-                    const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-                    rows = data.map(sale => {
-                        const client = clients.find(c => c.id === sale.clientId);
-                        return [Utils.formatDateTime(sale.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(sale.total), sale.paymentMethod];
-                    });
-                    break;
-                case 'financeiro':
-                    headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
-                    rows = data.map(cf => [Utils.formatDate(cf.date), cf.type === 'entrada' ? 'Entrada' : 'Saída', cf.description, Utils.formatCurrency(cf.value)]);
-                    break;
-                case 'produtos':
-                    headers = ['Código', 'Nome', 'Estoque', 'Preço Venda'];
-                    rows = data.map(p => [p.refCode, p.name, p.quantity, Utils.formatCurrency(p.salePrice)]);
-                    break;
-                case 'clientes':
-                    headers = ['Nome', 'Telefone', 'Cadastro'];
-                    rows = data.map(c => [c.name, c.phone, Utils.formatDate(c.createdAt)]);
-                    break;
-                case 'contas_a_receber':
-                    headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
-                    const clientsReceivables = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-                    rows = data.map(r => {
-                        const client = clientsReceivables.find(c => c.id === r.clientId);
-                        return [client ? client.name : 'N/A', r.description, Utils.formatCurrency(r.value), Utils.formatDate(r.dueDate), r.status];
-                    });
-                    break;
-            }
-
-            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
-            tbody.innerHTML = rows.length > 0 ? rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado</td></tr>`;
-        },
-        exportToPDF() {
-            if (!window.jsPDF) return Notification.error('Biblioteca PDF não carregada!');
-            
-            const { jsPDF } = window.jsPDF;
-            const doc = new jsPDF();
-            
-            // Título
-            doc.setFontSize(20);
-            doc.text('Relatório - ' + CONFIG.company.name, 20, 30);
-            
-            // Período
-            const startDate = document.getElementById('reportStartDate').value;
-            const endDate = document.getElementById('reportEndDate').value;
-            doc.setFontSize(12);
-            doc.text(`Período: ${Utils.formatDate(startDate)} a ${Utils.formatDate(endDate)}`, 20, 45);
-            
-            // Resumo
-            const totalSales = document.getElementById('reportTotalSales').textContent;
-            const totalExpenses = document.getElementById('reportTotalExpenses').textContent;
-            const profit = document.getElementById('reportProfit').textContent;
-            
-            doc.text(`Total de Vendas: ${totalSales}`, 20, 60);
-            doc.text(`Total de Despesas: ${totalExpenses}`, 20, 70);
-            doc.text(`Lucro Líquido: ${profit}`, 20, 80);
-            
-            // Tabela
-            const table = document.getElementById('reportDetailTable');
-            if (table && window.jsPDF.autoTable) {
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
-                    Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
-                );
-                
-                doc.autoTable({
-                    head: [headers],
-                    body: rows,
-                    startY: 90,
-                    styles: { fontSize: 8 }
-                });
-            }
-            
-            doc.save(`relatorio_${new Date().toISOString().split('T')[0]}.pdf`);
-            Notification.success('Relatório PDF exportado!');
-        },
-        exportToCSV() {
-            const table = document.getElementById('reportDetailTable');
-            if (!table) return Notification.warning('Nenhum relatório para exportar!');
-            
-            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-            const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
-                Array.from(tr.querySelectorAll('td')).map(td => `"${td.textContent}"`)
-            );
-            
-            const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-            Clients.downloadCSV(csvContent, 'relatorio');
-        }
-    };
-
-    // Módulo de Configurações
-    const Settings = {
-        init() {
-            document.getElementById('downloadBackup').addEventListener('click', () => this.downloadBackup());
-            document.getElementById('restoreFile').addEventListener('change', (e) => this.handleFileSelect(e));
-            document.getElementById('restoreBackup').addEventListener('click', () => this.restoreBackup());
-            document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
-        },
-        updateBackupStats() {
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-
-            document.getElementById('backupClientsCount').textContent = clients.length;
-            document.getElementById('backupProductsCount').textContent = products.length;
-            document.getElementById('backupSalesCount').textContent = sales.length;
-            document.getElementById('backupReceivablesCount').textContent = receivables.length;
-        },
-        downloadBackup() {
-            const backup = {
-                version: '2.9.3',
-                timestamp: new Date().toISOString(),
-                company: CONFIG.company,
-                data: {
-                    clients: Utils.loadFromStorage(CONFIG.storageKeys.clients),
-                    products: Utils.loadFromStorage(CONFIG.storageKeys.products),
-                    sales: Utils.loadFromStorage(CONFIG.storageKeys.sales),
-                    cashFlow: Utils.loadFromStorage(CONFIG.storageKeys.cashFlow),
-                    expenses: Utils.loadFromStorage(CONFIG.storageKeys.expenses),
-                    accountsReceivable: Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable)
-                }
-            };
-
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `backup_flor_de_maria_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            Notification.success('Backup baixado com sucesso!');
-        },
-        handleFileSelect(event) {
-            const file = event.target.files[0];
-            document.getElementById('restoreBackup').disabled = !file;
-        },
-        restoreBackup() {
-            const fileInput = document.getElementById('restoreFile');
-            const file = fileInput.files[0];
-            
-            if (!file) return Notification.error('Selecione um arquivo de backup!');
-            if (!confirm('Tem certeza? Isso substituirá todos os dados atuais!')) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const backup = JSON.parse(e.target.result);
-                    
-                    if (!backup.data) throw new Error('Formato de backup inválido');
-                    
-                    // Restaurar dados
-                    Object.entries(backup.data).forEach(([key, data]) => {
-                        const storageKey = CONFIG.storageKeys[key];
-                        if (storageKey) {
-                            Utils.saveToStorage(storageKey, data || []);
-                        }
-                    });
-                    
-                    Notification.success('Backup restaurado com sucesso!');
-                    setTimeout(() => location.reload(), 1500);
-                } catch (error) {
-                    console.error('Erro ao restaurar backup:', error);
-                    Notification.error('Erro ao restaurar backup. Verifique o arquivo.');
-                }
-            };
-            reader.readAsText(file);
-        },
-        clearAllData() {
-            if (!confirm('ATENÇÃO: Isso apagará TODOS os dados do sistema. Tem certeza?')) return;
-            if (!confirm('Última confirmação: Todos os dados serão perdidos permanentemente!')) return;
-
-            Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
-            Notification.success('Todos os dados foram apagados!');
-            setTimeout(() => location.reload(), 1500);
-        }
-    };
-
-    // Inicialização do Sistema
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            // Inicializar módulos
-            Auth.init();
-            Navigation.init();
-            Clients.init();
-            Products.init();
-            Sales.init();
-            Receipts.init();
-            CashFlow.init();
-            Expenses.init();
-            Receivables.init();
-            Reports.init();
-            Settings.init();
-
-            // Event listeners globais
-            document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
-            document.getElementById('modal').addEventListener('click', (e) => {
-                if (e.target.id === 'modal') Modal.hide();
-            });
-
-            console.log('Sistema de Gestão Integrado - Flor de Maria v2.9.3 (Responsiveness Enhanced) carregado com sucesso!');
-        } catch (error) {
-            console.error('Erro ao inicializar o sistema:', error);
-            Notification.error('Erro ao carregar o sistema. Verifique o console.');
-        }
-    });
-    </script>
-</body>
-</html>
-
+    // Iniciar a aplicação quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', App.init);
