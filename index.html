@@ -239,7 +239,7 @@
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            white-space: normal; /* Permite que o texto quebre */
+            white-space: nowrap; /* Keep text on one line by default */
         }
 
         .table th {
@@ -919,13 +919,13 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             color: #495057;
-            white-space: normal; /* Removido para responsividade no recibo também */
+            white-space: normal; /* Removed for responsiveness in receipt too */
         }
         .receipt-items-table td {
             padding: 0.75rem;
             border-bottom: 1px solid #dee2e6;
             font-size: 0.95rem;
-            white-space: normal; /* Removido para responsividade no recibo também */
+            white-space: normal; /* Removed for responsiveness in receipt too */
         }
         .receipt-items-table .text-right { text-align: right; }
         .receipt-items-table .text-center { text-align: center; }
@@ -1457,7 +1457,7 @@
                         </div>
                     </div>
                 </div>
-                   <div class="card mt-4">
+                       <div class="card mt-4">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
@@ -2080,50 +2080,50 @@
                             <p style="color: var(--text-muted); margin-bottom: 20px;">
                                 Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.
                             </p>
-                             <div class="grid grid-2 mb-3">
-                                 <div class="text-center">
-                                     <div class="stat-value" id="backupClientsCount">0</div>
-                                     <div class="stat-label">Clientes</div>
-                                 </div>
-                                 <div class="text-center">
-                                     <div class="stat-value" id="backupProductsCount">0</div>
-                                     <div class="stat-label">Produtos</div>
-                                 </div>
-                                 <div class="text-center">
-                                     <div class="stat-value" id="backupSalesCount">0</div>
-                                     <div class="stat-label">Vendas</div>
-                                 </div>
-                                  <div class="text-center">
-                                     <div class="stat-value" id="backupReceivablesCount">0</div>
-                                     <div class="stat-label">Contas a Receber</div>
+                               <div class="grid grid-2 mb-3">
+                                    <div class="text-center">
+                                        <div class="stat-value" id="backupClientsCount">0</div>
+                                        <div class="stat-label">Clientes</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="stat-value" id="backupProductsCount">0</div>
+                                        <div class="stat-label">Produtos</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="stat-value" id="backupSalesCount">0</div>
+                                        <div class="stat-label">Vendas</div>
+                                    </div>
+                                     <div class="text-center">
+                                        <div class="stat-value" id="backupReceivablesCount">0</div>
+                                        <div class="stat-label">Contas a Receber</div>
+                                    </div>
                                 </div>
-                            </div>
                             <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
                                 <i class="fas fa-download"></i> Baixar Backup Completo
                             </button>
                         </div>
-                         <div class="card">
-                             <div class="card-header">
-                                 <h3 class="card-title">
-                                     <i class="fas fa-upload"></i> Restaurar Dados
-                                 </h3>
-                             </div>
-                             <p style="color: var(--text-muted); margin-bottom: 20px;">
-                                 Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.
-                             </p>
-                             <div class="form-group">
-                                 <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
-                                 <input type="file" id="restoreFile" class="form-input" accept=".json">
-                             </div>
-                             <div class="flex gap-2">
-                                 <button class="btn btn-warning" id="restoreBackup" disabled>
-                                     <i class="fas fa-upload"></i> Restaurar Backup
-                                 </button>
-                                 <button class="btn btn-danger" id="clearAllData">
-                                     <i class="fas fa-trash"></i> Limpar Todos os Dados
-                                 </button>
-                             </div>
-                         </div>
+                       <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-upload"></i> Restaurar Dados
+                                </h3>
+                            </div>
+                            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                                Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.
+                            </p>
+                            <div class="form-group">
+                                <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
+                                <input type="file" id="restoreFile" class="form-input" accept=".json">
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-warning" id="restoreBackup" disabled>
+                                    <i class="fas fa-upload"></i> Restaurar Backup
+                                </button>
+                                <button class="btn btn-danger" id="clearAllData">
+                                    <i class="fas fa-trash"></i> Limpar Todos os Dados
+                                </button>
+                            </div>
+                        </div>
                    </div>
                 </div>
 
@@ -3911,11 +3911,11 @@
             }
              document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
                  topList.map(([name, value]) => `
-                                    <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                                            <span>${name}</span>
-                                            <span style="font-weight: bold;">${value}</span>
-                                    </div>`).join('') :
-                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
+                                         <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                                 <span>${name}</span>
+                                                 <span style="font-weight: bold;">${value}</span>
+                                         </div>`).join('') :
+                 '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
         },
         
         createSalesChart(sales, startDate, endDate) {
@@ -3932,7 +3932,7 @@
             const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
             const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
             
-            this.renderChart('doughnut', ['Vendas', 'Despesas'], '', [totalSales, totalExpenses], ['#10B981', '#EF4444']);
+            this.renderChart('doughnut', ['Vendas', 'Despesas'], '', [totalSales, totalExpenses], ['#10B980', '#EF4444']);
         },
         
         createProductChart(products) {
