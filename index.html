@@ -528,7 +528,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
         }
 
@@ -579,97 +579,68 @@
 
         /* ===== RECEIPT STYLES ===== */
         .receipt-container {
-            background: #fff;
-            color: #333;
-            padding: 25px;
+            background: white;
+            color: #000;
+            padding: 30px;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
-            max-width: 420px;
+            max-width: 400px;
             margin: 0 auto;
-            border: 1px solid #eee;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .receipt-header {
             text-align: center;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
         }
 
         .receipt-company {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .receipt-info {
             font-size: 12px;
-            line-height: 1.5;
-            color: #555;
+            line-height: 1.4;
         }
 
         .receipt-title {
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            margin: 20px 0 15px 0;
+            margin: 20px 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 5px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
-            color: #000;
         }
-        
-        .receipt-details, .receipt-payment-details {
+
+        .receipt-details {
             margin-bottom: 20px;
-            font-size: 14px;
-            border-bottom: 1px dashed #ccc;
-            padding-bottom: 15px;
         }
 
         .receipt-line {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-        }
-        .receipt-line span:first-child {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .receipt-items-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #333;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 14px;
         }
-        
+
         .receipt-items {
-            padding: 10px 0;
-            min-height: 80px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 15px 0;
+            margin: 20px 0;
         }
-        
+
         .receipt-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
             font-size: 14px;
         }
-        .receipt-item .item-name {
-            flex-grow: 1;
-        }
-        .receipt-item .item-total {
-            text-align: right;
-            min-width: 80px;
-        }
 
         .receipt-total {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             text-align: right;
             margin-top: 15px;
@@ -681,7 +652,8 @@
             text-align: center;
             margin-top: 30px;
             font-size: 12px;
-            color: #777;
+            border-top: 1px solid #000;
+            padding-top: 20px;
         }
 
         /* ===== RESPONSIVIDADE ===== */
@@ -762,6 +734,7 @@
     </style>
 </head>
 <body>
+    <!-- Tela de Login -->
     <div id="loginScreen" class="login-container">
         <div class="login-card">
             <div class="login-logo">
@@ -769,27 +742,29 @@
             </div>
             <h1 class="login-title">SGI - Flor de Maria</h1>
             <p class="login-subtitle">Sistema de Gestão Integrado</p>
-            <form onsubmit="login(event)">
-                <div class="form-group">
-                    <input type="text" id="username" class="form-input" placeholder="Usuário" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="password" class="form-input" placeholder="Senha" required>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt"></i> Entrar
-                </button>
-            </form>
+            <div class="form-group">
+                <input type="text" id="username" class="form-input" placeholder="Usuário">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-input" placeholder="Senha">
+            </div>
+            <button class="btn btn-primary" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
         </div>
     </div>
 
+    <!-- Aplicação Principal -->
     <div id="app" class="app-layout hidden">
+        <!-- Botão do Menu Mobile -->
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
             <i class="fas fa-bars"></i>
         </button>
 
+        <!-- Overlay para Mobile -->
         <div class="mobile-overlay" onclick="toggleMobileMenu()"></div>
 
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
@@ -856,13 +831,16 @@
             </nav>
         </aside>
 
+        <!-- Conteúdo Principal -->
         <main class="main-content">
+            <!-- Dashboard -->
             <div id="dashboardPage" class="page">
                 <div class="page-header">
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Visão geral do seu negócio</p>
                 </div>
 
+                <!-- Estatísticas -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon" style="color: var(--primary-color);">
@@ -876,14 +854,14 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stat-value" id="totalCustomers">0</div>
-                        <div class="stat-label">Clientes Ativos</div>
+                        <div class="stat-label">Clientes</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="color: var(--warning-color);">
                             <i class="fas fa-boxes"></i>
                         </div>
                         <div class="stat-value" id="totalProducts">0</div>
-                        <div class="stat-label">Produtos Cadastrados</div>
+                        <div class="stat-label">Produtos</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="color: var(--danger-color);">
@@ -894,12 +872,13 @@
                     </div>
                 </div>
 
+                <!-- Gráficos -->
                 <div class="grid grid-2">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-chart-line"></i>
-                                Vendas nos Últimos 6 Meses
+                                Vendas do Mês
                             </h3>
                         </div>
                         <div class="chart-container">
@@ -910,7 +889,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-chart-pie"></i>
-                                Top 5 Produtos Vendidos (Valor)
+                                Produtos Mais Vendidos
                             </h3>
                         </div>
                         <div class="chart-container">
@@ -920,6 +899,7 @@
                 </div>
             </div>
 
+            <!-- Estoque -->
             <div id="inventoryPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Gerenciamento de Estoque</h1>
@@ -932,7 +912,7 @@
                             <i class="fas fa-boxes"></i>
                             Produtos em Estoque
                         </h3>
-                        <button class="btn btn-primary" onclick="showProductModal()">
+                        <button class="btn btn-primary" onclick="showAddProductModal()">
                             <i class="fas fa-plus"></i> Adicionar Produto
                         </button>
                     </div>
@@ -942,6 +922,7 @@
                                 <tr>
                                     <th>Código</th>
                                     <th>Produto</th>
+                                    <th>Categoria</th>
                                     <th>Preço</th>
                                     <th>Estoque</th>
                                     <th>Status</th>
@@ -949,12 +930,14 @@
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody">
-                                </tbody>
+                                <!-- Produtos serão adicionados aqui -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- Vendas -->
             <div id="salesPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Nova Venda</h1>
@@ -966,7 +949,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-shopping-cart"></i>
-                                Registrar Item
+                                Carrinho de Vendas
                             </h3>
                         </div>
                         <div class="form-group">
@@ -979,21 +962,6 @@
                             <label class="form-label">Quantidade</label>
                             <input type="number" id="saleQuantity" class="form-input" min="1" value="1">
                         </div>
-                        <button class="btn btn-primary" onclick="addToCart()">
-                            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-list"></i>
-                                Detalhes da Venda
-                            </h3>
-                        </div>
-                        <div id="cartItems">
-                            <p class="text-center" style="color: var(--text-muted);">Carrinho vazio</p>
-                        </div>
-                        <hr style="margin: 20px 0; border-color: var(--border-color);">
                         <div class="form-group">
                             <label class="form-label">Cliente</label>
                             <select id="saleCustomerSelect" class="form-select">
@@ -1002,22 +970,30 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Forma de Pagamento</label>
-                            <select id="salePaymentMethod" class="form-select" onchange="toggleInstallmentsField()">
-                                <option value="Dinheiro">Dinheiro</option>
-                                <option value="PIX">PIX</option>
-                                <option value="Cartão de Débito">Cartão de Débito</option>
-                                <option value="Cartão de Crédito (1x)">Cartão de Crédito (1x)</option>
-                                <option value="Cartão de Crédito Parcelado">Cartão de Crédito Parcelado</option>
-                                <option value="Crediário">Crediário</option>
+                            <select id="salePaymentMethod" class="form-select">
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="cartao">Cartão</option>
+                                <option value="pix">PIX</option>
+                                <option value="credito">À Crédito</option>
                             </select>
                         </div>
-                        <div class="form-group hidden" id="installmentsGroup">
-                            <label class="form-label">Número de Parcelas</label>
-                            <select id="saleInstallments" class="form-select"></select>
+                        <button class="btn btn-primary" onclick="addToCart()">
+                            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-list"></i>
+                                Itens da Venda
+                            </h3>
+                        </div>
+                        <div id="cartItems">
+                            <p class="text-center" style="color: var(--text-muted);">Carrinho vazio</p>
                         </div>
                         <div class="flex-between mt-3">
-                             <div class="text-right" style="font-size: 1.2rem;">
-                                <strong>Total: <span id="cartTotal">R$ 0,00</span></strong>
+                            <div class="text-right">
+                                <strong>Total: R$ <span id="cartTotal">0,00</span></strong>
                             </div>
                             <button class="btn btn-success" onclick="finalizeSale()" id="finalizeSaleBtn" disabled>
                                 <i class="fas fa-check"></i> Finalizar Venda
@@ -1027,10 +1003,11 @@
                 </div>
             </div>
 
+            <!-- Clientes -->
             <div id="customersPage" class="page hidden">
-                 <div class="page-header">
+                <div class="page-header">
                     <h1 class="page-title">Gerenciamento de Clientes</h1>
-                    <p class="page-subtitle">Cadastro rápido de nome e telefone</p>
+                    <p class="page-subtitle">Mantenha seus clientes organizados</p>
                 </div>
 
                 <div class="card">
@@ -1039,7 +1016,7 @@
                             <i class="fas fa-users"></i>
                             Lista de Clientes
                         </h3>
-                        <button class="btn btn-primary" onclick="showCustomerModal()">
+                        <button class="btn btn-primary" onclick="showAddCustomerModal()">
                             <i class="fas fa-user-plus"></i> Adicionar Cliente
                         </button>
                     </div>
@@ -1048,18 +1025,22 @@
                             <thead>
                                 <tr>
                                     <th>Nome</th>
+                                    <th>Email</th>
                                     <th>Telefone</th>
-                                    <th>Total Comprado</th>
+                                    <th>Cidade</th>
+                                    <th>Total Compras</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="customersTableBody">
-                                </tbody>
+                                <!-- Clientes serão adicionados aqui -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- Recibos -->
             <div id="receiptsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Recibos de Vendas</h1>
@@ -1086,23 +1067,25 @@
                                 </tr>
                             </thead>
                             <tbody id="receiptsTableBody">
-                                </tbody>
+                                <!-- Recibos serão adicionados aqui -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- Contas a Receber -->
             <div id="receivablesPage" class="page hidden">
-                 <div class="page-header">
+                <div class="page-header">
                     <h1 class="page-title">Contas a Receber</h1>
-                    <p class="page-subtitle">Controle suas vendas em crediário</p>
+                    <p class="page-subtitle">Controle suas vendas a crédito</p>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-money-check-alt"></i>
-                            Vendas em Aberto
+                            Vendas a Prazo
                         </h3>
                     </div>
                     <div class="table-responsive">
@@ -1113,18 +1096,19 @@
                                     <th>Cliente</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>
-                                    <th>Parcela</th>
                                     <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="receivablesTableBody">
-                                </tbody>
+                                <!-- Contas a receber serão adicionadas aqui -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- Relatórios -->
             <div id="reportsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Relatórios</h1>
@@ -1147,7 +1131,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-file-alt"></i>
+                                <i class="fas fa-file-excel"></i>
                                 Relatório de Estoque
                             </h3>
                         </div>
@@ -1163,28 +1147,15 @@
                                 Relatório de Contas a Receber
                             </h3>
                         </div>
-                        <p>Filtre e gere relatórios de contas a receber.</p>
-                        
-                        <div class="form-group mt-3">
-                            <label for="receivablesReportCustomerFilter" class="form-label">Filtrar por Cliente</label>
-                            <select id="receivablesReportCustomerFilter" class="form-select">
-                                <option value="all">Todos os Clientes</option>
-                                </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="flex align-items-center gap-2" style="cursor: pointer; user-select: none;">
-                                <input type="checkbox" id="receivablesReportPendingOnlyFilter" style="width: 16px; height: 16px;">
-                                <span>Mostrar apenas pendentes</span>
-                            </label>
-                        </div>
-                        <button class="btn btn-primary" onclick="generateReceivablesReport()">
+                        <p>Controle suas vendas a crédito e recebimentos.</p>
+                        <button class="btn btn-primary mt-3" onclick="generateReceivablesReport()">
                             <i class="fas fa-download"></i> Gerar Relatório
                         </button>
                     </div>
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-chart-bar"></i>
                                 Relatório de Clientes
                             </h3>
                         </div>
@@ -1196,8 +1167,9 @@
                 </div>
             </div>
 
+            <!-- Configurações -->
             <div id="settingsPage" class="page hidden">
-                 <div class="page-header">
+                <div class="page-header">
                     <h1 class="page-title">Configurações</h1>
                     <p class="page-subtitle">Configure as preferências do sistema</p>
                 </div>
@@ -1221,11 +1193,17 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Telefone</label>
-                            <input type="text" id="companyPhone" class="form-input" placeholder="(11) 1234-5678">
+                            <input type="text" id="companyPhone" class="form-input" value="(11) 1234-5678">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="companyEmail" class="form-input" placeholder="contato@flordemaria.com">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Endereço Completo</label>
-                            <textarea id="companyAddress" class="form-textarea" placeholder="Rua das Flores, 123&#10;São Paulo - SP&#10;CEP: 01234-567"></textarea>
+                            <textarea id="companyAddress" class="form-textarea" placeholder="Rua das Flores, 123&#10;São Paulo - SP&#10;CEP: 01234-567">Rua das Flores, 123
+São Paulo - SP
+CEP: 01234-567</textarea>
                         </div>
                         <button class="btn btn-primary" onclick="saveCompanySettings()">
                             <i class="fas fa-save"></i> Salvar Dados da Loja
@@ -1249,7 +1227,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nova Senha</label>
-                            <input type="password" id="newPassword" class="form-input" placeholder="Digite a nova senha (mínimo 4 caracteres)">
+                            <input type="password" id="newPassword" class="form-input" placeholder="Digite a nova senha">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Confirmar Nova Senha</label>
@@ -1263,21 +1241,65 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-database"></i>
-                                Gerenciamento de Dados
+                                <i class="fas fa-cog"></i>
+                                Configurações Gerais
                             </h3>
                         </div>
-                        <p class="mb-3">Faça backup ou restaure todos os dados do sistema.</p>
-                         <div class="flex gap-2 mb-3">
+                        <div class="form-group">
+                            <label class="form-label">Estoque Mínimo (Alerta)</label>
+                            <input type="number" id="minStockAlert" class="form-input" value="10" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Prazo Padrão Contas a Receber (dias)</label>
+                            <input type="number" id="defaultDueDays" class="form-input" value="30" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Moeda</label>
+                            <select id="currency" class="form-select">
+                                <option value="BRL">Real (R$)</option>
+                                <option value="USD">Dólar (US$)</option>
+                                <option value="EUR">Euro (€)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tema</label>
+                            <select id="theme" class="form-select">
+                                <option value="dark">Escuro</option>
+                                <option value="light">Claro</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveGeneralSettings()">
+                            <i class="fas fa-save"></i> Salvar Configurações
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-download"></i>
+                                Backup Completo do Sistema
+                            </h3>
+                        </div>
+                        <p class="mb-3">Faça backup completo incluindo produtos, clientes, vendas, contas a receber e configurações.</p>
+                        <div class="form-group">
                             <button class="btn btn-success" onclick="exportCompleteBackup()">
-                                <i class="fas fa-download"></i> Fazer Backup
+                                <i class="fas fa-download"></i> Fazer Backup Completo
                             </button>
-                            <button class="btn btn-warning" onclick="importBackup()">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-warning" onclick="showImportModal()">
                                 <i class="fas fa-upload"></i> Restaurar Backup
                             </button>
                         </div>
-                         <hr style="margin: 20px 0; border-color: var(--border-color);">
-                         <p class="mb-3">Apaga permanentemente todos os dados do sistema.</p>
+                        <div class="form-group">
+                            <label class="form-label">Backup Automático</label>
+                            <select id="autoBackup" class="form-select">
+                                <option value="disabled">Desabilitado</option>
+                                <option value="daily">Diário</option>
+                                <option value="weekly">Semanal</option>
+                            </select>
+                        </div>
+                        <hr style="margin: 20px 0; border-color: var(--border-color);">
                         <div class="form-group">
                             <button class="btn btn-danger" onclick="clearAllData()">
                                 <i class="fas fa-trash"></i> Resetar Sistema (Limpar Tudo)
@@ -1295,8 +1317,17 @@
                         <div class="mb-3">
                             <strong>SGI - Flor de Maria</strong><br>
                             Sistema de Gestão Integrado<br>
-                            Versão: 1.3.0 (Cadastros Simplificados e Parcelamento)<br>
+                            Versão: 1.0.0<br>
                             Desenvolvido em: 2025
+                        </div>
+                        <div class="mb-3">
+                            <strong>Funcionalidades:</strong><br>
+                            • Gestão de Estoque<br>
+                            • Controle de Vendas<br>
+                            • Cadastro de Clientes<br>
+                            • Contas a Receber<br>
+                            • Relatórios em PDF<br>
+                            • Interface Responsiva
                         </div>
                     </div>
                 </div>
@@ -1304,16 +1335,16 @@
         </main>
     </div>
 
-    <div id="productModal" class="modal">
+    <!-- Modal para Adicionar Produto -->
+    <div id="addProductModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="productModalTitle" class="modal-title">Adicionar Produto</h3>
-                <button class="modal-close" onclick="hideModal('productModal')">
+                <h3 class="modal-title">Adicionar Produto</h3>
+                <button class="modal-close" onclick="hideAddProductModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="productForm">
-                <input type="hidden" id="productId">
+            <form id="addProductForm">
                 <div class="form-group">
                     <label class="form-label">Código do Produto</label>
                     <input type="text" id="productCode" class="form-input" required placeholder="Ex: FL001">
@@ -1323,18 +1354,26 @@
                     <input type="text" id="productName" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Preço (R$)</label>
-                    <input type="number" id="productPrice" class="form-input" step="0.01" min="0" required>
+                    <label class="form-label">Categoria</label>
+                    <input type="text" id="productCategory" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Preço</label>
+                    <input type="number" id="productPrice" class="form-input" step="0.01" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Quantidade em Estoque</label>
                     <input type="number" id="productQuantity" class="form-input" min="0" required>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea id="productDescription" class="form-textarea"></textarea>
+                </div>
                 <div class="flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Salvar
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="hideModal('productModal')">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddProductModal()">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
@@ -1342,29 +1381,41 @@
         </div>
     </div>
 
-    <div id="customerModal" class="modal">
+    <!-- Modal para Adicionar Cliente -->
+    <div id="addCustomerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="customerModalTitle" class="modal-title">Adicionar Cliente</h3>
-                <button class="modal-close" onclick="hideModal('customerModal')">
+                <h3 class="modal-title">Adicionar Cliente</h3>
+                <button class="modal-close" onclick="hideAddCustomerModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="customerForm">
-                <input type="hidden" id="customerId">
+            <form id="addCustomerForm">
                 <div class="form-group">
                     <label class="form-label">Nome Completo</label>
                     <input type="text" id="customerName" class="form-input" required>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="customerEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Telefone</label>
-                    <input type="tel" id="customerPhone" class="form-input" required placeholder="(XX) XXXXX-XXXX">
+                    <input type="tel" id="customerPhone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" id="customerCity" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Endereço</label>
+                    <textarea id="customerAddress" class="form-textarea"></textarea>
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Salvar
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="hideModal('customerModal')">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddCustomerModal()">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
@@ -1372,16 +1423,18 @@
         </div>
     </div>
 
+    <!-- Modal para Visualizar Recibo -->
     <div id="receiptModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Recibo de Venda</h3>
-                <button class="modal-close" onclick="hideModal('receiptModal')">
+                <button class="modal-close" onclick="hideReceiptModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div id="receiptContent">
-                </div>
+                <!-- Conteúdo do recibo será inserido aqui -->
+            </div>
             <div class="flex gap-2 mt-3">
                 <button class="btn btn-primary" onclick="printReceipt()">
                     <i class="fas fa-print"></i> Imprimir
@@ -1393,16 +1446,18 @@
         </div>
     </div>
 
+    <!-- Modal para Receber Pagamento -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Receber Pagamento de Parcela</h3>
-                <button class="modal-close" onclick="hideModal('paymentModal')">
+                <h3 class="modal-title">Receber Pagamento</h3>
+                <button class="modal-close" onclick="hidePaymentModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div id="paymentContent">
-                </div>
+                <!-- Conteúdo do pagamento será inserido aqui -->
+            </div>
             <div class="form-group">
                 <label class="form-label">Valor Recebido</label>
                 <input type="number" id="paymentAmount" class="form-input" step="0.01">
@@ -1415,469 +1470,506 @@
                 <button class="btn btn-success" onclick="confirmPayment()">
                     <i class="fas fa-check"></i> Confirmar Pagamento
                 </button>
-                <button class="btn btn-secondary" onclick="hideModal('paymentModal')">
+                <button class="btn btn-secondary" onclick="hidePaymentModal()">
                     <i class="fas fa-times"></i> Cancelar
                 </button>
             </div>
         </div>
     </div>
-    
-    <script>
-        // ===============================================
-        // SGI - FLOR DE MARIA (VERSÃO 1.3.0)
-        // ===============================================
 
-        // ===== DADOS GLOBAIS E ESTADO DA APLICAÇÃO =====
+    <script>
+        // ===== DADOS GLOBAIS =====
         let products = [];
         let customers = [];
         let sales = [];
         let receivables = [];
         let cart = [];
         let currentSale = null;
-        let currentReceivableId = null;
-        let currentUser = {};
-        let companyData = {};
-
-        const charts = {
-            salesChart: null,
-            productsChart: null
+        let currentReceivable = null;
+        let charts = {};
+        let currentUser = { username: '', password: 'admin123' };
+        let companyData = {
+            name: 'Flor de Maria',
+            cnpj: '',
+            phone: '(11) 1234-5678',
+            email: 'contato@flordemaria.com',
+            address: 'Rua das Flores, 123\nSão Paulo - SP\nCEP: 01234-567'
         };
-        const defaultMinStock = 10;
-        
-        // ===== FUNÇÕES DE UTILIDADE E FORMATAÇÃO =====
-        const formatCurrency = (value) => `R$ ${typeof value === 'number' ? value.toFixed(2).replace('.', ',') : '0,00'}`;
-        const formatDate = (date) => new Date(date).toLocaleDateString('pt-BR');
-        
-        // ===== PERSISTÊNCIA DE DADOS (LOCAL STORAGE) =====
-        function saveDataToLocalStorage() {
-            const allData = { products, customers, sales, receivables };
-            localStorage.setItem('sgi_app_data', JSON.stringify(allData));
-        }
 
-        function loadDataFromLocalStorage() {
-            const data = localStorage.getItem('sgi_app_data');
-            if (data) {
-                const parsedData = JSON.parse(data);
-                products = parsedData.products || [];
-                customers = parsedData.customers || [];
-                sales = (parsedData.sales || []).map(s => ({...s, date: new Date(s.date)}));
-                receivables = (parsedData.receivables || []).map(r => ({
-                    ...r,
-                    saleDate: new Date(r.saleDate),
-                    dueDate: new Date(r.dueDate),
-                    paymentDate: r.paymentDate ? new Date(r.paymentDate) : null
-                }));
-                return true;
-            }
-            return false;
-        }
-
-        // ===== INICIALIZAÇÃO =====
-        document.addEventListener('DOMContentLoaded', () => {
-            const loggedInUser = localStorage.getItem('sgi_current_user');
-            if (loggedInUser) {
-                currentUser = JSON.parse(loggedInUser);
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                initApp();
-            }
-            setupEventListeners();
-        });
-
+        // ===== FUNÇÕES DE INICIALIZAÇÃO =====
         function initApp() {
-            if (!loadDataFromLocalStorage()) {
-                loadSampleData();
-                saveDataToLocalStorage();
-            }
+            loadSampleData();
             loadSettings();
+            updateDashboard();
+            setupEventListeners();
             initCharts();
-            updateAllPages();
-            showPage('dashboard');
+        }
+
+        function loadSampleData() {
+            // Produtos de exemplo
+            products = [
+                { id: 1, code: 'FL001', name: 'Rosas Vermelhas', category: 'Flores', price: 25.00, quantity: 50, description: 'Rosas vermelhas frescas' },
+                { id: 2, code: 'BQ001', name: 'Buquê de Tulipas', category: 'Buquês', price: 35.00, quantity: 30, description: 'Buquê colorido de tulipas' },
+                { id: 3, code: 'AR001', name: 'Arranjo de Lírios', category: 'Arranjos', price: 45.00, quantity: 20, description: 'Arranjo elegante de lírios' },
+                { id: 4, code: 'VS001', name: 'Vaso de Orquídeas', category: 'Vasos', price: 80.00, quantity: 15, description: 'Vaso com orquídeas' },
+                { id: 5, code: 'FL002', name: 'Girassóis', category: 'Flores', price: 20.00, quantity: 40, description: 'Girassóis frescos' }
+            ];
+
+            // Clientes de exemplo
+            customers = [
+                { id: 1, name: 'Maria Silva', email: 'maria@email.com', phone: '(11) 99999-9999', city: 'São Paulo', address: 'Rua das Flores, 123', totalPurchases: 0 },
+                { id: 2, name: 'João Santos', email: 'joao@email.com', phone: '(11) 88888-8888', city: 'São Paulo', address: 'Av. Principal, 456', totalPurchases: 0 },
+                { id: 3, name: 'Ana Costa', email: 'ana@email.com', phone: '(11) 77777-7777', city: 'São Paulo', address: 'Rua das Rosas, 789', totalPurchases: 0 }
+            ];
+
+            // Vendas de exemplo
+            sales = [
+                {
+                    id: 1,
+                    date: new Date('2024-01-15'),
+                    customer: customers[0],
+                    items: [
+                        { product: products[0], quantity: 2, price: 25.00 },
+                        { product: products[1], quantity: 1, price: 35.00 }
+                    ],
+                    total: 85.00,
+                    paymentMethod: 'dinheiro'
+                },
+                {
+                    id: 2,
+                    date: new Date('2024-01-16'),
+                    customer: customers[1],
+                    items: [
+                        { product: products[2], quantity: 1, price: 45.00 }
+                    ],
+                    total: 45.00,
+                    paymentMethod: 'cartao'
+                }
+            ];
+
+            // Contas a receber de exemplo
+            receivables = [
+                {
+                    id: 1,
+                    saleDate: new Date('2024-01-10'),
+                    customer: customers[2],
+                    value: 120.00,
+                    dueDate: new Date('2024-02-10'),
+                    status: 'pendente',
+                    saleId: 3
+                }
+            ];
         }
 
         function setupEventListeners() {
-            document.getElementById('productForm').addEventListener('submit', handleProductFormSubmit);
-            document.getElementById('customerForm').addEventListener('submit', handleCustomerFormSubmit);
-            document.addEventListener('click', (e) => {
+            // Formulário de adicionar produto
+            document.getElementById('addProductForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addProduct();
+            });
+
+            // Formulário de adicionar cliente
+            document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addCustomer();
+            });
+
+            // Fechar modais clicando fora
+            document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('modal')) {
-                    hideModal(e.target.id);
+                    e.target.style.display = 'none';
                 }
             });
-            document.getElementById('paymentDate').valueAsDate = new Date();
+
+            // Configurar data atual no campo de pagamento
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
         }
 
-        function updateAllPages() {
-             updateDashboard();
-             updateInventoryTable();
-             updateSalesPage();
-             updateCustomersTable();
-             updateReceiptsTable();
-             updateReceivablesTable();
-             updateReportFilters();
-        }
-        
-        // ===== LOGIN & LOGOUT =====
-        function login(event) {
-            event.preventDefault();
+        // ===== FUNÇÕES DE LOGIN =====
+        function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
-            let storedUser = localStorage.getItem('sgi_user_credentials');
 
-            if (!storedUser) {
-                 if (password === 'admin123') {
-                    currentUser = { username, password };
-                    localStorage.setItem('sgi_user_credentials', JSON.stringify(currentUser));
-                    localStorage.setItem('sgi_current_user', JSON.stringify(currentUser));
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('app').classList.remove('hidden');
-                    initApp();
-                    alert('Bem-vindo! Recomendamos que você altere sua senha nas configurações.');
-                } else {
-                    alert('Senha incorreta. A senha padrão para o primeiro acesso é "admin123".');
+            if (username && password) {
+                // Verificar se há dados salvos do usuário
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
                 }
-            } else {
-                const credentials = JSON.parse(storedUser);
-                if (username === credentials.username && password === credentials.password) {
-                    currentUser = credentials;
-                    localStorage.setItem('sgi_current_user', JSON.stringify(currentUser));
+                
+                // Se for primeiro acesso ou senha padrão
+                if (!savedUser || password === 'admin123' || password === currentUser.password) {
+                    currentUser.username = username;
+                    if (!savedUser) {
+                        currentUser.password = password;
+                    }
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('app').classList.remove('hidden');
                     initApp();
                 } else {
                     alert('Usuário ou senha incorretos.');
                 }
+            } else {
+                alert('Por favor, preencha todos os campos.');
             }
         }
 
-        function logout() {
-            if (confirm('Tem certeza que deseja sair do sistema?')) {
-                products = [];
-                customers = [];
-                sales = [];
-                receivables = [];
-                cart = [];
-                currentUser = {};
-                localStorage.removeItem('sgi_current_user');
-
-                document.getElementById('app').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                closeMobileMenu();
-            }
-        }
-
-        // ===== NAVEGAÇÃO E UI =====
+        // ===== FUNÇÕES DE NAVEGAÇÃO =====
         function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
-            const targetPage = document.getElementById(`${pageName}Page`);
-            if (targetPage) targetPage.classList.remove('hidden');
-            
-            document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
-            const activeLink = document.querySelector(`[onclick="showPage('${pageName}')"]`);
-            if (activeLink) activeLink.classList.add('active');
+            try {
+                console.log('Navegando para página:', pageName);
+                
+                // Ocultar todas as páginas
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.add('hidden');
+                });
 
-            switch (pageName) {
-                case 'dashboard': updateDashboard(); break;
-                case 'inventory': updateInventoryTable(); break;
-                case 'sales': updateSalesPage(); break;
-                case 'customers': updateCustomersTable(); break;
-                case 'receipts': updateReceiptsTable(); break;
-                case 'receivables': updateReceivablesTable(); break;
-                case 'settings': loadSettings(); break;
-                case 'reports': updateReportFilters(); break;
+                // Mostrar página selecionada
+                const targetPage = document.getElementById(pageName + 'Page');
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                    console.log('Página exibida:', pageName);
+                } else {
+                    console.error('Página não encontrada:', pageName + 'Page');
+                    return;
+                }
+
+                // Atualizar menu ativo
+                document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Encontrar e ativar o link correto
+                const activeLink = document.querySelector(`[onclick="showPage('${pageName}')"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+
+                // Atualizar conteúdo da página
+                switch(pageName) {
+                    case 'dashboard':
+                        updateDashboard();
+                        break;
+                    case 'inventory':
+                        updateInventoryTable();
+                        break;
+                    case 'sales':
+                        updateSalesPage();
+                        break;
+                    case 'customers':
+                        updateCustomersTable();
+                        break;
+                    case 'receipts':
+                        updateReceiptsTable();
+                        break;
+                    case 'receivables':
+                        updateReceivablesTable();
+                        break;
+                    case 'settings':
+                        console.log('Carregando configurações...');
+                        loadSettings();
+                        break;
+                }
+
+                // Fechar menu mobile
+                closeMobileMenu();
+                
+            } catch (error) {
+                console.error('Erro ao navegar para página:', pageName, error);
             }
-
-            closeMobileMenu();
         }
 
         function toggleMobileMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.querySelector('.mobile-overlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
         function closeMobileMenu() {
-            document.getElementById('sidebar').classList.remove('active');
-            document.querySelector('.mobile-overlay').classList.remove('active');
-        }
-        
-        function showModal(modalId) {
-            document.getElementById(modalId).classList.add('show');
-        }
-
-        function hideModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('show');
-            const form = modal.querySelector('form');
-            if (form) form.reset();
-        }
-
-        // ===== DASHBOARD E GRÁFICOS =====
-        function updateDashboard() {
-            const now = new Date();
-            const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
             
-            const monthSales = sales
-                .filter(sale => new Date(sale.date) >= firstDayOfMonth)
-                .reduce((sum, sale) => sum + sale.total, 0);
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
 
-            const pendingReceivables = receivables
-                .filter(r => r.status === 'pendente')
-                .reduce((sum, r) => sum + r.value, 0);
+        // ===== FUNÇÕES DO DASHBOARD =====
+        function updateDashboard() {
+            const totalSales = sales.reduce((sum, sale) => sum + sale.total, 0);
+            const totalReceivables = receivables.filter(r => r.status === 'pendente').reduce((sum, r) => sum + r.value, 0);
 
-            document.getElementById('totalSales').textContent = formatCurrency(monthSales);
+            document.getElementById('totalSales').textContent = `R$ ${totalSales.toFixed(2).replace('.', ',')}`;
             document.getElementById('totalCustomers').textContent = customers.length;
             document.getElementById('totalProducts').textContent = products.length;
-            document.getElementById('totalReceivables').textContent = formatCurrency(pendingReceivables);
+            document.getElementById('totalReceivables').textContent = `R$ ${totalReceivables.toFixed(2).replace('.', ',')}`;
 
             updateCharts();
         }
 
         function initCharts() {
+            // Gráfico de vendas
             const salesCtx = document.getElementById('salesChart').getContext('2d');
-            charts.salesChart = new Chart(salesCtx, {
+            window.salesChart = new Chart(salesCtx, {
                 type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Vendas (R$)',
+                        data: [1200, 1900, 3000, 2500, 2200, 3000],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#F1F5F9' }
+                        }
+                    },
                     scales: {
-                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        y: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                        x: {
+                            ticks: { color: '#94A3B8' },
+                            grid: { color: '#475569' }
+                        },
+                        y: {
+                            ticks: { color: '#94A3B8' },
+                            grid: { color: '#475569' }
+                        }
                     }
                 }
             });
 
+            // Gráfico de produtos
             const productsCtx = document.getElementById('productsChart').getContext('2d');
-            charts.productsChart = new Chart(productsCtx, {
+            window.productsChart = new Chart(productsCtx, {
                 type: 'doughnut',
+                data: {
+                    labels: ['Rosas', 'Tulipas', 'Lírios', 'Orquídeas', 'Girassóis'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+                    }]
+                },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { color: '#F1F5F9' } } }
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#F1F5F9' }
+                        }
+                    }
                 }
             });
         }
-        
+
         function updateCharts() {
-            // Gráfico de Vendas (Últimos 6 meses)
-            const salesData = { labels: [], datasets: [{ label: 'Vendas (R$)', data: [], borderColor: '#3B82F6', tension: 0.4 }] };
-            const now = new Date();
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                salesData.labels.push(d.toLocaleString('pt-BR', { month: 'short' }));
-                const monthSales = sales
-                    .filter(s => new Date(s.date).getMonth() === d.getMonth() && new Date(s.date).getFullYear() === d.getFullYear())
-                    .reduce((sum, s) => sum + s.total, 0);
-                salesData.datasets[0].data.push(monthSales);
+            // Destruir gráficos existentes antes de recriar
+            if (window.salesChart && typeof window.salesChart.destroy === 'function') {
+                window.salesChart.destroy();
             }
-            if(charts.salesChart) {
-                charts.salesChart.data = salesData;
-                charts.salesChart.update();
+            if (window.productsChart && typeof window.productsChart.destroy === 'function') {
+                window.productsChart.destroy();
             }
-
-            // Gráfico de Top 5 Produtos Vendidos (em valor)
-            const productSales = {};
-            sales.forEach(sale => {
-                sale.items.forEach(item => {
-                    productSales[item.product.name] = (productSales[item.product.name] || 0) + item.price * item.quantity;
-                });
-            });
-
-            const sortedProducts = Object.entries(productSales).sort(([,a],[,b]) => b-a).slice(0, 5);
-            const productChartData = {
-                labels: sortedProducts.map(([name]) => name),
-                datasets: [{ 
-                    data: sortedProducts.map(([, total]) => total),
-                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-                }]
-            };
-            if(charts.productsChart) {
-                charts.productsChart.data = productChartData;
-                charts.productsChart.update();
-            }
+            
+            // Recriar gráficos
+            initCharts();
         }
 
-
-        // ===== GERENCIAMENTO DE PRODUTOS (ESTOQUE) =====
+        // ===== FUNÇÕES DE ESTOQUE =====
         function updateInventoryTable() {
             const tbody = document.getElementById('inventoryTableBody');
-            tbody.innerHTML = products.map(product => {
-                const isLowStock = product.quantity < defaultMinStock;
-                const statusClass = product.quantity === 0 ? 'badge-danger' : (isLowStock ? 'badge-warning' : 'badge-success');
-                const statusText = product.quantity === 0 ? 'Esgotado' : (isLowStock ? 'Baixo' : 'Em Estoque');
-                return `
-                    <tr>
-                        <td>${product.code}</td>
-                        <td>${product.name}</td>
-                        <td>${formatCurrency(product.price)}</td>
-                        <td>${product.quantity}</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
+            tbody.innerHTML = '';
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                const statusClass = product.quantity < 10 ? 'badge-danger' : 'badge-success';
+                const statusText = product.quantity < 10 ? 'Baixo' : 'Normal';
+
+                row.innerHTML = `
+                    <td>${product.code}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>R$ ${product.price.toFixed(2).replace('.', ',')}</td>
+                    <td>${product.quantity}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editProduct(${product.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
-            }).join('');
+                tbody.appendChild(row);
+            });
         }
 
-        function showProductModal() {
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('productModalTitle').textContent = 'Adicionar Produto';
-            showModal('productModal');
+        function showAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'flex';
         }
 
-        function handleProductFormSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('productId').value;
-            const newProduct = {
-                id: id ? parseInt(id) : Date.now(),
-                code: document.getElementById('productCode').value.trim(),
-                name: document.getElementById('productName').value.trim(),
-                price: parseFloat(document.getElementById('productPrice').value),
-                quantity: parseInt(document.getElementById('productQuantity').value)
-            };
+        function hideAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'none';
+            document.getElementById('addProductForm').reset();
+        }
 
-            const codeExists = products.some(p => p.code.toLowerCase() === newProduct.code.toLowerCase() && p.id !== newProduct.id);
-            if (codeExists) {
-                alert('Já existe um produto com este código.');
+        function addProduct() {
+            const code = document.getElementById('productCode').value;
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            const description = document.getElementById('productDescription').value;
+
+            // Verificar se o código já existe
+            const existingProduct = products.find(p => p.code.toLowerCase() === code.toLowerCase());
+            if (existingProduct) {
+                alert('Já existe um produto com este código. Por favor, use um código diferente.');
                 return;
             }
-            
-            if (id) {
-                const index = products.findIndex(p => p.id === newProduct.id);
-                products[index] = newProduct;
-            } else {
-                products.push(newProduct);
-            }
-            
-            saveDataToLocalStorage();
+
+            const newProduct = {
+                id: Date.now(),
+                code,
+                name,
+                category,
+                price,
+                quantity,
+                description
+            };
+
+            products.push(newProduct);
             updateInventoryTable();
             updateDashboard();
-            hideModal('productModal');
+            hideAddProductModal();
         }
 
         function editProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-            document.getElementById('productId').value = product.id;
-            document.getElementById('productCode').value = product.code;
-            document.getElementById('productName').value = product.name;
-            document.getElementById('productPrice').value = product.price;
-            document.getElementById('productQuantity').value = product.quantity;
-            document.getElementById('productModalTitle').textContent = 'Editar Produto';
-            showModal('productModal');
+            console.log('Editar produto:', id);
         }
 
         function deleteProduct(id) {
-            if (confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
                 products = products.filter(p => p.id !== id);
-                saveDataToLocalStorage();
                 updateInventoryTable();
                 updateDashboard();
             }
         }
 
-        // ===== GERENCIAMENTO DE VENDAS =====
-        function toggleInstallmentsField() {
-            const paymentMethod = document.getElementById('salePaymentMethod').value;
-            const installmentsGroup = document.getElementById('installmentsGroup');
-            const installmentsSelect = document.getElementById('saleInstallments');
-            
-            const showInstallments = paymentMethod === 'Crediário' || paymentMethod === 'Cartão de Crédito Parcelado';
-            
-            if (showInstallments) {
-                let options = '';
-                const maxInstallments = paymentMethod === 'Crediário' ? 3 : 6;
-                for (let i = 2; i <= maxInstallments; i++) {
-                    options += `<option value="${i}">${i}x</option>`;
-                }
-                installmentsSelect.innerHTML = options;
-                installmentsGroup.classList.remove('hidden');
-            } else {
-                installmentsGroup.classList.add('hidden');
-            }
-        }
-
+        // ===== FUNÇÕES DE VENDAS =====
         function updateSalesPage() {
             updateProductSelect();
             updateCustomerSelect();
             updateCart();
-            toggleInstallmentsField();
         }
 
         function updateProductSelect() {
             const select = document.getElementById('saleProductSelect');
-            select.innerHTML = '<option value="">Selecione um produto</option>' + products
-                .filter(p => p.quantity > 0)
-                .map(p => `<option value="${p.id}">${p.name} (${p.quantity}) - ${formatCurrency(p.price)}</option>`)
-                .join('');
+            select.innerHTML = '<option value="">Selecione um produto</option>';
+            
+            products.forEach(product => {
+                if (product.quantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.code} - ${product.name} - R$ ${product.price.toFixed(2).replace('.', ',')} (${product.quantity} disponíveis)`;
+                    select.appendChild(option);
+                }
+            });
         }
 
         function updateCustomerSelect() {
             const select = document.getElementById('saleCustomerSelect');
-            select.innerHTML = '<option value="">Selecione um cliente</option>' + customers
-                .map(c => `<option value="${c.id}">${c.name}</option>`)
-                .join('');
+            select.innerHTML = '<option value="">Selecione um cliente</option>';
+            
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
         }
 
         function addToCart() {
             const productId = parseInt(document.getElementById('saleProductSelect').value);
             const quantity = parseInt(document.getElementById('saleQuantity').value);
-            if (!productId || !quantity || quantity < 1) {
-                alert('Selecione um produto e uma quantidade válida.');
+
+            if (!productId || !quantity) {
+                alert('Selecione um produto e quantidade válidos.');
                 return;
             }
 
             const product = products.find(p => p.id === productId);
-            if (!product) return;
-
-            const totalInCart = (cart.find(item => item.product.id === productId)?.quantity || 0);
-            if (quantity + totalInCart > product.quantity) {
-                alert(`Quantidade indisponível. Restam ${product.quantity - totalInCart} em estoque.`);
+            if (!product) {
+                alert('Produto não encontrado.');
                 return;
             }
 
+            if (quantity > product.quantity) {
+                alert('Quantidade indisponível em estoque.');
+                return;
+            }
+
+            // Verificar se o produto já está no carrinho
             const existingItem = cart.find(item => item.product.id === productId);
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
-                cart.push({ product, quantity, price: product.price });
+                cart.push({
+                    product: product,
+                    quantity: quantity,
+                    price: product.price
+                });
             }
+
             updateCart();
+            document.getElementById('saleQuantity').value = 1;
         }
 
         function updateCart() {
-            const cartItemsDiv = document.getElementById('cartItems');
-            const cartTotalSpan = document.getElementById('cartTotal');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
             const finalizeSaleBtn = document.getElementById('finalizeSaleBtn');
 
             if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p class="text-center" style="color: var(--text-muted);">Carrinho vazio</p>';
-                cartTotalSpan.textContent = 'R$ 0,00';
+                cartItems.innerHTML = '<p class="text-center" style="color: var(--text-muted);">Carrinho vazio</p>';
+                cartTotal.textContent = '0,00';
                 finalizeSaleBtn.disabled = true;
                 return;
             }
 
             let total = 0;
-            cartItemsDiv.innerHTML = cart.map((item, index) => {
+            let itemsHTML = '';
+
+            cart.forEach((item, index) => {
                 const itemTotal = item.quantity * item.price;
                 total += itemTotal;
-                return `
+
+                itemsHTML += `
                     <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                         <div>
                             <strong>${item.product.name}</strong><br>
-                            <small>Qtd: ${item.quantity} x ${formatCurrency(item.price)}</small>
+                            <small>Qtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace('.', ',')}</small>
                         </div>
-                        <div class="flex gap-2 align-items-center">
-                            <span>${formatCurrency(itemTotal)}</span>
-                            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                        <div class="flex gap-2">
+                            <span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
-                    </div>`;
-            }).join('');
-            
-            cartTotalSpan.textContent = formatCurrency(total);
+                    </div>
+                `;
+            });
+
+            cartItems.innerHTML = itemsHTML;
+            cartTotal.textContent = total.toFixed(2).replace('.', ',');
             finalizeSaleBtn.disabled = false;
         }
 
@@ -1888,508 +1980,760 @@
 
         function finalizeSale() {
             const customerId = parseInt(document.getElementById('saleCustomerSelect').value);
+            const paymentMethod = document.getElementById('salePaymentMethod').value;
+            
             if (!customerId) {
                 alert('Selecione um cliente para finalizar a venda.');
                 return;
             }
+
             if (cart.length === 0) {
-                alert('O carrinho está vazio.');
+                alert('Adicione produtos ao carrinho antes de finalizar a venda.');
                 return;
             }
 
             const customer = customers.find(c => c.id === customerId);
             const total = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-            const paymentMethod = document.getElementById('salePaymentMethod').value;
-            const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
-            
+
             const newSale = {
                 id: Date.now(),
                 date: new Date(),
-                customer,
+                customer: customer,
                 items: [...cart],
-                total,
-                paymentMethod,
-                installments: (paymentMethod === 'Crediário' || paymentMethod === 'Cartão de Crédito Parcelado') ? installments : 1,
+                total: total,
+                paymentMethod: paymentMethod
             };
-            sales.push(newSale);
 
+            // Atualizar estoque
             cart.forEach(item => {
                 const product = products.find(p => p.id === item.product.id);
-                if (product) product.quantity -= item.quantity;
-            });
-            
-            customer.totalPurchases = (customer.totalPurchases || 0) + total;
-
-            if (paymentMethod === 'Crediário') {
-                const installmentValue = Math.floor((total / installments) * 100) / 100;
-                let remainingTotal = total;
-                
-                for (let i = 1; i <= installments; i++) {
-                    const value = (i === installments) ? remainingTotal : installmentValue;
-                    remainingTotal -= value;
-
-                    const dueDate = new Date();
-                    dueDate.setDate(dueDate.getDate() + (30 * i));
-
-                    receivables.push({
-                        id: Date.now() + i,
-                        saleId: newSale.id,
-                        saleDate: new Date(),
-                        customer,
-                        value,
-                        dueDate,
-                        status: 'pendente',
-                        installmentNumber: i,
-                        totalInstallments: installments
-                    });
+                if (product) {
+                    product.quantity -= item.quantity;
                 }
+            });
+
+            // Atualizar total de compras do cliente
+            customer.totalPurchases += total;
+
+            // Salvar venda
+            sales.push(newSale);
+
+            // Se for venda a crédito, adicionar às contas a receber
+            if (paymentMethod === 'credito') {
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 30); // 30 dias para vencimento
+
+                receivables.push({
+                    id: Date.now(),
+                    saleDate: new Date(),
+                    customer: customer,
+                    value: total,
+                    dueDate: dueDate,
+                    status: 'pendente',
+                    saleId: newSale.id
+                });
             }
 
-            saveDataToLocalStorage();
+            // Limpar carrinho
             cart = [];
-            updateAllPages();
+
+            // Atualizar interface
+            updateCart();
+            updateDashboard();
             
             alert('Venda finalizada com sucesso!');
+            
+            // Mostrar recibo
             showReceipt(newSale);
         }
 
-        // ===== GERENCIAMENTO DE CLIENTES (SIMPLIFICADO) =====
+        // ===== FUNÇÕES DE CLIENTES =====
         function updateCustomersTable() {
             const tbody = document.getElementById('customersTableBody');
-            tbody.innerHTML = customers.map(customer => `
-                <tr>
+            tbody.innerHTML = '';
+
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td>${customer.name}</td>
+                    <td>${customer.email}</td>
                     <td>${customer.phone}</td>
-                    <td>${formatCurrency(customer.totalPurchases || 0)}</td>
+                    <td>${customer.city}</td>
+                    <td>R$ ${customer.totalPurchases.toFixed(2).replace('.', ',')}</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" onclick="editCustomer(${customer.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${customer.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-sm btn-warning" onclick="editCustomer(${customer.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${customer.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
-                </tr>
-            `).join('');
-        }
-        
-        function showCustomerModal() {
-            document.getElementById('customerForm').reset();
-            document.getElementById('customerId').value = '';
-            document.getElementById('customerModalTitle').textContent = 'Adicionar Cliente';
-            showModal('customerModal');
+                `;
+                tbody.appendChild(row);
+            });
         }
 
-        function handleCustomerFormSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('customerId').value;
+        function showAddCustomerModal() {
+            document.getElementById('addCustomerModal').style.display = 'flex';
+        }
+
+        function hideAddCustomerModal() {
+            document.getElementById('addCustomerModal').style.display = 'none';
+            document.getElementById('addCustomerForm').reset();
+        }
+
+        function addCustomer() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const city = document.getElementById('customerCity').value;
+            const address = document.getElementById('customerAddress').value;
+
             const newCustomer = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('customerName').value.trim(),
-                phone: document.getElementById('customerPhone').value.trim(),
-                totalPurchases: id ? customers.find(c=>c.id === parseInt(id)).totalPurchases : 0
+                id: Date.now(),
+                name,
+                email,
+                phone,
+                city,
+                address,
+                totalPurchases: 0
             };
-            
-            if (id) {
-                const index = customers.findIndex(c => c.id === newCustomer.id);
-                customers[index] = newCustomer;
-            } else {
-                customers.push(newCustomer);
-            }
-            
-            saveDataToLocalStorage();
+
+            customers.push(newCustomer);
             updateCustomersTable();
             updateDashboard();
-            hideModal('customerModal');
+            hideAddCustomerModal();
         }
 
         function editCustomer(id) {
-            const customer = customers.find(c => c.id === id);
-            if (!customer) return;
-            document.getElementById('customerId').value = customer.id;
-            document.getElementById('customerName').value = customer.name;
-            document.getElementById('customerPhone').value = customer.phone;
-            document.getElementById('customerModalTitle').textContent = 'Editar Cliente';
-            showModal('customerModal');
+            console.log('Editar cliente:', id);
         }
 
         function deleteCustomer(id) {
-             if (confirm('Tem certeza que deseja excluir este cliente?')) {
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
                 customers = customers.filter(c => c.id !== id);
-                saveDataToLocalStorage();
                 updateCustomersTable();
                 updateDashboard();
             }
         }
-        
-        // ===== RECIBOS (DESIGN APRIMORADO) =====
+
+        // ===== FUNÇÕES DE RECIBOS =====
         function updateReceiptsTable() {
             const tbody = document.getElementById('receiptsTableBody');
-            tbody.innerHTML = [...sales].reverse().map(sale => `
-                <tr>
-                    <td>${formatDate(sale.date)}</td>
+            tbody.innerHTML = '';
+
+            sales.forEach(sale => {
+                const row = document.createElement('tr');
+                const itemsCount = sale.items.reduce((sum, item) => sum + item.quantity, 0);
+                
+                row.innerHTML = `
+                    <td>${sale.date.toLocaleDateString('pt-BR')}</td>
                     <td>${sale.customer.name}</td>
-                    <td>${sale.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                    <td>${formatCurrency(sale.total)}</td>
-                    <td><span class="badge badge-secondary">${sale.paymentMethod}${sale.installments > 1 ? ` ${sale.installments}x` : ''}</span></td>
+                    <td>${itemsCount} item(s)</td>
+                    <td>R$ ${sale.total.toFixed(2).replace('.', ',')}</td>
+                    <td><span class="badge badge-success">${sale.paymentMethod}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="showReceiptFromTable(${sale.id})"><i class="fas fa-eye"></i> Ver</button>
+                        <button class="btn btn-sm btn-primary" onclick="showReceiptFromTable(${sale.id})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="downloadReceiptPDFFromTable(${sale.id})">
+                            <i class="fas fa-download"></i> PDF
+                        </button>
                     </td>
-                </tr>
-            `).join('');
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showReceiptFromTable(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (sale) {
+                showReceipt(sale);
+            }
+        }
+
+        function downloadReceiptPDFFromTable(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (sale) {
+                downloadReceiptPDF(sale);
+            }
         }
 
         function showReceipt(sale) {
             currentSale = sale;
-            document.getElementById('receiptContent').innerHTML = generateReceiptHTML(sale);
-            showModal('receiptModal');
+            const modal = document.getElementById('receiptModal');
+            const content = document.getElementById('receiptContent');
+            
+            content.innerHTML = generateReceiptHTML(sale);
+            modal.style.display = 'flex';
         }
-        
-        function showReceiptFromTable(saleId) {
-            const sale = sales.find(s => s.id === saleId);
-            if (sale) showReceipt(sale);
+
+        function hideReceiptModal() {
+            document.getElementById('receiptModal').style.display = 'none';
+            currentSale = null;
         }
 
         function generateReceiptHTML(sale) {
             const itemsHTML = sale.items.map(item => `
                 <div class="receipt-item">
-                    <span class="item-name">${item.product.name} (${item.quantity}x ${formatCurrency(item.price)})</span>
-                    <span class="item-total">${formatCurrency(item.quantity * item.price)}</span>
+                    <span>${item.product.name} (${item.quantity}x)</span>
+                    <span>R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</span>
                 </div>
             `).join('');
 
-            let paymentDetailsHTML = `
-                <div class="receipt-line">
-                    <span>Forma de Pagamento:</span> 
-                    <span>${sale.paymentMethod}</span>
-                </div>`;
-            
-            if (sale.installments > 1) {
-                paymentDetailsHTML += `
-                <div class="receipt-line">
-                    <span>Parcelas:</span> 
-                    <span>${sale.installments}x de ${formatCurrency(sale.total / sale.installments)}</span>
-                </div>`;
-            }
-
             return `
-                <div class="receipt-container" id="printableReceipt">
+                <div class="receipt-container">
                     <div class="receipt-header">
-                        <div class="receipt-company">${companyData.name?.toUpperCase() || 'NOME DA LOJA'}</div>
+                        <div class="receipt-company">${companyData.name.toUpperCase()}</div>
                         <div class="receipt-info">
                             ${companyData.cnpj ? `CNPJ: ${companyData.cnpj}<br>` : ''}
-                            ${companyData.address ? `${companyData.address.replace(/\n/g, '<br>')}<br>` : ''}
-                            ${companyData.phone ? `Tel: ${companyData.phone}` : ''}
+                            ${companyData.address.replace(/\n/g, '<br>')}<br>
+                            ${companyData.phone ? `Tel: ${companyData.phone}<br>` : ''}
+                            ${companyData.email ? `Email: ${companyData.email}` : ''}
                         </div>
                     </div>
+                    
+                    <div class="receipt-title">RECIBO DE VENDA</div>
+                    
                     <div class="receipt-details">
-                        <div class="receipt-line"><span>Data:</span> <span>${formatDate(sale.date)}</span></div>
-                        <div class="receipt-line"><span>Cliente:</span> <span>${sale.customer.name}</span></div>
-                        <div class="receipt-line"><span>Recibo Nº:</span> <span>${sale.id}</span></div>
+                        <div class="receipt-line">
+                            <span>Data:</span>
+                            <span>${sale.date.toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div class="receipt-line">
+                            <span>Cliente:</span>
+                            <span>${sale.customer.name}</span>
+                        </div>
+                        <div class="receipt-line">
+                            <span>Recibo nº:</span>
+                            <span>${sale.id}</span>
+                        </div>
+                        <div class="receipt-line">
+                            <span>Pagamento:</span>
+                            <span>${sale.paymentMethod}</span>
+                        </div>
                     </div>
-                    <div class="receipt-payment-details">${paymentDetailsHTML}</div>
-                    <div class="receipt-title">Itens da Compra</div>
-                    <div class="receipt-items-header"><span>Descrição</span><span>Subtotal</span></div>
-                    <div class="receipt-items">${itemsHTML}</div>
-                    <div class="receipt-total"><span>TOTAL</span><span>${formatCurrency(sale.total)}</span></div>
-                    <div class="receipt-footer">Obrigado pela sua preferência!</div>
-                </div>`;
+                    
+                    <div class="receipt-items">
+                        ${itemsHTML}
+                    </div>
+                    
+                    <div class="receipt-total">
+                        TOTAL: R$ ${sale.total.toFixed(2).replace('.', ',')}
+                    </div>
+                    
+                    <div class="receipt-footer">
+                        Obrigado pela preferência!<br>
+                        Volte sempre!
+                    </div>
+                </div>
+            `;
         }
-        
+
         function printReceipt() {
-             const receiptHTML = document.getElementById('printableReceipt').outerHTML;
-             const printWindow = window.open('', '_blank');
-             printWindow.document.write(`
-                <html><head><title>Recibo</title>
-                <style>
-                 body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
-                 .receipt-container { max-width: 420px; margin: 0 auto; color: #333; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 25px; border-radius: 8px;}
-                 .receipt-header { text-align: center; padding-bottom: 15px; margin-bottom: 15px; } .receipt-company { font-size: 22px; font-weight: bold; color: #000; margin-bottom: 8px; }
-                 .receipt-info { font-size: 12px; line-height: 1.5; color: #555; } .receipt-title { text-align: center; font-size: 14px; font-weight: bold; margin: 20px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; padding: 5px; background-color: #f5f5f5; border-radius: 4px; color: #000; }
-                 .receipt-details, .receipt-payment-details { margin-bottom: 20px; font-size: 14px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-                 .receipt-line { display: flex; justify-content: space-between; margin-bottom: 6px; } .receipt-line span:first-child { font-weight: 600; color: #333; }
-                 .receipt-items-header { display: flex; justify-content: space-between; font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #333; margin-bottom: 10px; font-size: 14px; }
-                 .receipt-items { padding: 10px 0; min-height: 80px; } .receipt-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-                 .receipt-item .item-name { flex-grow: 1; } .receipt-item .item-total { text-align: right; min-width: 80px; }
-                 .receipt-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 15px; padding-top: 15px; border-top: 2px solid #000; }
-                 .receipt-footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
-                </style>
-                </head><body>${receiptHTML}</body></html>`);
-             printWindow.document.close();
-             printWindow.print();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Recibo de Venda</title>
+                        <style>
+                            body { margin: 0; padding: 20px; font-family: 'Courier New', monospace; }
+                            .receipt-container { max-width: 400px; margin: 0 auto; }
+                            .receipt-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
+                            .receipt-company { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+                            .receipt-info { font-size: 12px; line-height: 1.4; }
+                            .receipt-title { text-align: center; font-size: 16px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
+                            .receipt-details { margin-bottom: 20px; }
+                            .receipt-line { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+                            .receipt-items { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 15px 0; margin: 20px 0; }
+                            .receipt-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+                            .receipt-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 15px; padding-top: 15px; border-top: 2px solid #000; }
+                            .receipt-footer { text-align: center; margin-top: 30px; font-size: 12px; border-top: 1px solid #000; padding-top: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        ${generateReceiptHTML(currentSale)}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
         }
-        
-        function downloadReceiptPDF() {
-            if (!currentSale) return;
+
+        function downloadReceiptPDF(sale = null) {
+            if (!sale) sale = currentSale;
+            if (!sale) return;
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            const sale = currentSale;
-            const bodyData = sale.items.map(item => [item.product.name, item.quantity, formatCurrency(item.price), formatCurrency(item.price * item.quantity)]);
-            
-            doc.setFontSize(18);
-            doc.text(`Recibo - ${companyData.name || 'Sua Loja'}`, 105, 20, { align: 'center' });
 
+            // Cabeçalho
+            doc.setFontSize(20);
+            doc.text(companyData.name.toUpperCase(), 105, 20, { align: 'center' });
+            
             doc.setFontSize(12);
-            doc.text(`Recibo Nº: ${sale.id}`, 14, 35);
-            doc.text(`Data: ${formatDate(sale.date)}`, 14, 42);
-            doc.text(`Cliente: ${sale.customer.name}`, 14, 49);
-            
-            let paymentText = sale.paymentMethod;
-            if (sale.installments > 1) {
-                paymentText += ` (${sale.installments}x de ${formatCurrency(sale.total / sale.installments)})`;
+            let yPos = 30;
+            if (companyData.cnpj) {
+                doc.text(`CNPJ: ${companyData.cnpj}`, 105, yPos, { align: 'center' });
+                yPos += 10;
             }
-            doc.text(`Pagamento: ${paymentText}`, 14, 56);
             
-            doc.autoTable({
-                startY: 65,
-                head: [['Produto', 'Qtd.', 'Preço Unit.', 'Subtotal']],
-                body: bodyData,
-                theme: 'striped',
-                foot: [['', '', 'Total', formatCurrency(sale.total)]],
-                showFoot: 'last_page',
-                styles: { halign: 'right' },
-                columnStyles: { 0: { halign: 'left' } },
+            const addressLines = companyData.address.split('\n');
+            addressLines.forEach(line => {
+                if (line.trim()) {
+                    doc.text(line.trim(), 105, yPos, { align: 'center' });
+                    yPos += 10;
+                }
             });
             
+            if (companyData.phone) {
+                doc.text(`Tel: ${companyData.phone}`, 105, yPos, { align: 'center' });
+                yPos += 10;
+            }
+            
+            if (companyData.email) {
+                doc.text(`Email: ${companyData.email}`, 105, yPos, { align: 'center' });
+                yPos += 10;
+            }
+
+            // Linha
+            doc.line(20, yPos + 10, 190, yPos + 10);
+            yPos += 20;
+
+            // Título
+            doc.setFontSize(16);
+            doc.text('RECIBO DE VENDA', 105, yPos, { align: 'center' });
+            yPos += 20;
+
+            // Detalhes
+            doc.setFontSize(12);
+            doc.text(`Data: ${sale.date.toLocaleDateString('pt-BR')}`, 20, yPos);
+            yPos += 10;
+            doc.text(`Cliente: ${sale.customer.name}`, 20, yPos);
+            yPos += 10;
+            doc.text(`Recibo nº: ${sale.id}`, 20, yPos);
+            yPos += 10;
+            doc.text(`Pagamento: ${sale.paymentMethod}`, 20, yPos);
+            yPos += 10;
+
+            // Linha
+            doc.line(20, yPos, 190, yPos);
+            yPos += 10;
+
+            // Itens
+            doc.text('ITENS:', 20, yPos);
+            yPos += 10;
+
+            sale.items.forEach(item => {
+                const itemText = `${item.product.name} (${item.quantity}x)`;
+                const priceText = `R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}`;
+                doc.text(itemText, 20, yPos);
+                doc.text(priceText, 190, yPos, { align: 'right' });
+                yPos += 10;
+            });
+
+            // Linha
+            doc.line(20, yPos, 190, yPos);
+            yPos += 15;
+
+            // Total
+            doc.setFontSize(14);
+            doc.text(`TOTAL: R$ ${sale.total.toFixed(2).replace('.', ',')}`, 190, yPos, { align: 'right' });
+
+            // Rodapé
+            doc.setFontSize(10);
+            doc.text('Obrigado pela preferência!', 105, 250, { align: 'center' });
+            doc.text('Volte sempre!', 105, 260, { align: 'center' });
+
             doc.save(`recibo-${sale.id}.pdf`);
         }
-        
-        // ===== CONTAS A RECEBER (COM PARCELAMENTO) =====
+
+        // ===== FUNÇÕES DE CONTAS A RECEBER =====
         function updateReceivablesTable() {
             const tbody = document.getElementById('receivablesTableBody');
-            tbody.innerHTML = receivables.map(r => {
-                const isOverdue = new Date() > new Date(r.dueDate) && r.status === 'pendente';
-                const statusClass = r.status === 'pago' ? 'badge-success' : (isOverdue ? 'badge-danger' : 'badge-warning');
-                const statusText = r.status === 'pago' ? 'Pago' : (isOverdue ? 'Vencido' : 'Pendente');
-                return `
-                    <tr>
-                        <td>${formatDate(r.saleDate)}</td>
-                        <td>${r.customer.name}</td>
-                        <td>${formatCurrency(r.value)}</td>
-                        <td>${formatDate(r.dueDate)}</td>
-                        <td>${r.installmentNumber}/${r.totalInstallments}</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            ${r.status === 'pendente' ? `<button class="btn btn-sm btn-success" onclick="showPaymentModal(${r.id})"><i class="fas fa-dollar-sign"></i> Receber</button>` : ''}
-                            <button class="btn btn-sm btn-primary" onclick="showReceiptFromTable(${r.saleId})"><i class="fas fa-eye"></i> Ver Venda</button>
-                        </td>
-                    </tr>
+            tbody.innerHTML = '';
+
+            receivables.forEach(receivable => {
+                const row = document.createElement('tr');
+                const isOverdue = new Date() > receivable.dueDate && receivable.status === 'pendente';
+                const statusClass = receivable.status === 'pago' ? 'badge-success' : (isOverdue ? 'badge-danger' : 'badge-warning');
+                const statusText = receivable.status === 'pago' ? 'Pago' : (isOverdue ? 'Vencido' : 'Pendente');
+                
+                row.innerHTML = `
+                    <td>${receivable.saleDate.toLocaleDateString('pt-BR')}</td>
+                    <td>${receivable.customer.name}</td>
+                    <td>R$ ${receivable.value.toFixed(2).replace('.', ',')}</td>
+                    <td>${receivable.dueDate.toLocaleDateString('pt-BR')}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${receivable.status === 'pendente' ? `
+                            <button class="btn btn-sm btn-success" onclick="showPaymentModal(${receivable.id})">
+                                <i class="fas fa-dollar-sign"></i> Receber
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="viewReceivableDetails(${receivable.id})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                    </td>
                 `;
-            }).join('');
+                tbody.appendChild(row);
+            });
         }
 
-        function showPaymentModal(id) {
-            const receivable = receivables.find(r => r.id === id);
+        function showPaymentModal(receivableId) {
+            const receivable = receivables.find(r => r.id === receivableId);
             if (!receivable) return;
-            currentReceivableId = id;
+
+            currentReceivable = receivable;
+            const modal = document.getElementById('paymentModal');
+            const content = document.getElementById('paymentContent');
             
-            document.getElementById('paymentContent').innerHTML = `
+            content.innerHTML = `
                 <div class="mb-3">
                     <strong>Cliente:</strong> ${receivable.customer.name}<br>
-                    <strong>Parcela:</strong> ${receivable.installmentNumber} de ${receivable.totalInstallments}<br>
-                    <strong>Valor Pendente:</strong> ${formatCurrency(receivable.value)}<br>
-                    <strong>Vencimento:</strong> ${formatDate(receivable.dueDate)}
-                </div>`;
-            document.getElementById('paymentAmount').value = receivable.value.toFixed(2);
-            document.getElementById('paymentDate').valueAsDate = new Date();
-            showModal('paymentModal');
-        }
-        
-        function confirmPayment() {
-            if (currentReceivableId === null) return;
-            const index = receivables.findIndex(r => r.id === currentReceivableId);
-            if (index === -1) return;
+                    <strong>Valor:</strong> R$ ${receivable.value.toFixed(2).replace('.', ',')}<br>
+                    <strong>Vencimento:</strong> ${receivable.dueDate.toLocaleDateString('pt-BR')}
+                </div>
+            `;
             
+            document.getElementById('paymentAmount').value = receivable.value.toFixed(2);
+            modal.style.display = 'flex';
+        }
+
+        function hidePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            currentReceivable = null;
+        }
+
+        function confirmPayment() {
+            if (!currentReceivable) return;
+
             const amount = parseFloat(document.getElementById('paymentAmount').value);
-            if (amount <= 0 || isNaN(amount)) {
-                alert('Por favor, insira um valor de pagamento válido.');
+            const date = document.getElementById('paymentDate').value;
+
+            if (!amount || !date) {
+                alert('Por favor, preencha todos os campos.');
                 return;
             }
 
-            receivables[index].status = 'pago';
-            receivables[index].paymentDate = new Date(document.getElementById('paymentDate').value);
-            receivables[index].paidAmount = amount;
-            
-            saveDataToLocalStorage();
+            // Atualizar status da conta a receber
+            currentReceivable.status = 'pago';
+            currentReceivable.paymentDate = new Date(date);
+            currentReceivable.paidAmount = amount;
+
+            // Atualizar tabela e dashboard
             updateReceivablesTable();
             updateDashboard();
-            hideModal('paymentModal');
-            alert('Pagamento de parcela registrado com sucesso!');
+            hidePaymentModal();
+
+            alert('Pagamento recebido com sucesso!');
         }
 
-        // ===== RELATÓRIOS (PDF COM FILTROS) =====
-        function updateReportFilters() {
-            const customerFilterSelect = document.getElementById('receivablesReportCustomerFilter');
-            if (customerFilterSelect) {
-                const selectedValue = customerFilterSelect.value;
-                customerFilterSelect.innerHTML = '<option value="all">Todos os Clientes</option>' + customers
-                    .map(c => `<option value="${c.id}">${c.name}</option>`)
-                    .join('');
-                customerFilterSelect.value = selectedValue || 'all';
-            }
+        function viewReceivableDetails(receivableId) {
+            const receivable = receivables.find(r => r.id === receivableId);
+            if (!receivable) return;
+
+            const details = `
+                Cliente: ${receivable.customer.name}
+                Valor: R$ ${receivable.value.toFixed(2).replace('.', ',')}
+                Data da Venda: ${receivable.saleDate.toLocaleDateString('pt-BR')}
+                Vencimento: ${receivable.dueDate.toLocaleDateString('pt-BR')}
+                Status: ${receivable.status}
+                ${receivable.status === 'pago' ? `Data do Pagamento: ${receivable.paymentDate.toLocaleDateString('pt-BR')}` : ''}
+            `;
+
+            alert(details);
         }
-        
-        function generateReport(title, head, body, foot, filename) {
+
+        // ===== FUNÇÕES DE RELATÓRIOS =====
+        function generateSalesReport() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(18);
-            doc.text(title, 105, 20, { align: 'center', maxWidth: 180 });
+
+            doc.setFontSize(20);
+            doc.text('RELATÓRIO DE VENDAS', 105, 20, { align: 'center' });
             
             doc.setFontSize(12);
-            doc.text(`Gerado em: ${formatDate(new Date())}`, 14, 35);
-            
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 40);
+
+            // Preparar dados para a tabela
+            const tableData = sales.map(sale => [
+                sale.date.toLocaleDateString('pt-BR'),
+                sale.customer.name,
+                sale.items.reduce((sum, item) => sum + item.quantity, 0),
+                sale.paymentMethod,
+                `R$ ${sale.total.toFixed(2).replace('.', ',')}`
+            ]);
+
+            // Adicionar tabela
             doc.autoTable({
-                startY: 45,
-                head: [head],
-                body: body,
-                foot: foot ? [foot] : [],
-                showFoot: foot ? 'last_page' : 'never',
+                head: [['Data', 'Cliente', 'Itens', 'Pagamento', 'Total']],
+                body: tableData,
+                startY: 60,
                 theme: 'grid',
-                styles: { halign: 'right' },
-                columnStyles: { 0: { halign: 'left' } },
+                styles: { fontSize: 10 }
             });
+
+            const totalSales = sales.reduce((sum, sale) => sum + sale.total, 0);
+            const finalY = doc.autoTable.previous.finalY + 20;
             
-            doc.save(`${filename}-${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.setFontSize(14);
+            doc.text(`Total Geral: R$ ${totalSales.toFixed(2).replace('.', ',')}`, 20, finalY);
+
+            doc.save('relatorio-vendas.pdf');
         }
-        
-        function generateSalesReport() {
-            const body = sales.map(s => [formatDate(s.date), s.customer.name, s.paymentMethod, formatCurrency(s.total)]);
-            const total = sales.reduce((sum, s) => sum + s.total, 0);
-            generateReport('Relatório de Vendas', ['Data', 'Cliente', 'Pagamento', 'Total'], body, ['', '', 'Total Geral', formatCurrency(total)], 'relatorio_vendas');
-        }
-        
+
         function generateInventoryReport() {
-            const body = products.map(p => [p.code, p.name, p.quantity, formatCurrency(p.price)]);
-            generateReport('Relatório de Estoque', ['Código', 'Produto', 'Estoque', 'Preço'], body, null, 'relatorio_estoque');
-        }
-        
-        function generateReceivablesReport() {
-            const customerId = document.getElementById('receivablesReportCustomerFilter').value;
-            const pendingOnly = document.getElementById('receivablesReportPendingOnlyFilter').checked;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-            let filteredData = [...receivables];
-            let reportTitle = 'Relatório de Contas a Receber';
-            let filterDescription = [];
+            doc.setFontSize(20);
+            doc.text('RELATÓRIO DE ESTOQUE', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 40);
 
-            if (pendingOnly) {
-                filteredData = filteredData.filter(r => r.status === 'pendente');
-                filterDescription.push("Apenas Pendentes");
-            }
-            
-            if (customerId && customerId !== 'all') {
-                filteredData = filteredData.filter(r => r.customer.id === parseInt(customerId));
-                const customer = customers.find(c => c.id === parseInt(customerId));
-                if(customer) filterDescription.push(`Cliente: ${customer.name}`);
-            }
-            
-            const body = filteredData.map(r => {
-                const isOverdue = new Date() > new Date(r.dueDate) && r.status === 'pendente';
-                const statusText = r.status === 'pago' ? 'Pago' : (isOverdue ? 'Vencido' : 'Pendente');
-                return [r.customer.name, formatDate(r.dueDate), `${r.installmentNumber}/${r.totalInstallments}`, statusText, formatCurrency(r.value)];
+            // Preparar dados para a tabela
+            const tableData = products.map(product => [
+                product.code,
+                product.name,
+                product.category,
+                `R$ ${product.price.toFixed(2).replace('.', ',')}`,
+                product.quantity,
+                product.quantity < 10 ? 'Baixo' : 'Normal'
+            ]);
+
+            // Adicionar tabela
+            doc.autoTable({
+                head: [['Código', 'Produto', 'Categoria', 'Preço', 'Estoque', 'Status']],
+                body: tableData,
+                startY: 60,
+                theme: 'grid',
+                styles: { fontSize: 10 }
             });
-            
-            const total = filteredData.reduce((sum, r) => sum + r.value, 0);
-            const foot = ['', '', '', 'Total Filtrado', formatCurrency(total)];
-            
-            if (filterDescription.length > 0) {
-                reportTitle += ` (${filterDescription.join(', ')})`;
-            }
 
-            generateReport(reportTitle, ['Cliente', 'Vencimento', 'Parcela', 'Status', 'Valor'], body, foot, 'relatorio_contas_receber');
+            doc.save('relatorio-estoque.pdf');
+        }
+
+        function generateReceivablesReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(20);
+            doc.text('RELATÓRIO DE CONTAS A RECEBER', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 40);
+
+            // Preparar dados para a tabela
+            const tableData = receivables.map(receivable => {
+                const isOverdue = new Date() > receivable.dueDate && receivable.status === 'pendente';
+                const status = receivable.status === 'pago' ? 'Pago' : (isOverdue ? 'Vencido' : 'Pendente');
+                
+                return [
+                    receivable.saleDate.toLocaleDateString('pt-BR'),
+                    receivable.customer.name,
+                    `R$ ${receivable.value.toFixed(2).replace('.', ',')}`,
+                    receivable.dueDate.toLocaleDateString('pt-BR'),
+                    status
+                ];
+            });
+
+            // Adicionar tabela
+            doc.autoTable({
+                head: [['Data Venda', 'Cliente', 'Valor', 'Vencimento', 'Status']],
+                body: tableData,
+                startY: 60,
+                theme: 'grid',
+                styles: { fontSize: 10 }
+            });
+
+            const totalReceivables = receivables.filter(r => r.status === 'pendente').reduce((sum, r) => sum + r.value, 0);
+            const finalY = doc.autoTable.previous.finalY + 20;
+            
+            doc.setFontSize(14);
+            doc.text(`Total a Receber: R$ ${totalReceivables.toFixed(2).replace('.', ',')}`, 20, finalY);
+
+            doc.save('relatorio-contas-receber.pdf');
         }
 
         function generateCustomersReport() {
-            const body = customers.map(c => [c.name, c.phone, formatCurrency(c.totalPurchases || 0)]);
-            generateReport('Relatório de Clientes', ['Nome', 'Telefone', 'Total Comprado'], body, null, 'relatorio_clientes');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(20);
+            doc.text('RELATÓRIO DE CLIENTES', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 40);
+
+            // Preparar dados para a tabela
+            const tableData = customers.map(customer => [
+                customer.name,
+                customer.email,
+                customer.phone,
+                customer.city,
+                `R$ ${customer.totalPurchases.toFixed(2).replace('.', ',')}`
+            ]);
+
+            // Adicionar tabela
+            doc.autoTable({
+                head: [['Nome', 'Email', 'Telefone', 'Cidade', 'Total Compras']],
+                body: tableData,
+                startY: 60,
+                theme: 'grid',
+                styles: { fontSize: 10 }
+            });
+
+            doc.save('relatorio-clientes.pdf');
         }
 
-
-        // ===== CONFIGURAÇÕES =====
-        function loadSettings() {
-            const companySettings = localStorage.getItem('sgi_company_settings');
-            if (companySettings) companyData = JSON.parse(companySettings);
-            
-            document.getElementById('companyName').value = companyData.name || '';
-            document.getElementById('companyCNPJ').value = companyData.cnpj || '';
-            document.getElementById('companyPhone').value = companyData.phone || '';
-            document.getElementById('companyAddress').value = companyData.address || '';
-            
-            document.getElementById('currentUsername').value = currentUser.username;
-        }
-
+        // ===== FUNÇÕES DE CONFIGURAÇÕES =====
         function saveCompanySettings() {
             companyData = {
                 name: document.getElementById('companyName').value,
                 cnpj: document.getElementById('companyCNPJ').value,
                 phone: document.getElementById('companyPhone').value,
-                address: document.getElementById('companyAddress').value,
+                email: document.getElementById('companyEmail').value,
+                address: document.getElementById('companyAddress').value
             };
-            localStorage.setItem('sgi_company_settings', JSON.stringify(companyData));
-            alert('Dados da loja salvos com sucesso!');
+            
+            localStorage.setItem('companySettings', JSON.stringify(companyData));
+            alert('Dados da loja salvos com sucesso! Estes dados aparecerão nos recibos.');
         }
 
         function changePassword() {
-            const currentPass = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirmPass = document.getElementById('confirmPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (currentPass !== currentUser.password) {
-                alert('Senha atual incorreta.'); return;
-            }
-            if (newPass.length < 4) {
-                alert('A nova senha deve ter pelo menos 4 caracteres.'); return;
-            }
-            if (newPass !== confirmPass) {
-                alert('A nova senha e a confirmação não coincidem.'); return;
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Por favor, preencha todos os campos.');
+                return;
             }
 
-            currentUser.password = newPass;
-            localStorage.setItem('sgi_user_credentials', JSON.stringify(currentUser));
-            localStorage.setItem('sgi_current_user', JSON.stringify(currentUser));
-            
+            if (currentPassword !== currentUser.password) {
+                alert('Senha atual incorreta.');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('A nova senha e a confirmação não coincidem.');
+                return;
+            }
+
+            if (newPassword.length < 4) {
+                alert('A nova senha deve ter pelo menos 4 caracteres.');
+                return;
+            }
+
+            currentUser.password = newPassword;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Limpar campos
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
+
             alert('Senha alterada com sucesso!');
         }
 
-        // ===== BACKUP E RESTAURAÇÃO =====
-        function exportCompleteBackup() {
-            const backupData = {
-                sgi_app_data: JSON.parse(localStorage.getItem('sgi_app_data') || '{}'),
-                sgi_user_credentials: JSON.parse(localStorage.getItem('sgi_user_credentials') || '{}'),
-                sgi_company_settings: JSON.parse(localStorage.getItem('sgi_company_settings') || '{}'),
-                exportDate: new Date().toISOString()
+        function saveGeneralSettings() {
+            const generalSettings = {
+                minStockAlert: parseInt(document.getElementById('minStockAlert').value),
+                defaultDueDays: parseInt(document.getElementById('defaultDueDays').value),
+                currency: document.getElementById('currency').value,
+                theme: document.getElementById('theme').value
             };
             
-            const dataStr = JSON.stringify(backupData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `SGI-FlordeMaria-Backup-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-            alert('Backup completo exportado com sucesso!');
+            localStorage.setItem('generalSettings', JSON.stringify(generalSettings));
+            alert('Configurações gerais salvas com sucesso!');
         }
 
-        function importBackup() {
+        function exportCompleteBackup() {
+            const allData = {
+                products: products,
+                customers: customers,
+                sales: sales,
+                receivables: receivables,
+                companyData: companyData,
+                currentUser: currentUser,
+                generalSettings: JSON.parse(localStorage.getItem('generalSettings') || '{}'),
+                exportDate: new Date().toISOString(),
+                version: '1.0.0',
+                systemInfo: {
+                    name: 'SGI - Flor de Maria',
+                    description: 'Sistema de Gestão Integrado - Backup Completo'
+                }
+            };
+            
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T');
+            const filename = `SGI-FlordeMaria-Backup-${timestamp[0]}-${timestamp[1].split('.')[0]}.json`;
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = filename;
+            link.click();
+            
+            alert('Backup completo exportado com sucesso!\nIncluindo: produtos, clientes, vendas, contas a receber, dados da loja e configurações.');
+        }
+
+        function showImportModal() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
-            input.onchange = e => {
+            input.onchange = function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = event => {
+                    reader.onload = function(e) {
                         try {
-                            const backupData = JSON.parse(event.target.result);
-                            if (confirm('Restaurar este backup substituirá TODOS os dados atuais. Deseja continuar?')) {
-                                localStorage.setItem('sgi_app_data', JSON.stringify(backupData.sgi_app_data || {}));
-                                localStorage.setItem('sgi_user_credentials', JSON.stringify(backupData.sgi_user_credentials || {}));
-                                localStorage.setItem('sgi_company_settings', JSON.stringify(backupData.sgi_company_settings || {}));
-                                alert('Backup restaurado com sucesso! O sistema será recarregado.');
-                                location.reload();
+                            const data = JSON.parse(e.target.result);
+                            if (confirm('Isso irá restaurar TODOS os dados do backup. Deseja continuar?')) {
+                                // Restaurar dados principais
+                                products = data.products || [];
+                                customers = data.customers || [];
+                                sales = data.sales || [];
+                                receivables = data.receivables || [];
+                                
+                                // Restaurar dados da empresa se existir
+                                if (data.companyData) {
+                                    companyData = data.companyData;
+                                    localStorage.setItem('companySettings', JSON.stringify(companyData));
+                                }
+                                
+                                // Restaurar usuário se existir
+                                if (data.currentUser) {
+                                    currentUser = data.currentUser;
+                                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                                }
+                                
+                                // Restaurar configurações gerais se existir
+                                if (data.generalSettings) {
+                                    localStorage.setItem('generalSettings', JSON.stringify(data.generalSettings));
+                                }
+                                
+                                // Converter strings de data de volta para objetos Date
+                                sales.forEach(sale => {
+                                    sale.date = new Date(sale.date);
+                                });
+                                receivables.forEach(receivable => {
+                                    receivable.saleDate = new Date(receivable.saleDate);
+                                    receivable.dueDate = new Date(receivable.dueDate);
+                                    if (receivable.paymentDate) {
+                                        receivable.paymentDate = new Date(receivable.paymentDate);
+                                    }
+                                });
+                                
+                                updateDashboard();
+                                loadSettings();
+                                alert('Backup restaurado com sucesso! Todos os dados, configurações e dados da loja foram restaurados.');
                             }
                         } catch (error) {
-                            alert('Erro ao ler o arquivo de backup. O arquivo pode estar corrompido.');
+                            alert('Erro ao restaurar backup: arquivo inválido ou corrompido');
                         }
                     };
                     reader.readAsText(file);
@@ -2399,34 +2743,103 @@
         }
 
         function clearAllData() {
-            if (confirm('ATENÇÃO: Esta ação apagará PERMANENTEMENTE todos os dados. Deseja continuar?')) {
-                if (confirm('ÚLTIMO AVISO: Confirma a exclusão de todos os dados do sistema?')) {
-                    localStorage.removeItem('sgi_app_data');
-                    localStorage.removeItem('sgi_company_settings');
-                    localStorage.removeItem('sgi_user_credentials');
-                    localStorage.removeItem('sgi_current_user');
-                    alert('Todos os dados foram limpos. O sistema será recarregado.');
-                    location.reload();
+            if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita!')) {
+                if (confirm('Última confirmação: Todos os produtos, clientes, vendas e contas a receber serão excluídos!')) {
+                    products = [];
+                    customers = [];
+                    sales = [];
+                    receivables = [];
+                    cart = [];
+                    
+                    updateDashboard();
+                    alert('Todos os dados foram limpos!');
                 }
             }
         }
-        
-        // ===== DADOS DE AMOSTRA (PARA PRIMEIRO USO) =====
-        function loadSampleData() {
-            products = [
-                { id: 1, code: 'FL001', name: 'Rosas Vermelhas (Dúzia)', price: 50.00, quantity: 50 },
-                { id: 2, code: 'BQ001', name: 'Buquê de Tulipas Coloridas', price: 85.00, quantity: 30 },
-                { id: 3, code: 'AR001', name: 'Arranjo de Lírios Brancos', price: 120.00, quantity: 20 },
-                { id: 4, code: 'VS001', name: 'Vaso de Orquídea Phalaenopsis', price: 95.00, quantity: 15 },
-                { id: 5, code: 'FL002', name: 'Girassóis (Unidade)', price: 8.00, quantity: 100 }
-            ];
-            customers = [
-                { id: 1, name: 'Maria Silva', phone: '(11) 98765-4321', totalPurchases: 0 },
-                { id: 2, name: 'João Pereira', phone: '(21) 91234-5678', totalPurchases: 0 }
-            ];
-            sales = [];
-            receivables = [];
+
+        function loadSettings() {
+            try {
+                console.log('Iniciando carregamento de configurações...');
+                
+                // Carregar dados da empresa
+                const companySettings = localStorage.getItem('companySettings');
+                if (companySettings) {
+                    companyData = JSON.parse(companySettings);
+                    console.log('Dados da empresa carregados:', companyData);
+                }
+                
+                // Atualizar campos da interface se existirem
+                const companyNameField = document.getElementById('companyName');
+                if (companyNameField) {
+                    console.log('Atualizando campos da empresa...');
+                    document.getElementById('companyName').value = companyData.name || 'Flor de Maria';
+                    document.getElementById('companyCNPJ').value = companyData.cnpj || '';
+                    document.getElementById('companyPhone').value = companyData.phone || '(11) 1234-5678';
+                    document.getElementById('companyEmail').value = companyData.email || '';
+                    document.getElementById('companyAddress').value = companyData.address || 'Rua das Flores, 123\nSão Paulo - SP\nCEP: 01234-567';
+                }
+                
+                // Carregar dados do usuário
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    console.log('Dados do usuário carregados:', currentUser.username);
+                }
+                
+                // Atualizar campo do usuário se existir
+                const usernameField = document.getElementById('currentUsername');
+                if (usernameField) {
+                    usernameField.value = currentUser.username || 'admin';
+                }
+                
+                // Carregar configurações gerais
+                const generalSettings = localStorage.getItem('generalSettings');
+                const minStockField = document.getElementById('minStockAlert');
+                if (minStockField) {
+                    console.log('Atualizando configurações gerais...');
+                    if (generalSettings) {
+                        const data = JSON.parse(generalSettings);
+                        document.getElementById('minStockAlert').value = data.minStockAlert || 10;
+                        document.getElementById('defaultDueDays').value = data.defaultDueDays || 30;
+                        document.getElementById('currency').value = data.currency || 'BRL';
+                        document.getElementById('theme').value = data.theme || 'dark';
+                        document.getElementById('autoBackup').value = data.autoBackup || 'disabled';
+                    } else {
+                        // Valores padrão
+                        document.getElementById('minStockAlert').value = 10;
+                        document.getElementById('defaultDueDays').value = 30;
+                        document.getElementById('currency').value = 'BRL';
+                        document.getElementById('theme').value = 'dark';
+                        document.getElementById('autoBackup').value = 'disabled';
+                    }
+                }
+                
+                console.log('Configurações carregadas com sucesso!');
+                
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+            }
         }
+
+        // ===== FUNÇÃO DE LOGOUT =====
+        function logout() {
+            if (confirm('Tem certeza que deseja sair do sistema?')) {
+                document.getElementById('app').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                
+                // Limpar campos de login
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+                // Fechar menu mobile se estiver aberto
+                closeMobileMenu();
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // A aplicação será inicializada apenas após o login
+        });
     </script>
 </body>
 </html>
