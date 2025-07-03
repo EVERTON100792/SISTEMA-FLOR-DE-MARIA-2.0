@@ -1,1 +1,4137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Flor de Maria | Sistema de Gestão Integrado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+    <style>
+        /* ===== RESET E VARIÁVEIS CSS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Paleta de Cores Moderna */
+            --primary-bg: #0F172A;  /* Azul escuro profundo */
+            --secondary-bg: #1E293B;  /* Azul acinzentado */
+            --surface-bg: #334155;  /* Superfície elevada */
+            --primary-color: #3B82F6; /* Azul vibrante */
+            --accent-color: #10B981;  /* Verde neon */
+            --danger-color: #EF4444;  /* Vermelho */
+            --warning-color: #F59E0B; /* Amarelo */
+            --text-primary: #FFFFFF;  /* Branco puro */
+            --text-secondary: #F1F5F9; /* Cinza claro */
+            --text-muted: #94A3B8;  /* Cinza médio */
+            --border-color: #475569;  /* Borda */
+            --hover-bg: #475569;    /* Hover */
+            
+            /* Gradientes */
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            --gradient-dark: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            /* Transições */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== ESTILOS GLOBAIS ===== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== COMPONENTES REUTILIZÁVEIS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            justify-content: center;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+        }
+        
+        .btn-success {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: var(--text-primary);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--text-primary);
+        }
+
+        .btn-warning:hover {
+            background: #D97706;
+        }
+
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .card {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Otimização para mobile: remove efeito de hover que pode ser "pegajoso" */
+        @media (hover: none) {
+            .card:hover {
+                transform: none;
+                box-shadow: var(--shadow-lg);
+            }
+            .btn-primary:hover:not(:disabled) {
+                transform: none;
+                box-shadow: var(--shadow-md);
+            }
+        }
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+            }
+        }
+
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 16px; 
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            /* white-space: nowrap; Removido para melhor responsividade em mobile */
+        }
+
+        .table th {
+            background: var(--surface-bg);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .table tr:hover {
+            background: var(--surface-bg);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-color);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+        .badge-secondary {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-muted);
+        }
+
+
+        /* ===== TELA DE LOGIN ===== */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--secondary-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sidebar-logo i {
+            font-size: 24px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav-item {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            border-radius: 0;
+            position: relative;
+        }
+
+        .sidebar-nav-link:hover {
+            background: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav-link.active {
+            background: var(--primary-color);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .sidebar-nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-color);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            flex-grow: 1; 
+        }
+
+
+        /* ===== RESPONSIVIDADE ===== */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px; 
+            z-index: 1001;
+            background: var(--surface-bg); 
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 12px; 
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 800px) { /* Aumentado o breakpoint para cobrir mais tablets */
+            body {
+                font-size: 14px;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-xl);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 80px 15px 20px; 
+            }
+
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+            
+            /* Ajuste crucial para os grids em mobile */
+            .grid-2, .grid-3, .grid-4, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            /* Garante que grupos de botões em formulários empilhem verticalmente */
+            .form-group .flex.gap-2 {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-group .flex.gap-2 .btn {
+                width: 100%;
+            }
+            
+            /* Empilha o total e o botão de finalizar na página de vendas */
+            #salesPage .flex-between.mt-3 {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+                text-align: center;
+            }
+            #salesPage .flex-between.mt-3 .btn {
+                width: 100%;
+            }
+            
+            /* Empilha o conteúdo dos cabeçalhos dos cards */
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .card-header .flex.gap-2 {
+                 flex-direction: column;
+                 width: 100%;
+                 align-items: stretch;
+            }
+            
+            /* Melhorando a visualização do recibo no modal */
+            .receipt-professional-header, .receipt-sale-info .text-right {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+                gap: 16px;
+            }
+            .receipt-company-details {
+                text-align: left;
+                margin-top: 16px;
+            }
+            .receipt-sale-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .receipt-summary {
+                justify-content: flex-start;
+            }
+            .receipt-summary table {
+                width: 100%;
+                max-width: none;
+            }
+            
+            .btn {
+                padding: 12px 18px; 
+                font-size: 14px;
+            }
+
+            .form-input, .form-select {
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+
+            .chart-container {
+                max-height: 300px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 24px 16px;
+            }
+
+            .modal-title {
+                font-size: 20px;
+            }
+
+            /* --- RELATÓRIOS & TABELAS GERAIS: Ajustes para responsividade --- */
+            /* Garante que as colunas da tabela quebrem o texto em mobile */
+            .table th, .table td {
+                white-space: normal; /* Permite que o texto quebre */
+            }
+
+            /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
+            /* Isso é uma otimização, mas `overflow-x: auto` ainda é necessário para tabelas muito grandes */
+            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição/Produto */
+            .table th:nth-child(2), .table td:nth-child(2) { width: 30%; } /* Ex: Telefone/Qtd/Tipo */
+            .table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Ex: Cadastro/Valor/Categoria */
+            .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* Ex: Compras/Vencimento/Status */
+            /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
+            .table td:last-child, .table th:last-child {
+                width: auto; /* Deixa o navegador ajustar a última coluna */
+            }
+
+            /* Ajusta o input de quantidade no carrinho do PDV */
+            #salesPage .table input[type="number"].form-input {
+                width: 55px; /* Mais compacto */
+                padding: 4px;
+                font-size: 13px;
+            }
+
+            /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
+            #reportsPage .grid-4 {
+                grid-template-columns: 1fr; /* Força empilhamento em uma única coluna */
+            }
+
+            /* Reduz o padding para filtros para usar melhor o espaço */
+            #reportsPage .form-group {
+                margin-bottom: 15px;
+            }
+
+            /* Garante que o botão de atualizar relatório ocupe a largura total */
+            #reportsPage #generateReport {
+                width: 100%;
+            }
+
+            /* Ajusta a disposição dos botões de exportar em mobile */
+            #reportsPage .card-header .flex.gap-2 {
+                flex-direction: column;
+                width: 100%;
+                align-items: stretch;
+            }
+            #reportsPage .card-header .flex.gap-2 .btn {
+                width: 100%;
+            }
+            /* --- FIM: RELATÓRIOS & TABELAS GERAIS --- */
+        }
+
+        /* ===== UTILITÁRIOS ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .mb-4 { margin-bottom: 32px; }
+
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mt-3 { margin-top: 24px; }
+        .mt-4 { margin-top: 32px; }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .gap-1 { gap: 8px; }
+        .gap-2 { gap: 16px; }
+        .gap-3 { gap: 24px; }
+
+        /* ===== NOTIFICAÇÕES ===== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateX(400px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            background: var(--accent-color);
+        }
+
+        .notification-error {
+            background: var(--danger-color);
+        }
+
+        .notification-warning {
+            background: var(--warning-color);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column; 
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+        
+        #modalBody {
+            overflow-y: auto; 
+        }
+
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== DASHBOARD ESPECÍFICO ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--secondary-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-icon {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 32px;
+            color: var(--primary-color);
+            opacity: 0.3;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* PDV - Sugestões de produtos */
+        .suggestion-item:hover {
+            background: var(--surface-bg) !important;
+            color: var(--text-primary);
+        }
+
+        /* ===== NOVO ESTILO DE RECIBO PROFISSIONAL ===== */
+        .receipt-professional-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .receipt-professional-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap; 
+        }
+        .receipt-logo-container {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        .receipt-company-details {
+            text-align: right;
+        }
+        .receipt-company-details h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #343a40;
+        }
+        .receipt-company-details p {
+            margin: 2px 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .receipt-sale-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .receipt-info-block p {
+            margin: 4px 0;
+        }
+        .receipt-info-block .label {
+            color: #6c757d;
+            font-weight: 600;
+        }
+        .receipt-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+        .receipt-items-table thead {
+            background-color: #e9ecef;
+        }
+        .receipt-items-table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #495057;
+            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
+        }
+        .receipt-items-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.95rem;
+            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
+        }
+        .receipt-items-table .text-right { text-align: right; }
+        .receipt-items-table .text-center { text-align: center; }
+        .receipt-summary {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .receipt-summary table {
+            width: 50%;
+            max-width: 300px;
+        }
+        .receipt-summary td {
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        .receipt-summary .total-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .receipt-summary .total-value {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+        .receipt-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1 class="login-title">Flor de Maria</h1>
+            <p class="login-subtitle">Sistema de Gestão Integrado</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuário</label>
+                    <input type="text" id="username" class="form-input" placeholder="Digite seu usuário" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="appLayout" class="app-layout hidden">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-store"></i>
+                    <span>Flor de Maria</span>
+                </div>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#clients" class="sidebar-nav-link" data-page="clients">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#products" class="sidebar-nav-link" data-page="products">
+                        <i class="fas fa-boxes"></i>
+                        <span>Estoque</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#sales" class="sidebar-nav-link" data-page="sales">
+                        <i class="fas fa-cash-register"></i>
+                        <span>PDV</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#receipts" class="sidebar-nav-link" data-page="receipts">
+                        <i class="fas fa-receipt"></i>
+                        <span>Recibos</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#cashflow" class="sidebar-nav-link" data-page="cashflow">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Fluxo de Caixa</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#expenses" class="sidebar-nav-link" data-page="expenses">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Despesas</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#receivables" class="sidebar-nav-link" data-page="receivables">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Contas a Receber</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#reports" class="sidebar-nav-link" data-page="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#settings" class="sidebar-nav-link" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item" style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                    <a href="#" class="sidebar-nav-link" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div id="dashboardPage" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Visão geral do seu negócio</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="cashBalance">R$ 0,00</div>
+                        <div class="stat-label">Saldo em Caixa</div>
+                        <i class="fas fa-wallet stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalReceivables">R$ 0,00</div>
+                        <div class="stat-label">Total a Receber</div>
+                        <i class="fas fa-clock stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="monthlyExpenses">R$ 0,00</div>
+                        <div class="stat-label">Despesas do Mês</div>
+                        <i class="fas fa-credit-card stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
+                        <div class="stat-label">Vendas do Mês</div>
+                        <i class="fas fa-chart-line stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Vendas por Método de Pagamento (Mês Atual)
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="paymentMethodChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Contas Vencidas
+                            </h3>
+                        </div>
+                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
+                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
+                                Nenhuma conta vencida
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="clientsPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Clientes</h1>
+                    <p class="page-subtitle">Gerencie seus clientes</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-user-plus"></i>
+                                Novo Cliente
+                            </h3>
+                        </div>
+                        
+                        <form id="clientForm">
+                            <div class="form-group">
+                                <label class="form-label" for="clientName">Nome Completo</label>
+                                <input type="text" id="clientName" class="form-input" placeholder="Digite o nome do cliente" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="clientPhone">Telefone</label>
+                                <input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar Cliente
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearClientForm">
+                                    <i class="fas fa-times"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-search"></i>
+                                Buscar Cliente
+                            </h3>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone do cliente">
+                        </div>
+                        
+                        <div class="flex-between">
+                            <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
+                            <button class="btn btn-secondary btn-sm" id="exportClients">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-users"></i>
+                            Lista de Clientes
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>Cadastro</th>
+                                    <th>Compras</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="productsPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Estoque</h1>
+                    <p class="page-subtitle">Gerencie seus produtos</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-box"></i>
+                                Novo Produto
+                            </h3>
+                        </div>
+                        
+                        <form id="productForm">
+                            <div class="form-group">
+                                <label class="form-label" for="productRefCode">Código de Referência</label>
+                                <input type="text" id="productRefCode" class="form-input" placeholder="Ex: PRD001" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="productName">Nome do Produto</label>
+                                <input type="text" id="productName" class="form-input" placeholder="Digite o nome do produto" required>
+                            </div>
+                            
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label class="form-label" for="productQuantity">Quantidade</label>
+                                    <input type="number" id="productQuantity" class="form-input" min="0" placeholder="0" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="productCostPrice">Preço de Custo</label>
+                                    <input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="productSalePrice">Preço de Venda</label>
+                                <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar Produto
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearProductForm">
+                                    <i class="fas fa-times"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Resumo do Estoque
+                            </h3>
+                        </div>
+                        
+                        <div class="grid grid-2 mb-3">
+                            <div class="text-center">
+                                <div class="stat-value" id="totalProducts">0</div>
+                                <div class="stat-label">Total de Produtos</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="outOfStockProducts">0</div>
+                                <div class="stat-label">Produtos Esgotados</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código">
+                        </div>
+                        
+                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;">
+                            <i class="fas fa-download"></i>
+                            Exportar Estoque
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-boxes"></i>
+                            Lista de Produtos
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço Custo</th>
+                                    <th>Preço Venda</th>
+                                    <th>Margem</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="salesPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Ponto de Venda</h1>
+                    <p class="page-subtitle">Registre suas vendas</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-search"></i>
+                                Buscar Produto
+                            </h3>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
+                        </div>
+                        
+                        <div id="productSuggestions" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-user"></i>
+                                Cliente e Pagamento
+                            </h3>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="saleClient">Cliente</label>
+                            <select id="saleClient" class="form-select">
+                                <option value="">Selecione um cliente (opcional)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
+                            <select id="salePaymentMethod" class="form-select" required>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="PIX">PIX</option>
+                                <option value="Cartão de Débito">Cartão de Débito</option>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                <option value="Crediário">Crediário</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group hidden" id="installmentsGroup">
+                            <label class="form-label" for="saleInstallments">Número de Parcelas</label>
+                            <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            Carrinho de Compras
+                        </h3>
+                        <div class="flex gap-2">
+                            <button class="btn btn-danger btn-sm" id="clearCart">
+                                <i class="fas fa-trash"></i>
+                                Limpar Carrinho
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Preço Unit.</th>
+                                    <th>Quantidade</th>
+                                    <th>Subtotal</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        <div>
+                            <strong style="font-size: 24px; color: var(--primary-color);">
+                                Total: <span id="cartTotal">R$ 0,00</span>
+                            </strong>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary" id="finalizeSale" disabled>
+                                <i class="fas fa-check"></i>
+                                Finalizar Venda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="receiptsPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Recibos</h1>
+                    <p class="page-subtitle">Visualize e gerencie os recibos de vendas</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-filter"></i>
+                            Filtrar Recibos
+                        </h3>
+                    </div>
+                    <div class="grid grid-2">
+                            <div class="form-group">
+                            <label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label>
+                            <select id="receiptClientFilter" class="form-select">
+                                <option value="">Todos os Clientes</option>
+                            </select>
+                        </div>
+                            <div class="form-group">
+                            <label class="form-label" for="receiptDateFilter">Filtrar por Data</label>
+                            <input type="date" id="receiptDateFilter" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                   <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            Lista de Vendas
+                        </h3>
+                    </div>
+                        <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID da Venda</th>
+                                    <th>Data</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receiptsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cashflowPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Fluxo de Caixa</h1>
+                    <p class="page-subtitle">Controle suas finanças</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-plus"></i>
+                                Novo Lançamento Manual
+                            </h3>
+                        </div>
+                        
+                        <form id="cashFlowForm">
+                            <div class="form-group">
+                                <label class="form-label" for="cashFlowType">Tipo</label>
+                                <select id="cashFlowType" class="form-select" required>
+                                    <option value="entrada">Entrada</option>
+                                    <option value="saida">Saída</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cashFlowDescription">Descrição</label>
+                                <input type="text" id="cashFlowDescription" class="form-input" placeholder="Descrição do lançamento" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cashFlowValue">Valor</label>
+                                <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cashFlowDate">Data</label>
+                                <input type="date" id="cashFlowDate" class="form-input" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar Lançamento
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearCashFlowForm">
+                                    <i class="fas fa-times"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Resumo Financeiro
+                            </h3>
+                        </div>
+                        
+                        <div class="grid grid-2 mb-3">
+                            <div class="text-center">
+                                <div class="stat-value" id="totalEntradas" style="color: var(--accent-color);">R$ 0,00</div>
+                                <div class="stat-label">Total Entradas</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="totalSaidas" style="color: var(--danger-color);">R$ 0,00</div>
+                                <div class="stat-label">Total Saídas</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <div class="stat-value" id="saldoAtual">R$ 0,00</div>
+                            <div class="stat-label">Saldo Atual</div>
+                        </div>
+                        
+                        <div class="form-group mt-3">
+                            <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento">
+                        </div>
+                        
+                        <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;">
+                            <i class="fas fa-download"></i>
+                            Exportar Fluxo de Caixa
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            Histórico de Lançamentos
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cashFlowTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="expensesPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Despesas</h1>
+                    <p class="page-subtitle">Registre suas despesas</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-plus"></i>
+                                Nova Despesa
+                            </h3>
+                        </div>
+                        
+                        <form id="expenseForm">
+                            <div class="form-group">
+                                <label class="form-label" for="expenseDescription">Descrição</label>
+                                <input type="text" id="expenseDescription" class="form-input" placeholder="Descrição da despesa" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="expenseCategory">Categoria</label>
+                                <select id="expenseCategory" class="form-select" required>
+                                    <option value="">Selecione uma categoria</option>
+                                    <option value="Aluguel">Aluguel</option>
+                                    <option value="Energia Elétrica">Energia Elétrica</option>
+                                    <option value="Água">Água</option>
+                                    <option value="Internet">Internet</option>
+                                    <option value="Telefone">Telefone</option>
+                                    <option value="Fornecedores">Fornecedores</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Transporte">Transporte</option>
+                                    <option value="Alimentação">Alimentação</option>
+                                    <option value="Material de Escritório">Material de Escritório</option>
+                                    <option value="Impostos">Impostos</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="expenseValue">Valor</label>
+                                <input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="expenseDate">Data</label>
+                                <input type="date" id="expenseDate" class="form-input" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar Despesa
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearExpenseForm">
+                                    <i class="fas fa-times"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Resumo de Despesas
+                            </h3>
+                        </div>
+                        
+                        <div class="grid grid-2 mb-3">
+                            <div class="text-center">
+                                <div class="stat-value" id="totalExpensesMonth" style="color: var(--danger-color);">R$ 0,00</div>
+                                <div class="stat-label">Despesas do Mês</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="totalExpensesYear" style="color: var(--warning-color);">R$ 0,00</div>
+                                <div class="stat-label">Despesas do Ano</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa">
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <select id="expenseFilterCategory" class="form-select">
+                                <option value="">Todas as categorias</option>
+                                <option value="Aluguel">Aluguel</option>
+                                <option value="Energia Elétrica">Energia Elétrica</option>
+                                <option value="Água">Água</option>
+                                <option value="Internet">Internet</option>
+                                <option value="Telefone">Telefone</option>
+                                <option value="Fornecedores">Fornecedores</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Material de Escritório">Material de Escritório</option>
+                                <option value="Impostos">Impostos</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" id="exportExpenses">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            Lista de Despesas
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="receivablesPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Contas a Receber</h1>
+                    <p class="page-subtitle">Gerencie seus recebimentos (Crediário)</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-plus"></i>
+                                Nova Conta a Receber (Manual)
+                            </h3>
+                        </div>
+                        
+                        <form id="receivableForm">
+                            <div class="form-group">
+                                <label class="form-label" for="receivableClient">Cliente</label>
+                                <select id="receivableClient" class="form-select" required>
+                                    <option value="">Selecione um cliente</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="receivableDescription">Descrição</label>
+                                <input type="text" id="receivableDescription" class="form-input" placeholder="Descrição da conta" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="receivableValue">Valor</label>
+                                <input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
+                                <input type="date" id="receivableDueDate" class="form-input" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar Conta
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearReceivableForm">
+                                    <i class="fas fa-times"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Resumo de Recebimentos
+                            </h3>
+                        </div>
+                        
+                        <div class="grid grid-2 mb-3">
+                            <div class="text-center">
+                                <div class="stat-value" id="totalReceivablesPending" style="color: var(--warning-color);">R$ 0,00</div>
+                                <div class="stat-label">Pendentes</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="totalReceivablesOverdue" style="color: var(--danger-color);">R$ 0,00</div>
+                                <div class="stat-label">Vencidas</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$ 0,00</div>
+                            <div class="stat-label">Recebidas</div>
+                        </div>
+                        
+                        <div class="form-group mt-3">
+                            <input type="text" id="receivableSearch" class="form-input" placeholder="Buscar por cliente ou descrição">
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <select id="receivableFilterStatus" class="form-select">
+                                <option value="">Todos os status</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Pago">Pago</option>
+                                <option value="Vencido">Vencido</option>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" id="exportReceivables">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            Lista de Contas a Receber
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receivablesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reportsPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Relatórios</h1>
+                    <p class="page-subtitle">Análise e relatórios</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-filter"></i>
+                            Filtros de Relatório
+                        </h3>
+                    </div>
+                    
+                    <div class="grid grid-4">
+                        <div class="form-group">
+                            <label class="form-label" for="reportStartDate">Data Inicial</label>
+                            <input type="date" id="reportStartDate" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="reportEndDate">Data Final</label>
+                            <input type="date" id="reportEndDate" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="reportType">Tipo de Relatório</label>
+                            <select id="reportType" class="form-select">
+                                <option value="vendas">Vendas</option>
+                                <option value="financeiro">Financeiro</option>
+                                <option value="produtos">Produtos</option>
+                                <option value="clientes">Clientes</option>
+                                <option value="contas_a_receber">Contas a Receber</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group hidden" id="reportClientFilterContainer">
+                             <label class="form-label" for="reportReceivableClient">Cliente</label>
+                             <select id="reportReceivableClient" class="form-select">
+                                 <option value="">Todos os Clientes</option>
+                             </select>
+                        </div>
+                        
+                        <div class="form-group hidden" id="reportStatusFilterContainer">
+                            <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
+                            <select id="reportReceivableStatus" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="Pendente">Pendentes</option>
+                                <option value="Pago">Pagas</option>
+                                <option value="Vencido">Vencidas</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary" id="generateReport" style="width: 100%;">
+                                <i class="fas fa-sync-alt"></i>
+                                Atualizar Relatório
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Resumo Geral
+                            </h3>
+                        </div>
+                        
+                        <div class="grid grid-2">
+                            <div class="text-center">
+                                <div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$ 0,00</div>
+                                <div class="stat-label">Total de Vendas</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="reportTotalExpenses" style="color: var(--danger-color);">R$ 0,00</div>
+                                <div class="stat-label">Total de Despesas</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="reportProfit" style="color: var(--primary-color);">R$ 0,00</div>
+                                <div class="stat-label">Lucro Líquido</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="reportSalesCount">0</div>
+                                <div class="stat-label">Número de Vendas</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-trophy"></i>
+                                Top 5 (Produtos/Clientes/Devedores)
+                            </h3>
+                        </div>
+                        
+                        <div id="topProductsList">
+                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
+                                Gere um relatório para ver os destaques.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Gráfico do Relatório
+                        </h3>
+                        <div class="flex gap-2">
+                            <button class="btn btn-secondary btn-sm" id="exportReportPDF">
+                                <i class="fas fa-file-pdf"></i>
+                                Exportar PDF
+                            </button>
+                            <button class="btn btn-secondary btn-sm" id="exportReportCSV">
+                                <i class="fas fa-file-csv"></i>
+                                Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                    
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-table"></i>
+                            Detalhes do Relatório
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="reportDetailTable">
+                            <thead id="reportTableHead"></thead>
+                            <tbody id="reportTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settingsPage" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Configurações</h1>
+                    <p class="page-subtitle">Backup e restauração dos dados</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-download"></i>
+                                Backup dos Dados
+                            </h3>
+                        </div>
+                        
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.
+                        </p>
+                        
+                        <div class="grid grid-2 mb-3">
+                            <div class="text-center">
+                                <div class="stat-value" id="backupClientsCount">0</div>
+                                <div class="stat-label">Clientes</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="backupProductsCount">0</div>
+                                <div class="stat-label">Produtos</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value" id="backupSalesCount">0</div>
+                                <div class="stat-label">Vendas</div>
+                            </div>
+                             <div class="text-center">
+                                 <div class="stat-value" id="backupReceivablesCount">0</div>
+                                 <div class="stat-label">Contas a Receber</div>
+                             </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
+                            <i class="fas fa-download"></i>
+                            Baixar Backup Completo
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-upload"></i>
+                                Restaurar Dados
+                            </h3>
+                        </div>
+                        
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.
+                        </p>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
+                            <input type="file" id="restoreFile" class="form-input" accept=".json">
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button class="btn btn-warning" id="restoreBackup" disabled>
+                                <i class="fas fa-upload"></i>
+                                Restaurar Backup
+                            </button>
+                            <button class="btn btn-danger" id="clearAllData">
+                                <i class="fas fa-trash"></i>
+                                Limpar Todos os Dados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.2 (Responsiveness Fix) =====
+    
+    // Configurações globais
+    const CONFIG = {
+        users: { username: 'maria', password: 'flor123' },
+        storageKeys: {
+            lastActivePage: 'sgi_last_active_page', 
+            clients: 'sgi_clients',
+            products: 'sgi_products',
+            sales: 'sgi_sales',
+            cashFlow: 'sgi_cashflow',
+            expenses: 'sgi_expenses',
+            accountsReceivable: 'sgi_accounts_receivable'
+        },
+        company: { 
+            name: 'Flor de Maria',
+            address: 'Rua das Flores, 123 - Centro',
+            phone: '(11) 98765-4321',
+            cnpj: '12.345.678/0001-99'
+        }
+    };
+
+    // Utilitários
+    const Utils = {
+        generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        },
+        formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        },
+        formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
+        },
+        formatDateTime(date) {
+            if (!date) return 'N/A';
+            return new Intl.DateTimeFormat('pt-BR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(new Date(date));
+        },
+        saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Erro ao salvar no localStorage:', error);
+                Notification.error('Erro ao salvar dados. Verifique o console.');
+                return false;
+            }
+        },
+        loadFromStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('Erro ao carregar do localStorage:', error);
+                Notification.error('Erro ao carregar dados. Verifique o console.');
+                return [];
+            }
+        },
+        debounce(func, delay = 300) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+    };
+
+    // Sistema de Notificações
+    const Notification = {
+        show(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification notification-${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        },
+        success(message) { this.show(message, 'success'); },
+        error(message) { this.show(message, 'error'); },
+        warning(message) { this.show(message, 'warning'); }
+    };
+
+    // Sistema de Modal
+    const Modal = {
+        show(title, content, actionsHtml = '') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            
+            const existingActions = document.getElementById('modalActions');
+            if (existingActions) existingActions.remove();
+            
+            if (actionsHtml) {
+                const modalContent = document.querySelector('.modal-content');
+                const actionsContainer = document.createElement('div');
+                actionsContainer.id = 'modalActions';
+                actionsContainer.style.marginTop = '24px';
+                actionsContainer.style.paddingTop = '16px';
+                actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
+                actionsContainer.innerHTML = actionsHtml;
+                modalContent.appendChild(actionsContainer);
+            }
+            
+            document.getElementById('modal').classList.add('show');
+        },
+        hide() {
+            document.getElementById('modal').classList.remove('show');
+        }
+    };
+
+    // Sistema de Navegação
+    const Navigation = {
+        init() {
+            const sidebar = document.getElementById('sidebar');
+
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // CORREÇÃO: Fecha a sidebar no clique, antes de qualquer outra ação
+                    if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+
+                    const page = link.getAttribute('data-page');
+                    if (page) {
+                        this.navigateTo(page);
+                    }
+                });
+            });
+
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+            // Fecha a sidebar se clicar fora dela
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        },
+        navigateTo(page) {
+            try {
+                if (!document.getElementById(`${page}Page`)) {
+                    console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
+                    page = 'dashboard';
+                }
+                
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`${page}Page`).classList.remove('hidden');
+
+                document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+                
+                localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
+                
+                this.loadPageData(page);
+            } catch (error) {
+                console.error(`Erro ao navegar para a página ${page}:`, error);
+                Notification.error("Ocorreu um erro ao carregar a página.");
+            }
+        },
+        loadPageData(page) {
+            // O conteúdo desta função permanece o mesmo
+            switch (page) {
+                case 'dashboard': Dashboard.loadData(); break;
+                case 'clients': Clients.loadClients(); break;
+                case 'products': Products.loadProducts(); break;
+                case 'sales': Sales.initPage(); break;
+                case 'receipts': Receipts.initPage(); break;
+                case 'cashflow': CashFlow.loadCashFlow(); break;
+                case 'expenses': Expenses.loadExpenses(); break;
+                case 'receivables': Receivables.loadReceivables(); break;
+                case 'settings': Settings.updateBackupStats(); break;
+                case 'reports': Reports.initPage(); break;
+            }
+        }
+    };
+
+    // Autenticação (sem alterações)
+    const Auth = {
+        init() {
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.login();
+            });
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                this.logout();
+            });
+            this.checkAuth();
+        },
+        login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === CONFIG.users.username && password === CONFIG.users.password) {
+                localStorage.setItem('sgi_logged_in', 'true');
+                this.showApp();
+                Notification.success('Login realizado com sucesso!');
+            } else {
+                Notification.error('Usuário ou senha incorretos!');
+            }
+        },
+        logout() {
+            localStorage.removeItem('sgi_logged_in');
+            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
+            this.showLogin();
+            Notification.success('Logout realizado com sucesso!');
+        },
+        checkAuth() {
+            localStorage.getItem('sgi_logged_in') === 'true' ? this.showApp() : this.showLogin();
+        },
+        showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appLayout').classList.add('hidden');
+        },
+        showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appLayout').classList.remove('hidden');
+            
+            const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
+            Navigation.navigateTo(lastPage || 'dashboard');
+        }
+    };
+    
+    // Dashboard (sem alterações)
+    const Dashboard = {
+        chart: null,
+        loadData() {
+            this.updateStats();
+            this.updateChart();
+            this.updateOverdueAccounts();
+        },
+        updateStats() {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const accountsReceivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+
+            const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
+            const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
+            
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthlySales = sales
+                .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+                .reduce((total, s) => total + s.total, 0);
+                
+            const monthlyExpenses = cashFlow
+                .filter(cf => cf.type === 'saida')
+                .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+                .reduce((total, cf) => total + cf.value, 0);
+
+            document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
+            document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
+            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
+            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
+        },
+        updateChart() {
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+
+            const paymentMethods = {};
+            monthlySales.forEach(sale => {
+                const method = sale.paymentMethod || 'N/A';
+                paymentMethods[method] = (paymentMethods[method] || 0) + sale.total;
+            });
+
+            const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+            if (this.chart) this.chart.destroy();
+            this.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(paymentMethods),
+                    datasets: [{
+                        label: 'Vendas (R$)',
+                        data: Object.values(paymentMethods),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                    }
+                }
+            });
+        },
+        updateOverdueAccounts() {
+            const accountsReceivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
+
+            const container = document.getElementById('overdueAccounts');
+            if (overdueAccounts.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>';
+            } else {
+                container.innerHTML = overdueAccounts.map(account => {
+                    const client = clients.find(c => c.id === account.clientId);
+                    const daysOverdue = Math.floor((today - new Date(account.dueDate)) / (1000 * 60 * 60 * 24));
+                    return `
+                        <div style="padding: 12px; border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 8px; border-radius: 4px;">
+                            <div class="flex-between" style="flex-direction: row; align-items: center;">
+                                <div>
+                                    <strong>${client ? client.name : 'N/A'}</strong><br>
+                                    <small style="color: var(--text-muted);">${daysOverdue} dia(s) em atraso</small>
+                                </div>
+                                <div class="text-right">
+                                    <strong style="color: var(--danger-color);">${Utils.formatCurrency(account.value)}</strong><br>
+                                    <small style="color: var(--text-muted);">Venc: ${Utils.formatDate(account.dueDate)}</small>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+        }
+    };
+
+    // Módulo de Clientes
+    const Clients = {
+        currentEditId: null,
+        init() {
+            document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
+            document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('clientSearch').addEventListener('input', Utils.debounce((e) => this.filterClients(e.target.value), 300));
+            document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
+        },
+        saveClient() {
+            const name = document.getElementById('clientName').value.trim();
+            const phone = document.getElementById('clientPhone').value.trim();
+
+            if (!name || !phone) return Notification.error('Preencha nome e telefone!');
+
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            if (this.currentEditId) {
+                const clientIndex = clients.findIndex(c => c.id === this.currentEditId);
+                if (clientIndex !== -1) {
+                    clients[clientIndex] = { ...clients[clientIndex], name, phone, updatedAt: new Date().toISOString() };
+                    Notification.success('Cliente atualizado!');
+                }
+            } else {
+                clients.push({ id: Utils.generateUUID(), name, phone, createdAt: new Date().toISOString() });
+                Notification.success('Cliente cadastrado!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.clients, clients);
+            this.clearForm();
+            this.loadClients();
+        },
+        editClient(id) {
+            const client = Utils.loadFromStorage(CONFIG.storageKeys.clients).find(c => c.id === id);
+            if (client) {
+                document.getElementById('clientName').value = client.name;
+                document.getElementById('clientPhone').value = client.phone;
+                this.currentEditId = id;
+                document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteClient(id) {
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients).filter(c => c.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.clients, clients);
+                this.loadClients();
+                Notification.success('Cliente excluído!');
+            }
+        },
+        viewHistory(id) {
+            const client = Utils.loadFromStorage(CONFIG.storageKeys.clients).find(c => c.id === id);
+            if (!client) return;
+
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => s.clientId === id);
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.clientId === id);
+            
+            const totalSpent = sales.reduce((sum, sale) => sum + sale.total, 0);
+            const totalDebt = receivables.filter(r => r.status === 'Pendente' || (r.status !== 'Pago' && new Date(r.dueDate) < new Date())).reduce((sum, r) => sum + r.value, 0);
+
+            // CORREÇÃO: Adicionado .table-responsive em volta de cada tabela no modal
+            let historyHtml = `
+                <h4>Histórico de Compras - ${client.name}</h4>
+                <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${sales.length} compra(s).</p>
+                <hr style="margin: 16px 0;">
+                <div class="table-responsive" style="max-height: 150px;">
+                ${sales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
+                    <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
+                    ${sales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
+                    </tbody></table>
+                `}
+                </div>
+                
+                <h4 class="mt-3">Contas (Crediário)</h4>
+                <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
+                <hr style="margin: 16px 0;">
+                <div class="table-responsive" style="max-height: 150px;">
+                ${receivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
+                    <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
+                    ${receivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
+                    </tbody></table>
+                `}
+                </div>
+            `;
+            Modal.show('Histórico do Cliente', historyHtml);
+        },
+        clearForm() {
+            document.getElementById('clientForm').reset();
+            this.currentEditId = null;
+        },
+        filterClients(searchTerm) {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.phone.includes(searchTerm));
+            this.renderClients(filtered);
+        },
+        loadClients() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            this.renderClients(clients);
+            document.getElementById('clientCount').textContent = `${clients.length} clientes`;
+        },
+        renderClients(clients) {
+            const tbody = document.getElementById('clientsTableBody');
+            if (clients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado</td></tr>`;
+                return;
+            }
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
+                const purchaseCount = sales.filter(s => s.clientId === client.id).length;
+                return `
+                    <tr>
+                        <td>${client.name}</td>
+                        <td>${client.phone}</td>
+                        <td>${Utils.formatDate(client.createdAt)}</td>
+                        <td>${purchaseCount} compra(s)</td>
+                        <td>
+                            <div class="flex gap-1">
+                                <button class="btn btn-secondary btn-sm" onclick="Clients.editClient('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-primary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="Clients.deleteClient('${client.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        },
+        exportToCSV() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            if (clients.length === 0) return Notification.warning('Nenhum cliente para exportar!');
+
+            const headers = ['Nome', 'Telefone', 'Data de Cadastro'];
+            const csvContent = [
+                headers.join(','),
+                ...clients.map(c => [`"${c.name}"`, `"${c.phone}"`, `"${Utils.formatDate(c.createdAt)}"`].join(','))
+            ].join('\n');
+            this.downloadCSV(csvContent, 'clientes');
+        },
+        downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            Notification.success('Relatório CSV exportado!');
+        }
+    };
+    
+    // Módulo de Produtos
+    const Products = {
+        currentEditId: null,
+        init() {
+            document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
+            document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('productSearch').addEventListener('input', Utils.debounce(e => this.filterProducts(e.target.value), 300));
+            document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
+        },
+        saveProduct() {
+            const refCode = document.getElementById('productRefCode').value.trim();
+            const name = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('productQuantity').value) || 0;
+            const costPrice = parseFloat(document.getElementById('productCostPrice').value) || 0;
+            const salePrice = parseFloat(document.getElementById('productSalePrice').value) || 0;
+
+            if (!refCode || !name) return Notification.error('Preencha código e nome!');
+            if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return;
+
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            if (!this.currentEditId && products.some(p => p.refCode.toLowerCase() === refCode.toLowerCase())) {
+                return Notification.error('Código de referência já existe!');
+            }
+
+            if (this.currentEditId) {
+                const index = products.findIndex(p => p.id === this.currentEditId);
+                if (index !== -1) {
+                    products[index] = { ...products[index], refCode, name, quantity, costPrice, salePrice, updatedAt: new Date().toISOString() };
+                    Notification.success('Produto atualizado!');
+                }
+            } else {
+                products.push({ id: Utils.generateUUID(), refCode, name, quantity, costPrice, salePrice, createdAt: new Date().toISOString() });
+                Notification.success('Produto cadastrado!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+            this.clearForm();
+            this.loadProducts();
+        },
+        editProduct(id) {
+            const product = Utils.loadFromStorage(CONFIG.storageKeys.products).find(p => p.id === id);
+            if (product) {
+                document.getElementById('productRefCode').value = product.refCode;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productQuantity').value = product.quantity;
+                document.getElementById('productCostPrice').value = product.costPrice;
+                document.getElementById('productSalePrice').value = product.salePrice;
+                this.currentEditId = id;
+                document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteProduct(id) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                const products = Utils.loadFromStorage(CONFIG.storageKeys.products).filter(p => p.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.products, products);
+                this.loadProducts();
+                Notification.success('Produto excluído!');
+            }
+        },
+        clearForm() {
+            document.getElementById('productForm').reset();
+            this.currentEditId = null;
+        },
+        filterProducts(searchTerm) {
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.refCode.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.renderProducts(filtered);
+        },
+        loadProducts() {
+            try {
+                const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+                this.renderProducts(products);
+                this.updateStats(products);
+            } catch (error) {
+                console.error("Erro ao carregar produtos:", error);
+                Notification.error("Não foi possível carregar os produtos.");
+            }
+        },
+        updateStats(products) {
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('outOfStockProducts').textContent = products.filter(p => p.quantity <= 0).length;
+        },
+        renderProducts(products) {
+            const tbody = document.getElementById('productsTableBody');
+            if (products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
+                const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
+                const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
+                const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
+                return `
+                    <tr>
+                        <td>${product.refCode}</td>
+                        <td>${product.name}</td>
+                        <td>${product.quantity}</td>
+                        <td>${Utils.formatCurrency(product.costPrice)}</td>
+                        <td>${Utils.formatCurrency(product.salePrice)}</td>
+                        <td>${margin.toFixed(1)}%</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="flex gap-1">
+                                <button class="btn btn-secondary btn-sm" onclick="Products.editProduct('${product.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="Products.deleteProduct('${product.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        },
+        exportToCSV() {
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            if (products.length === 0) return Notification.warning('Nenhum produto para exportar!');
+            Clients.downloadCSV(
+                ['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda', 'Margem %'].join(',') + '\n' +
+                products.map(p => {
+                    const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0;
+                    return [`"${p.refCode}"`, `"${p.name}"`, p.quantity, p.costPrice.toFixed(2), p.salePrice.toFixed(2), margin.toFixed(1)].join(',');
+                }).join('\n'), 'estoque'
+            );
+        }
+    };
+
+    // Módulo PDV (Ponto de Venda)
+    const Sales = {
+        cart: [],
+        init() {
+            document.getElementById('productSuggestions').addEventListener('click', (e) => this.handleSuggestionClick(e));
+            document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(e => this.searchProducts(e.target.value), 300));
+            document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
+            document.getElementById('finalizeSale').addEventListener('click', () => this.finalizeSale());
+            document.getElementById('salePaymentMethod').addEventListener('change', () => this.updatePaymentOptions());
+        },
+        initPage() {
+            this.loadClients();
+            this.updateCartDisplay();
+            this.updatePaymentOptions();
+        },
+        loadClients() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('saleClient');
+            select.innerHTML = '<option value="">1 - Consumidor Final</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        updatePaymentOptions() {
+            const paymentMethod = document.getElementById('salePaymentMethod').value;
+            const installmentsGroup = document.getElementById('installmentsGroup');
+            const installmentsInput = document.getElementById('saleInstallments');
+
+            if (paymentMethod === 'Crediário' || paymentMethod === 'Cartão de Crédito') {
+                installmentsGroup.classList.remove('hidden');
+                installmentsInput.max = (paymentMethod === 'Crediário') ? 12 : 12;
+            } else {
+                installmentsGroup.classList.add('hidden');
+            }
+        },
+        searchProducts(searchTerm) {
+            const suggestions = document.getElementById('productSuggestions');
+            if (searchTerm.length < 2) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const filtered = products.filter(p => (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.refCode.toLowerCase().includes(searchTerm.toLowerCase())) && p.quantity > 0);
+            
+            if (filtered.length === 0) {
+                suggestions.innerHTML = `<div class="suggestion-item" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum produto encontrado</div>`;
+                suggestions.classList.remove('hidden');
+                return;
+            }
+            
+            suggestions.innerHTML = filtered.slice(0, 10).map(p => `
+                <div class="suggestion-item" data-product-id="${p.id}" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;">
+                    <div style="font-weight: 500; pointer-events: none;">${p.name}</div>
+                    <small style="color: var(--text-muted); pointer-events: none;">Cód: ${p.refCode} | Estoque: ${p.quantity} | Preço: ${Utils.formatCurrency(p.salePrice)}</small>
+                </div>`).join('');
+            suggestions.classList.remove('hidden');
+        },
+        handleSuggestionClick(event) {
+            const suggestionItem = event.target.closest('.suggestion-item');
+            if (suggestionItem) {
+                const productId = suggestionItem.dataset.productId;
+                if (productId) {
+                    this.addToCart(productId);
+                }
+            }
+        },
+        addToCart(productId) {
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const product = products.find(p => p.id === productId);
+            if (!product || product.quantity <= 0) return Notification.error('Produto sem estoque!');
+
+            const existingItem = this.cart.find(item => item.productId === productId);
+            if (existingItem) {
+                if (existingItem.quantity >= product.quantity) return Notification.error('Quantidade máxima em estoque atingida!');
+                existingItem.quantity++;
+            } else {
+                this.cart.push({ productId, name: product.name, price: product.salePrice, quantity: 1 });
+            }
+            this.updateCartDisplay();
+            document.getElementById('productSearchPDV').value = '';
+            document.getElementById('productSuggestions').classList.add('hidden');
+            Notification.success(`${product.name} adicionado ao carrinho!`);
+        },
+        updateQuantity(productId, newQuantity) {
+            const item = this.cart.find(item => item.productId === productId);
+            if (!item) return;
+            const product = Utils.loadFromStorage(CONFIG.storageKeys.products).find(p => p.id === productId);
+            if (newQuantity > product.quantity) {
+                item.quantity = product.quantity;
+                Notification.error('Quantidade maior que o estoque!');
+            } else if (newQuantity < 1) {
+                item.quantity = 1;
+            } else {
+                item.quantity = newQuantity;
+            }
+            this.updateCartDisplay();
+        },
+        removeFromCart(productId) {
+            this.cart = this.cart.filter(item => item.productId !== productId);
+            this.updateCartDisplay();
+            Notification.success('Produto removido!');
+        },
+        updateCartDisplay() {
+            const tbody = document.getElementById('cartTableBody');
+            const totalElement = document.getElementById('cartTotal');
+            const finalizeSaleBtn = document.getElementById('finalizeSale');
+
+            if (this.cart.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>`;
+                totalElement.textContent = 'R$ 0,00';
+                finalizeSaleBtn.disabled = true;
+                return;
+            }
+            const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            tbody.innerHTML = this.cart.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${Utils.formatCurrency(item.price)}</td>
+                    <td>
+                        <input type="number" value="${item.quantity}" min="1" onchange="Sales.updateQuantity('${item.productId}', parseInt(this.value))" class="form-input" style="width: 80px; padding: 6px;">
+                    </td>
+                    <td>${Utils.formatCurrency(item.price * item.quantity)}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.productId}')"><i class="fas fa-trash"></i></button></td>
+                </tr>`).join('');
+            totalElement.textContent = Utils.formatCurrency(total);
+            finalizeSaleBtn.disabled = false;
+        },
+        clearCart() {
+            if (this.cart.length > 0 && confirm('Limpar o carrinho?')) {
+                this.cart = [];
+                this.updateCartDisplay();
+                Notification.success('Carrinho limpo!');
+            }
+        },
+        finalizeSale() {
+            if (this.cart.length === 0) return Notification.error('Carrinho vazio!');
+
+            const clientId = document.getElementById('saleClient').value;
+            const paymentMethod = document.getElementById('salePaymentMethod').value;
+            const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
+            
+            if (paymentMethod === 'Crediário' && !clientId) {
+                return Notification.error('Selecione um cliente para vendas em crediário!');
+            }
+
+            const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const sale = {
+                id: Utils.generateUUID(),
+                clientId: clientId || null,
+                date: new Date().toISOString(),
+                total,
+                paymentMethod,
+                installments,
+                products: [...this.cart]
+            };
+
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            sales.push(sale);
+            Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
+
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            this.cart.forEach(cartItem => {
+                const product = products.find(p => p.id === cartItem.productId);
+                if (product) product.quantity -= cartItem.quantity;
+            });
+            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+
+            if (paymentMethod === 'Crediário') {
+                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+                const installmentValue = total / installments;
+                for (let i = 1; i <= installments; i++) {
+                    const dueDate = new Date();
+                    dueDate.setMonth(dueDate.getMonth() + i);
+                    receivables.push({
+                        id: Utils.generateUUID(),
+                        clientId,
+                        description: `Parcela ${i}/${installments} da Venda #${sale.id.substring(0, 8)}`,
+                        value: installmentValue,
+                        dueDate: dueDate.toISOString(),
+                        status: 'Pendente',
+                        saleId: sale.id,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                Notification.success('Venda em crediário registrada! Parcelas em "Contas a Receber".');
+            } else {
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+                cashFlow.push({
+                    id: Utils.generateUUID(),
+                    date: new Date().toISOString(),
+                    type: 'entrada',
+                    description: `Venda #${sale.id.substring(0, 8)} (${paymentMethod})`,
+                    value: total,
+                    relatedSaleId: sale.id
+                });
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                Notification.success('Venda finalizada com sucesso!');
+            }
+            
+            Receipts.showReceipt(sale.id);
+
+            this.cart = [];
+            this.updateCartDisplay();
+            document.getElementById('saleClient').value = '';
+        }
+    };
+
+    // Módulo de Recibos
+    const Receipts = {
+        init() {
+            document.getElementById('receiptClientFilter').addEventListener('change', () => this.filterReceipts());
+            document.getElementById('receiptDateFilter').addEventListener('input', () => this.filterReceipts());
+        },
+        initPage() {
+            this.loadClientsIntoFilter();
+            this.loadReceipts();
+        },
+        loadClientsIntoFilter() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('receiptClientFilter');
+            select.innerHTML = '<option value="">Todos os Clientes</option><option value="guest">Consumidor Final</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+        },
+        filterReceipts() {
+            const clientId = document.getElementById('receiptClientFilter').value;
+            const dateFilter = document.getElementById('receiptDateFilter').value;
+            this.loadReceipts(clientId, dateFilter);
+        },
+        loadReceipts(clientIdFilter = '', dateFilter = '') {
+            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+
+            if (clientIdFilter) {
+                if (clientIdFilter === 'guest') {
+                    sales = sales.filter(s => !s.clientId);
+                } else {
+                    sales = sales.filter(s => s.clientId === clientIdFilter);
+                }
+            }
+            if (dateFilter) {
+                sales = sales.filter(s => s.date.startsWith(dateFilter));
+            }
+
+            const tbody = document.getElementById('receiptsTableBody');
+            if (sales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum recibo encontrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(sale => {
+                const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : null;
+                return `
+                    <tr>
+                        <td>#${sale.id.substring(0, 8)}</td>
+                        <td>${Utils.formatDateTime(sale.date)}</td>
+                        <td>${client ? client.name : 'Consumidor Final'}</td>
+                        <td>${Utils.formatCurrency(sale.total)}</td>
+                        <td>
+                           <div class="flex gap-1">
+                                <button class="btn btn-primary btn-sm" onclick="Receipts.showReceipt('${sale.id}')" title="Visualizar">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="Receipts.deleteReceipt('${sale.id}')" title="Excluir Venda">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                           </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        },
+        deleteReceipt(saleId) {
+            const confirmation = confirm('ATENÇÃO!\n\nDeseja excluir esta venda permanentemente?\n\nEsta ação irá:\n- Excluir a venda e seu recibo.\n- Remover o lançamento do caixa (se houver).\n- Excluir todas as parcelas em "Contas a Receber".\n- Devolver os produtos ao estoque.\n\nEsta ação não pode ser desfeita.');
+
+            if (!confirmation) {
+                return Notification.warning('Exclusão cancelada.');
+            }
+
+            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            let products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+
+            const saleToDelete = sales.find(s => s.id === saleId);
+            if (!saleToDelete) {
+                return Notification.error('Venda não encontrada.');
+            }
+
+            saleToDelete.products.forEach(item => {
+                const productIndex = products.findIndex(p => p.id === item.productId);
+                if (productIndex > -1) {
+                    products[productIndex].quantity += item.quantity;
+                }
+            });
+
+            cashFlow = cashFlow.filter(cf => cf.relatedSaleId !== saleId);
+            receivables = receivables.filter(r => r.saleId !== saleId);
+            sales = sales.filter(s => s.id !== saleId);
+
+            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
+
+            Notification.success('Venda excluída com sucesso! O estoque foi restaurado.');
+            this.loadReceipts(); 
+        },
+        showReceipt(saleId) {
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return Notification.error('Venda não encontrada!');
+
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
+
+            const receiptHtml = this.generateReceiptHTML(sale, client);
+            const actionsHtml = `
+                <div class="flex gap-2 justify-content-end">
+                    <button class="btn btn-success" onclick="Receipts.shareOnWhatsApp('${sale.id}')"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button>
+                    <button class="btn btn-secondary" onclick="Receipts.printReceipt()"><i class="fas fa-print"></i> Imprimir</button>
+                </div>
+            `;
+            Modal.show(`Recibo da Venda`, `<div id="receiptToPrint">${receiptHtml}</div>`, actionsHtml);
+        },
+        generateReceiptHTML(sale, client) {
+            return `
+                <div class="receipt-professional-container">
+                    <div class="receipt-professional-header">
+                        <div class="receipt-logo-container">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="receipt-company-details">
+                            <h3>${CONFIG.company.name}</h3>
+                            <p>${CONFIG.company.address}</p>
+                            <p>${CONFIG.company.cnpj}</p>
+                        </div>
+                    </div>
+
+                    <h4>Detalhes da Compra</h4>
+                    <div class="receipt-sale-info">
+                        <div class="receipt-info-block">
+                            <p><span class="label">Cliente:</span><br>${client.name}</p>
+                            <p><span class="label">Data:</span><br>${Utils.formatDateTime(sale.date)}</p>
+                        </div>
+                        <div class="receipt-info-block text-right">
+                            <p><span class="label">Recibo N°:</span><br>#${sale.id.substring(0, 8).toUpperCase()}</p>
+                            <p><span class="label">Pagamento:</span><br>${sale.paymentMethod}${sale.installments > 1 ? ` (${sale.installments}x)` : ''}</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="receipt-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Qtd.</th>
+                                    <th class="text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sale.products.map(p => `
+                                <tr>
+                                    <td>
+                                        ${p.name}
+                                        <small style="display: block; color: #6c757d;">(${Utils.formatCurrency(p.price)} / un.)</small>
+                                    </td>
+                                    <td class="text-center">${p.quantity}</td>
+                                    <td class="text-right">${Utils.formatCurrency(p.price * p.quantity)}</td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="receipt-summary">
+                        <table>
+                            <tr>
+                                <td class="total-label">Total</td>
+                                <td class="text-right total-value">${Utils.formatCurrency(sale.total)}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="receipt-footer">
+                        <p>Obrigado pela sua compra! Volte sempre!</p>
+                    </div>
+                </div>
+            `;
+        },
+        generateWhatsAppText(sale, client) {
+            let text = `*Recibo da Compra - ${CONFIG.company.name}*\n\n`;
+            text += `Olá ${client.name.split(' ')[0]}, agradecemos pela sua compra!\n\n`;
+            text += `*Recibo N°:* #${sale.id.substring(0, 8).toUpperCase()}\n`;
+            text += `*Data:* ${Utils.formatDateTime(sale.date)}\n\n`;
+            text += "*Resumo dos Itens:*\n";
+            sale.products.forEach(p => {
+                text += `- ${p.name} (Qtd: ${p.quantity}) - ${Utils.formatCurrency(p.price * p.quantity)}\n`;
+            });
+            text += `\n*Total da Compra:* *${Utils.formatCurrency(sale.total)}*\n`;
+            text += `*Forma de Pagamento:* ${sale.paymentMethod}${sale.installments > 1 ? ` (${sale.installments}x)` : ''}\n\n`;
+            text += "Qualquer dúvida, estamos à disposição!\n";
+            text += `${CONFIG.company.name}`;
+            return encodeURIComponent(text);
+        },
+        shareOnWhatsApp(saleId) {
+             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+             const sale = sales.find(s => s.id === saleId);
+             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+             const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
+
+            if (!client.phone) {
+                return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
+            }
+             const phoneNumber = client.phone.replace(/\D/g, '');
+             const message = this.generateWhatsAppText(sale, client);
+             const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
+             window.open(whatsappUrl, '_blank');
+        },
+        printReceipt() {
+            const printContent = document.getElementById('receiptToPrint').innerHTML;
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            location.reload();
+        }
+    };
+    
+    // Módulo Fluxo de Caixa
+    const CashFlow = {
+        currentEditId: null,
+        init() {
+            document.getElementById('cashFlowForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveEntry(); });
+            document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce((e) => this.filterEntries(e.target.value), 300));
+            document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
+        },
+        saveEntry() {
+            const type = document.getElementById('cashFlowType').value;
+            const description = document.getElementById('cashFlowDescription').value.trim();
+            const value = parseFloat(document.getElementById('cashFlowValue').value) || 0;
+            const date = document.getElementById('cashFlowDate').value;
+
+            if (!description || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
+
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const newEntry = {
+                id: this.currentEditId || Utils.generateUUID(),
+                date: new Date(date + 'T00:00:00').toISOString(), type, description, value
+            };
+
+            if (this.currentEditId) {
+                const index = cashFlow.findIndex(e => e.id === this.currentEditId);
+                if (index !== -1 && !cashFlow[index].relatedSaleId && !cashFlow[index].relatedExpenseId && !cashFlow[index].relatedAccountId) {
+                    cashFlow[index] = newEntry;
+                    Notification.success('Lançamento atualizado!');
+                } else {
+                    Notification.error('Não é possível editar lançamentos automáticos.');
+                }
+            } else {
+                cashFlow.push(newEntry);
+                Notification.success('Lançamento salvo!');
+            }
+            
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            this.loadCashFlow();
+            this.clearForm();
+        },
+        loadCashFlow() {
+            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            this.updateSummary(entries);
+            this.displayEntries(entries);
+            document.getElementById('cashFlowDate').valueAsDate = new Date();
+        },
+        updateSummary(entries) {
+            const totalEntradas = entries.filter(e => e.type === 'entrada').reduce((sum, e) => sum + e.value, 0);
+            const totalSaidas = entries.filter(e => e.type === 'saida').reduce((sum, e) => sum + e.value, 0);
+            const saldoAtual = totalEntradas - totalSaidas;
+
+            document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
+            document.getElementById('totalSaidas').textContent = Utils.formatCurrency(totalSaidas);
+            document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
+            document.getElementById('saldoAtual').style.color = saldoAtual >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
+        },
+        displayEntries(entries) {
+            const tbody = document.getElementById('cashFlowTableBody');
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado</td></tr>`;
+                return;
+            }
+            const sorted = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            tbody.innerHTML = sorted.map(entry => {
+                const isManual = !entry.relatedSaleId && !entry.relatedExpenseId && !entry.relatedAccountId;
+                return `
+                    <tr>
+                        <td>${Utils.formatDate(entry.date)}</td>
+                        <td><span class="badge ${entry.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${entry.type}</span></td>
+                        <td>${entry.description}</td>
+                        <td style="color: ${entry.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'};">
+                            ${entry.type === 'entrada' ? '+' : '-'} ${Utils.formatCurrency(entry.value)}
+                        </td>
+                        <td>
+                            <div class="flex gap-1">
+                                ${isManual ? `
+                                <button class="btn btn-secondary btn-sm" onclick="CashFlow.editEntry('${entry.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteEntry('${entry.id}')"><i class="fas fa-trash"></i></button>` : 
+                                `<i class="fas fa-lock" title="Lançamento automático"></i>`}
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        },
+        editEntry(id) {
+            const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
+            if(entry) {
+                document.getElementById('cashFlowType').value = entry.type;
+                document.getElementById('cashFlowDescription').value = entry.description;
+                document.getElementById('cashFlowValue').value = entry.value;
+                document.getElementById('cashFlowDate').value = entry.date.split('T')[0];
+                this.currentEditId = id;
+            }
+        },
+        deleteEntry(id) {
+            const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
+            if(entry && (entry.relatedSaleId || entry.relatedExpenseId || entry.relatedAccountId)) {
+                return Notification.error('Lançamentos automáticos não podem ser excluídos.');
+            }
+            if (confirm('Excluir este lançamento?')) {
+                const filtered = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(e => e.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, filtered);
+                this.loadCashFlow();
+                Notification.success('Lançamento excluído!');
+            }
+        },
+        clearForm() {
+            document.getElementById('cashFlowForm').reset();
+            document.getElementById('cashFlowDate').valueAsDate = new Date();
+            this.currentEditId = null;
+        },
+        filterEntries(searchTerm) {
+            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const filtered = entries.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.displayEntries(filtered);
+        },
+        exportToCSV() {
+            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            if(entries.length === 0) return Notification.warning('Nenhum dado para exportar.');
+            Clients.downloadCSV(
+                ['Data', 'Tipo', 'Descrição', 'Valor'].join(',') + '\n' +
+                entries.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.type}"`, `"${e.description}"`, e.value.toFixed(2)].join(',')).join('\n'),
+                'fluxo_de_caixa'
+            );
+        }
+    };
+    
+    // Módulo Despesas
+    const Expenses = {
+        currentEditId: null,
+        init() {
+            document.getElementById('expenseForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveExpense(); });
+            document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.filterExpenses(), 300));
+            document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
+            document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
+        },
+        saveExpense() {
+            const description = document.getElementById('expenseDescription').value.trim();
+            const category = document.getElementById('expenseCategory').value;
+            const value = parseFloat(document.getElementById('expenseValue').value) || 0;
+            const date = document.getElementById('expenseDate').value;
+            if (!description || !category || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
+
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            
+            const expense = {
+                id: this.currentEditId || Utils.generateUUID(),
+                description, category, value, date: new Date(date + 'T00:00:00').toISOString()
+            };
+            
+            if (this.currentEditId) {
+                const index = expenses.findIndex(exp => exp.id === this.currentEditId);
+                if (index !== -1) {
+                    expenses[index] = expense;
+                    const cfIndex = cashFlow.findIndex(cf => cf.relatedExpenseId === this.currentEditId);
+                    if (cfIndex !== -1) {
+                        cashFlow[cfIndex].description = `Despesa: ${description}`;
+                        cashFlow[cfIndex].value = value;
+                        cashFlow[cfIndex].date = expense.date;
+                    }
+                    Notification.success('Despesa atualizada!');
+                }
+            } else {
+                expenses.push(expense);
+                cashFlow.push({
+                    id: Utils.generateUUID(),
+                    date: expense.date, type: 'saida',
+                    description: `Despesa: ${expense.description}`,
+                    value: expense.value,
+                    relatedExpenseId: expense.id
+                });
+                Notification.success('Despesa salva!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+            this.loadExpenses();
+            this.clearForm();
+        },
+        loadExpenses() {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            this.updateSummary(expenses);
+            this.displayExpenses(expenses);
+            document.getElementById('expenseDate').valueAsDate = new Date();
+        },
+        updateSummary(expenses) {
+            const today = new Date();
+            const monthExpenses = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); }).reduce((sum, e) => sum + e.value, 0);
+            const yearExpenses = expenses.filter(e => new Date(e.date).getFullYear() === today.getFullYear()).reduce((sum, e) => sum + e.value, 0);
+            document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(monthExpenses);
+            document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(yearExpenses);
+        },
+        displayExpenses(expenses) {
+            const tbody = document.getElementById('expensesTableBody');
+            if (expenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada</td></tr>`;
+                return;
+            }
+            const sorted = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+            tbody.innerHTML = sorted.map(exp => `
+                <tr>
+                    <td>${Utils.formatDate(exp.date)}</td>
+                    <td>${exp.description}</td>
+                    <td><span class="badge badge-secondary">${exp.category}</span></td>
+                    <td style="color: var(--danger-color);">${Utils.formatCurrency(exp.value)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${exp.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${exp.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+        },
+        editExpense(id) {
+            const expense = Utils.loadFromStorage(CONFIG.storageKeys.expenses).find(e => e.id === id);
+            if (expense) {
+                document.getElementById('expenseDescription').value = expense.description;
+                document.getElementById('expenseCategory').value = expense.category;
+                document.getElementById('expenseValue').value = expense.value;
+                document.getElementById('expenseDate').value = expense.date.split('T')[0];
+                this.currentEditId = id;
+            }
+        },
+        deleteExpense(id) {
+            if (confirm('Excluir esta despesa? O lançamento no caixa também será removido.')) {
+                const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses).filter(e => e.id !== id);
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.relatedExpenseId !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                this.loadExpenses();
+                Notification.success('Despesa excluída!');
+            }
+        },
+        clearForm() {
+            document.getElementById('expenseForm').reset();
+            document.getElementById('expenseDate').valueAsDate = new Date();
+            this.currentEditId = null;
+        },
+        filterExpenses() {
+            const searchTerm = document.getElementById('expenseSearch').value.toLowerCase();
+            const category = document.getElementById('expenseFilterCategory').value;
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            const filtered = expenses.filter(e => e.description.toLowerCase().includes(searchTerm) && (!category || e.category === category));
+            this.displayExpenses(filtered);
+        },
+        exportToCSV() {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            if(expenses.length === 0) return Notification.warning('Nenhum dado para exportar.');
+            Clients.downloadCSV(
+                ['Data', 'Descrição', 'Categoria', 'Valor'].join(',') + '\n' +
+                expenses.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.description}"`, `"${e.category}"`, e.value.toFixed(2)].join(',')).join('\n'), 'despesas'
+            );
+        }
+    };
+    
+    // Módulo Contas a Receber
+    const Receivables = {
+        currentEditId: null,
+        init() {
+            document.getElementById('receivableForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveReceivable(); });
+            document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
+            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
+            document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
+            document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
+        },
+        loadClients() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('receivableClient');
+            select.innerHTML = '<option value="">Selecione um cliente</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        saveReceivable() {
+            const clientId = document.getElementById('receivableClient').value;
+            const description = document.getElementById('receivableDescription').value.trim();
+            const value = parseFloat(document.getElementById('receivableValue').value) || 0;
+            const dueDate = document.getElementById('receivableDueDate').value;
+            if (!clientId || !description || value <= 0 || !dueDate) return Notification.error('Preencha todos os campos!');
+
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const receivable = {
+                id: this.currentEditId || Utils.generateUUID(),
+                clientId, description, value, status: 'Pendente',
+                dueDate: new Date(dueDate + 'T00:00:00').toISOString(),
+                createdAt: this.currentEditId ? receivables.find(r=>r.id===this.currentEditId).createdAt : new Date().toISOString()
+            };
+
+            if (this.currentEditId) {
+                const index = receivables.findIndex(r => r.id === this.currentEditId);
+                if (index !== -1) {
+                    receivables[index] = receivable;
+                    Notification.success('Conta atualizada!');
+                }
+            } else {
+                receivables.push(receivable);
+                Notification.success('Conta salva!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            this.loadReceivables();
+            this.clearForm();
+        },
+        loadReceivables() {
+            this.loadClients();
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            this.updateSummary(receivables);
+            this.displayReceivables(receivables);
+        },
+        updateSummary(receivables) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const pending = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) >= today).reduce((sum, r) => sum + r.value, 0);
+            const overdue = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) < today).reduce((sum, r) => sum + r.value, 0);
+            const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
+
+            document.getElementById('totalReceivablesPending').textContent = Utils.formatCurrency(pending);
+            document.getElementById('totalReceivablesOverdue').textContent = Utils.formatCurrency(overdue);
+            document.getElementById('totalReceivablesPaid').textContent = Utils.formatCurrency(paid);
+        },
+        displayReceivables(receivables) {
+            const tbody = document.getElementById('receivablesTableBody');
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            if (receivables.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma conta encontrada</td></tr>`;
+                return;
+            }
+            const sorted = [...receivables].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            tbody.innerHTML = sorted.map(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const isOverdue = r.status === 'Pendente' && new Date(r.dueDate) < today;
+                let statusBadge;
+                if (r.status === 'Pago') statusBadge = '<span class="badge badge-success">Pago</span>';
+                else if (isOverdue) statusBadge = '<span class="badge badge-danger">Vencido</span>';
+                else statusBadge = '<span class="badge badge-warning">Pendente</span>';
+                
+                return `
+                    <tr>
+                        <td>${client ? client.name : 'N/A'}</td>
+                        <td>${r.description}</td>
+                        <td style="color: var(--primary-color);">${Utils.formatCurrency(r.value)}</td>
+                        <td>${Utils.formatDate(r.dueDate)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="flex gap-1">
+                                ${r.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
+                                ${!r.saleId && r.status !== 'Pago' ? `<button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${r.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
+                                <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${r.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        },
+        markAsPaid(id) {
+            if (confirm('Marcar esta conta como paga? Uma entrada será criada no caixa.')) {
+                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+                const receivable = receivables.find(r => r.id === id);
+                if (receivable) {
+                    receivable.status = 'Pago';
+                    receivable.paymentDate = new Date().toISOString();
+                    
+                    const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+                    cashFlow.push({
+                        id: Utils.generateUUID(),
+                        date: receivable.paymentDate, type: 'entrada',
+                        description: `Recebimento: ${receivable.description}`,
+                        value: receivable.value,
+                        relatedAccountId: receivable.id
+                    });
+                    Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                    Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                    this.loadReceivables();
+                    Notification.success('Conta marcada como paga!');
+                }
+            }
+        },
+        editReceivable(id) {
+            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
+            if (receivable && !receivable.saleId) {
+                document.getElementById('receivableClient').value = receivable.clientId;
+                document.getElementById('receivableDescription').value = receivable.description;
+                document.getElementById('receivableValue').value = receivable.value;
+                document.getElementById('receivableDueDate').value = receivable.dueDate.split('T')[0];
+                this.currentEditId = id;
+            } else {
+                Notification.warning('Contas geradas por vendas não podem ser editadas aqui.');
+            }
+        },
+        deleteReceivable(id) {
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const receivable = receivables.find(r => r.id === id);
+
+            if (!receivable) return Notification.error("Conta não encontrada.");
+
+            let canDelete = false;
+            if (receivable.saleId) {
+                canDelete = confirm('ATENÇÃO: Esta conta faz parte de uma venda. Excluí-la pode gerar inconsistências nos relatórios. Deseja mesmo excluir?');
+            } else {
+                canDelete = confirm('Tem certeza que deseja excluir esta conta?');
+            }
+
+            if (canDelete) {
+                if (receivable.status === 'Pago') {
+                    cashFlow = cashFlow.filter(cf => cf.relatedAccountId !== id);
+                    Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                }
+
+                receivables = receivables.filter(r => r.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                this.loadReceivables();
+                Notification.success('Conta excluída!');
+            } else {
+                Notification.warning('Exclusão cancelada.');
+            }
+        },
+        clearForm() {
+            document.getElementById('receivableForm').reset();
+            this.currentEditId = null;
+        },
+        filterReceivables() {
+            const searchTerm = document.getElementById('receivableSearch').value.toLowerCase();
+            const status = document.getElementById('receivableFilterStatus').value;
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            
+            const filtered = receivables.filter(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                const clientName = client ? client.name.toLowerCase() : '';
+                const matchesSearch = r.description.toLowerCase().includes(searchTerm) || clientName.includes(searchTerm);
+                
+                let currentStatus = r.status;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
+                    currentStatus = 'Vencido';
+                }
+
+                const matchesStatus = !status || currentStatus === status;
+
+                return matchesSearch && matchesStatus;
+            });
+            this.displayReceivables(filtered);
+        },
+        exportToCSV() {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            if(receivables.length === 0) return Notification.warning('Nenhum dado para exportar.');
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            Clients.downloadCSV(
+                ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'].join(',') + '\n' +
+                receivables.map(r => {
+                    const client = clients.find(c => c.id === r.clientId);
+                    return [`"${client ? client.name : 'N/A'}"`, `"${r.description}"`, r.value.toFixed(2), `"${Utils.formatDate(r.dueDate)}"`, `"${r.status}"`].join(',');
+                }).join('\n'), 'contas_a_receber'
+            );
+        }
+    };
+    
+    // Módulo Relatórios (VERSÃO PROFISSIONAL PDF)
+    const Reports = {
+        chart: null,
+        currentReportData: { headers: [], rows: [], rawData: [] }, // Inicializado corretamente
+        currentReportType: '',
+
+        init() {
+            document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
+            document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
+            document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
+            
+            document.getElementById('reportType').addEventListener('change', () => this.generateReport());
+            document.getElementById('reportStartDate').addEventListener('input', () => this.generateReport());
+            document.getElementById('reportEndDate').addEventListener('input', () => this.generateReport());
+            document.getElementById('reportReceivableStatus').addEventListener('change', () => this.generateReport());
+            document.getElementById('reportReceivableClient').addEventListener('change', () => this.generateReport());
+        },
+        initPage() {
+            const endDate = new Date();
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); 
+            document.getElementById('reportStartDate').valueAsDate = startDate;
+            document.getElementById('reportEndDate').valueAsDate = endDate;
+            this.loadClientFilter();
+            this.generateReport();
+        },
+        loadClientFilter() {
+             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+             const select = document.getElementById('reportReceivableClient');
+             select.innerHTML = '<option value="">Todos os Clientes</option>';
+             clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+                 select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+             });
+        },
+        generateReport() {
+            const startDateStr = document.getElementById('reportStartDate').value;
+            const endDateStr = document.getElementById('reportEndDate').value;
+            this.currentReportType = document.getElementById('reportType').value;
+            
+            const statusFilterContainer = document.getElementById('reportStatusFilterContainer');
+            const clientFilterContainer = document.getElementById('reportClientFilterContainer');
+
+            if (this.currentReportType === 'contas_a_receber') {
+                statusFilterContainer.classList.remove('hidden');
+                clientFilterContainer.classList.remove('hidden');
+            } else {
+                statusFilterContainer.classList.add('hidden');
+                clientFilterContainer.classList.add('hidden');
+            }
+
+            if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
+            
+            const startDate = new Date(startDateStr + 'T00:00:00');
+            const endDate = new Date(endDateStr + 'T23:59:59');
+            
+            if (startDate > endDate) return Notification.error('Data inicial maior que a final!');
+
+            const allSales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            const allExpenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            const allProducts = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const allClients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            
+            const sales = allSales.filter(s => { const d = new Date(s.date); return d >= startDate && d <= endDate; });
+            const expenses = allExpenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
+            
+            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
+            const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
+            const profit = totalSales - totalExpenses;
+
+            document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalSales);
+            document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(totalExpenses);
+            document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
+            document.getElementById('reportProfit').style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
+            document.getElementById('reportSalesCount').textContent = sales.length;
+            
+            switch (this.currentReportType) {
+                case 'vendas': this.generateSalesReport(sales, startDate, endDate, allClients); break;
+                case 'financeiro': this.generateFinancialReport(sales, expenses, startDate, endDate); break;
+                case 'produtos': this.generateProductsReport(sales, allProducts); break;
+                case 'clientes': this.generateClientsReport(sales, allClients); break;
+                case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate, allClients); break;
+            }
+        },
+        
+        generateReceivablesReport(startDate, endDate, clients) {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const statusFilter = document.getElementById('reportReceivableStatus').value;
+            const clientFilter = document.getElementById('reportReceivableClient').value;
+
+            const filteredReceivables = receivables.filter(r => {
+                const creationDate = new Date(r.createdAt || r.date); 
+                const matchesDate = creationDate >= startDate && creationDate <= endDate;
+
+                let currentStatus = r.status;
+                 const today = new Date();
+                 today.setHours(0,0,0,0);
+                 if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
+                        currentStatus = 'Vencido';
+                 }
+                
+                let matchesStatus = !statusFilter || currentStatus === statusFilter;
+                let matchesClient = !clientFilter || r.clientId === clientFilter;
+
+                return matchesDate && matchesStatus && matchesClient;
+            });
+
+            const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
+            const rows = filteredReceivables.map(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                 let status = r.status;
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                 if (status === 'Pendente' && new Date(r.dueDate) < today) {
+                            status = 'Vencido';
+                 }
+                return [
+                    client ? client.name : 'N/A',
+                    r.description,
+                    Utils.formatCurrency(r.value),
+                    Utils.formatDate(r.dueDate),
+                    status
+                ];
+            });
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows, rawData: filteredReceivables };
+
+            const statusSummary = { 'Pago': 0, 'Pendente': 0, 'Vencido': 0 };
+            filteredReceivables.forEach(r => {
+                 const today = new Date();
+                 today.setHours(0,0,0,0);
+                 if (r.status === 'Pago') {
+                        statusSummary['Pago'] += r.value;
+                 } else if (new Date(r.dueDate) < today) {
+                        statusSummary['Vencido'] += r.value;
+                 } else {
+                        statusSummary['Pendente'] += r.value;
+                 }
+            });
+            
+            this.renderChart('pie', 
+                ['Pagas', 'Pendentes', 'Vencidas'], 
+                'Valor (R$)', 
+                [statusSummary.Pago, statusSummary.Pendente, statusSummary.Vencido],
+                ['#10B981', '#F59E0B', '#EF4444']
+            );
+            
+            const debtors = {};
+            filteredReceivables.filter(r => r.status !== 'Pago').forEach(r => {
+                const clientName = (clients.find(c => c.id === r.clientId) || {name: 'N/A'}).name;
+                debtors[clientName] = (debtors[clientName] || 0) + r.value;
+            });
+            const topDebtors = Object.entries(debtors).sort(([, a], [, b]) => b - a).slice(0, 5)
+                .map(([name, value]) => [name, Utils.formatCurrency(value)]);
+
+            document.getElementById('topProductsList').innerHTML = topDebtors.length > 0 ?
+                topDebtors.map(([name, value]) => `
+                    <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span>${name}</span>
+                        <span style="font-weight: bold;">${value}</span>
+                    </div>`).join('') :
+                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum devedor no período.</p>';
+
+            Notification.success('Relatório de contas a receber gerado!');
+        },
+
+        generateSalesReport(sales, startDate, endDate, clients) {
+            const headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
+            const rows = sales.map(s => {
+                const client = s.clientId ? clients.find(c => c.id === s.clientId) : null;
+                return [Utils.formatDate(s.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(s.total), s.paymentMethod];
+            });
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows, rawData: sales };
+            this.updateTopList(sales, 'products');
+            this.createSalesChart(sales, startDate, endDate);
+            Notification.success('Relatório de vendas gerado!');
+        },
+        generateFinancialReport(sales, expenses, startDate, endDate) {
+            const data = [
+                ...sales.map(s => ({ date: s.date, type: 'Entrada', description: `Venda #${s.id.substring(0,6)}`, value: s.total })),
+                ...expenses.map(e => ({ date: e.date, type: 'Saída', description: e.description, value: e.value }))
+            ].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
+            const rows = data.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows, rawData: data };
+            
+            document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">N/A para este relatório.</p>';
+
+            this.createFinancialChart(sales, expenses);
+            Notification.success('Relatório financeiro gerado!');
+        },
+        
+        generateProductsReport(sales, products) {
+            const productStats = {};
+            sales.forEach(sale => {
+                sale.products.forEach(item => {
+                    if (!productStats[item.productId]) {
+                        const pInfo = products.find(p => p.id === item.productId);
+                        productStats[item.productId] = { name: pInfo ? pInfo.name : 'Produto Excluído', quantity: 0, revenue: 0 };
+                    }
+                    productStats[item.productId].quantity += item.quantity;
+                    productStats[item.productId].revenue += item.price * item.quantity;
+                });
+            });
+            
+            const sortedProducts = Object.values(productStats).sort((a,b) => b.revenue - a.revenue);
+
+            const headers = ['Produto', 'Qtd. Vendida', 'Receita Total'];
+            const rows = sortedProducts.map(p => [p.name, p.quantity, Utils.formatCurrency(p.revenue)]);
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows, rawData: sortedProducts };
+
+            this.updateTopList(sales, 'products');
+            this.createProductChart(sortedProducts.slice(0, 10));
+            Notification.success('Relatório de produtos gerado!');
+        },
+        generateClientsReport(sales, clients) {
+            const clientStats = {};
+            sales.forEach(sale => {
+                const clientId = sale.clientId || 'guest';
+                if (!clientStats[clientId]) {
+                    const cInfo = clients.find(c => c.id === clientId);
+                    clientStats[clientId] = { name: cInfo ? cInfo.name : 'Consumidor Final', purchases: 0, total: 0 };
+                }
+                clientStats[clientId].purchases++;
+                clientStats[clientId].total += sale.total;
+            });
+            
+            const sortedClients = Object.values(clientStats).sort((a,b) => b.total - a.total);
+            const headers = ['Cliente', 'Nº de Compras', 'Total Gasto'];
+            const rows = sortedClients.map(c => [c.name, c.purchases, Utils.formatCurrency(c.total)]);
+            this.updateReportTable(headers, rows);
+            this.currentReportData = { headers, rows, rawData: sortedClients };
+
+            this.updateTopList(sales, 'clients', clients);
+            this.createClientChart(sortedClients.slice(0, 10));
+            Notification.success('Relatório de clientes gerado!');
+        },
+        updateTopList(sales, type, clients = []) {
+            let topList = [];
+            if (type === 'products') {
+                const productSales = {};
+                sales.forEach(sale => sale.products.forEach(p => productSales[p.name] = (productSales[p.name] || 0) + p.quantity));
+                topList = Object.entries(productSales).sort(([, a], [, b]) => b - a).slice(0, 5);
+            } else { // clients
+                const clientSales = {};
+                sales.forEach(sale => {
+                    if(sale.clientId) clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
+                });
+                topList = Object.entries(clientSales).sort(([,a],[,b])=>b-a).slice(0,5).map(([id, total]) => {
+                    const client = clients.find(c => c.id === id);
+                    return [client ? client.name : 'Excluído', Utils.formatCurrency(total)];
+                });
+            }
+             document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
+                 topList.map(([name, value]) => `
+                                <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                        <span>${name}</span>
+                                        <span style="font-weight: bold;">${value}</span>
+                                </div>`).join('') :
+                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
+        },
+        
+        createSalesChart(sales, startDate, endDate) {
+            const chartData = {};
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                chartData[d.toISOString().split('T')[0]] = 0;
+            }
+            sales.forEach(s => chartData[s.date.split('T')[0]] += s.total);
+
+            this.renderChart('line', Object.keys(chartData).map(d => Utils.formatDate(d)), 'Vendas (R$)', Object.values(chartData), '#3B82F6');
+        },
+        
+        createFinancialChart(sales, expenses) {
+            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
+            const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
+            
+            this.renderChart('doughnut', ['Vendas', 'Despesas'], '', [totalSales, totalExpenses], ['#10B981', '#EF4444']);
+        },
+        
+        createProductChart(products) {
+            this.renderChart('bar', products.map(p => p.name), 'Receita (R$)', products.map(p => p.revenue), '#10B981');
+        },
+        createClientChart(clients) {
+            this.renderChart('bar', clients.map(c => c.name), 'Total Gasto (R$)', clients.map(c => c.total), '#3B82F6');
+        },
+        renderChart(type, labels, label, data, color) {
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            if (this.chart) this.chart.destroy();
+            this.chart = new Chart(ctx, {
+                type,
+                data: {
+                    labels,
+                    datasets: [{ label, data, backgroundColor: color, borderColor: color, fill: type === 'line' }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
+                    scales: {
+                        y: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                        x: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                    }
+                }
+            });
+        },
+        updateReportTable(headers, rows) {
+            const thead = document.getElementById('reportTableHead');
+            const tbody = document.getElementById('reportTableBody');
+            
+            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
+        },
+        
+        exportToPDF() {
+            try {
+                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+                    return Notification.error('Biblioteca jsPDF não carregada.');
+                }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+                if (typeof doc.autoTable !== 'function') {
+                    return Notification.error('Plugin jsPDF-AutoTable não está funcionando. Recarregue a página.');
+                }
+                
+                if (!this.currentReportData || this.currentReportData.rows.length === 0) {
+                    return Notification.warning('Gere um relatório com dados para poder exportar.');
+                }
+                
+                const { headers, rows } = this.currentReportData;
+                const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
+                const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
+                const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
+                
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const margin = 15;
+                let finalY = margin;
+
+                const drawFooter = () => {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+                        doc.text(`Gerado em: ${Utils.formatDateTime(new Date())}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+                    }
+                };
+                
+                doc.setFontSize(18);
+                doc.setFont('helvetica', 'bold');
+                doc.text(CONFIG.company.name, margin, finalY);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100);
+                doc.text(`Relatório de ${reportType}`, margin, finalY + 8);
+                doc.text(`Período: ${startDate} a ${endDate}`, margin, finalY + 14);
+
+                finalY += 25;
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Resumo do Período', margin, finalY);
+                doc.setLineWidth(0.2);
+                doc.line(margin, finalY + 1, pageWidth - margin, finalY + 1);
+                finalY += 8;
+                
+                doc.setFont('helvetica', 'normal');
+                const summary = [
+                    ['Total de Vendas:', document.getElementById('reportTotalSales').textContent],
+                    ['Total de Despesas:', document.getElementById('reportTotalExpenses').textContent],
+                    ['Lucro Líquido:', document.getElementById('reportProfit').textContent],
+                    ['Nº de Vendas:', document.getElementById('reportSalesCount').textContent + ' venda(s)']
+                ];
+
+                // AJUSTE PARA TOTAL PENDENTE DO CLIENTE
+                if (this.currentReportType === 'contas_a_receber') {
+                    const clientId = document.getElementById('reportReceivableClient').value;
+                    if (clientId && this.currentReportData.rawData) {
+                        const clientName = document.getElementById('reportReceivableClient').options[document.getElementById('reportReceivableClient').selectedIndex].text;
+                        
+                        const clientTotalPending = this.currentReportData.rawData
+                            .filter(r => r.status !== 'Pago')
+                            .reduce((sum, item) => sum + item.value, 0);
+
+                        if (clientTotalPending > 0) {
+                            summary.push([`Total a Receber (${clientName.split(' ')[0]}):`, Utils.formatCurrency(clientTotalPending)]);
+                        }
+                    }
+                }
+
+                summary.forEach(item => {
+                    doc.text(item[0], margin, finalY);
+                    doc.text(item[1], pageWidth / 2, finalY, { align: 'left' });
+                    finalY += 6;
+                });
+                
+                finalY += 5;
+
+                const bodyData = rows.map(row => row.map(cell => String(cell).replace(/<[^>]*>/g, '')));
+
+                doc.autoTable({
+                    head: [headers],
+                    body: bodyData,
+                    startY: finalY,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [59, 130, 246],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 245, 245]
+                    },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2.5
+                    },
+                    margin: { left: margin, right: margin },
+                });
+                
+                drawFooter();
+
+                doc.save(`relatorio_${this.currentReportType}_${new Date().toISOString().split('T')[0]}.pdf`);
+                Notification.success('Relatório PDF gerado com sucesso!');
+
+            } catch (error) {
+                console.error("ERRO AO GERAR PDF:", error);
+                Notification.error(`Falha ao gerar o PDF: ${error.message}`);
+            }
+        },
+
+        exportToCSV() {
+            if (!this.currentReportData || this.currentReportData.rows.length === 0) {
+                return Notification.warning('Gere um relatório primeiro para exportar.');
+            }
+            const { headers, rows } = this.currentReportData;
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""').replace(/<[^>]*>/g, '')}"`).join(','))
+            ].join('\n');
+            Clients.downloadCSV(csvContent, `relatorio_${this.currentReportType}`);
+        }
+    };
+
+    // Módulo Configurações
+    const Settings = {
+        init() {
+            document.getElementById('downloadBackup').addEventListener('click', () => this.downloadBackup());
+            document.getElementById('restoreBackup').addEventListener('click', () => this.restoreBackup());
+            document.getElementById('restoreFile').addEventListener('change', e => {
+                document.getElementById('restoreBackup').disabled = !e.target.files.length;
+            });
+            document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
+        },
+        updateBackupStats() {
+            document.getElementById('backupClientsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.clients).length;
+            document.getElementById('backupProductsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.products).length;
+            document.getElementById('backupSalesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.sales).length;
+            document.getElementById('backupReceivablesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).length;
+        },
+        downloadBackup() {
+            const backupData = {
+                version: '2.9.2', timestamp: new Date().toISOString(),
+                data: {}
+            };
+            for (const key in CONFIG.storageKeys) {
+                if (key !== 'lastActivePage') {
+                    backupData.data[key] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
+                }
+            }
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_flor_de_maria_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            Notification.success('Backup baixado!');
+        },
+        restoreBackup() {
+            const file = document.getElementById('restoreFile').files[0];
+            if (!file) return Notification.error('Selecione um arquivo!');
+            if (!confirm('Restaurar backup? Todos os dados atuais serão substituídos!')) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+                    if (!backupData.data) throw new Error('Formato inválido.');
+                    for (const key in backupData.data) {
+                        if (CONFIG.storageKeys[key]) {
+                            Utils.saveToStorage(CONFIG.storageKeys[key], backupData.data[key]);
+                        }
+                    }
+                    this.updateBackupStats();
+                    Navigation.navigateTo('dashboard');
+                    Notification.success('Backup restaurado com sucesso!');
+                } catch (error) {
+                    Notification.error('Erro ao restaurar: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        },
+        clearAllData() {
+            if (prompt("Para confirmar, digite 'LIMPAR DADOS' em maiúsculas.") !== 'LIMPAR DADOS') {
+                return Notification.warning('Ação cancelada.');
+            }
+            Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
+            
+            this.updateBackupStats();
+            Navigation.navigateTo('dashboard');
+            Notification.success('Todos os dados foram limpos!');
+        }
+    };
+    
+    // Inicialização do Sistema
+    document.addEventListener('DOMContentLoaded', () => {
+        Auth.init();
+        Navigation.init();
+        Clients.init();
+        Products.init();
+        Sales.init();
+        Receipts.init();
+        CashFlow.init();
+        Expenses.init();
+        Receivables.init();
+        Reports.init();
+        Settings.init();
+
+        document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') Modal.hide();
+        });
+
+        console.log('SGI - Flor de Maria v2.9.2 (Responsiveness Fix) iniciado!');
+    });
+    </script>
+</body>
+</html>
