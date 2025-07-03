@@ -53,12 +53,13 @@
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden; /* Previne scroll horizontal global */
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 16px; /* Reduzido para mobile */
         }
 
         /* ===== COMPONENTES REUTILIZÁVEIS ===== */
@@ -66,7 +67,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 24px;
+            padding: 10px 20px; /* Reduzido para mobile */
             border: none;
             border-radius: 8px;
             font-size: 14px;
@@ -76,6 +77,7 @@
             transition: var(--transition);
             text-align: center;
             justify-content: center;
+            white-space: nowrap; /* Evita quebra de texto em botões */
         }
         .btn:disabled {
             opacity: 0.5;
@@ -132,21 +134,21 @@
             background: #D97706;
         }
 
-
         .btn-sm {
-            padding: 8px 16px;
+            padding: 6px 12px; /* Reduzido para mobile */
             font-size: 12px;
         }
 
         .card {
             background: var(--secondary-bg);
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px; /* Reduzido para mobile */
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
             transition: var(--transition);
             display: flex;
             flex-direction: column;
+            width: 100%; /* Garante que não ultrapasse o container */
         }
 
         /* Otimização para mobile: remove efeito de hover que pode ser "pegajoso" */
@@ -167,42 +169,44 @@
             }
         }
 
-
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start; /* Mudado para flex-start */
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 16px; 
+            gap: 12px; /* Reduzido */
         }
 
         .card-title {
-            font-size: 20px;
+            font-size: 18px; /* Reduzido para mobile */
             font-weight: 700;
             color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 12px;
+            flex: 1; /* Permite que o título ocupe espaço disponível */
+            min-width: 0; /* Permite quebra de texto se necessário */
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px; /* Reduzido para mobile */
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* Reduzido */
             font-weight: 600;
             color: var(--text-secondary);
+            font-size: 14px;
         }
 
         .form-input,
         .form-select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px; /* Reduzido para mobile */
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: var(--surface-bg);
@@ -226,20 +230,23 @@
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            border-radius: 8px; /* Adiciona bordas arredondadas */
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            min-width: 600px; /* Define largura mínima para manter estrutura */
         }
 
         .table th,
         .table td {
-            padding: 12px 16px;
+            padding: 10px 12px; /* Reduzido para mobile */
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            /* white-space: nowrap; Removido para melhor responsividade em mobile */
+            white-space: normal; /* CORREÇÃO: Permite quebra de texto */
+            word-wrap: break-word; /* Quebra palavras longas */
         }
 
         .table th {
@@ -247,8 +254,9 @@
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px; /* Reduzido para mobile */
             letter-spacing: 0.5px;
+            white-space: nowrap; /* Mantém cabeçalhos em uma linha */
         }
 
         .table tr:hover {
@@ -258,12 +266,13 @@
         .badge {
             display: inline-flex;
             align-items: center;
-            padding: 4px 12px;
+            padding: 3px 10px; /* Reduzido */
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px; /* Reduzido */
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .badge-success {
@@ -285,7 +294,6 @@
             color: var(--text-muted);
         }
 
-
         /* ===== TELA DE LOGIN ===== */
         .login-container {
             display: flex;
@@ -297,7 +305,7 @@
 
         .login-card {
             background: var(--secondary-bg);
-            padding: 40px;
+            padding: 32px 24px; /* Ajustado para mobile */
             border-radius: 16px;
             box-shadow: var(--shadow-xl);
             border: 1px solid var(--border-color);
@@ -307,7 +315,7 @@
         }
 
         .login-logo {
-            font-size: 48px;
+            font-size: 40px; /* Reduzido para mobile */
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -316,7 +324,7 @@
         }
 
         .login-title {
-            font-size: 28px;
+            font-size: 24px; /* Reduzido para mobile */
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--text-primary);
@@ -325,6 +333,7 @@
         .login-subtitle {
             color: var(--text-muted);
             margin-bottom: 32px;
+            font-size: 14px;
         }
 
         /* ===== LAYOUT PRINCIPAL ===== */
@@ -337,7 +346,7 @@
             width: 280px;
             background: var(--secondary-bg);
             border-right: 1px solid var(--border-color);
-            padding: 24px 0;
+            padding: 20px 0; /* Reduzido */
             position: fixed;
             top: 0;
             left: 0;
@@ -348,22 +357,22 @@
         }
 
         .sidebar-header {
-            padding: 0 24px 24px;
+            padding: 0 20px 20px; /* Reduzido */
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
+            margin-bottom: 20px; /* Reduzido */
         }
 
         .sidebar-logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 20px;
+            font-size: 18px; /* Reduzido */
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .sidebar-logo i {
-            font-size: 24px;
+            font-size: 22px; /* Reduzido */
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -375,19 +384,20 @@
         }
 
         .sidebar-nav-item {
-            margin-bottom: 4px;
+            margin-bottom: 2px; /* Reduzido */
         }
 
         .sidebar-nav-link {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 24px;
+            padding: 10px 20px; /* Reduzido */
             color: var(--text-muted);
             text-decoration: none;
             transition: var(--transition);
             border-radius: 0;
             position: relative;
+            font-size: 14px;
         }
 
         .sidebar-nav-link:hover {
@@ -414,16 +424,17 @@
         .main-content {
             flex: 1;
             margin-left: 280px;
-            padding: 24px;
+            padding: 20px; /* Reduzido */
             transition: var(--transition);
+            min-width: 0; /* CORREÇÃO: Permite que o conteúdo encolha */
         }
 
         .page-header {
-            margin-bottom: 32px;
+            margin-bottom: 24px; /* Reduzido */
         }
 
         .page-title {
-            font-size: 32px;
+            font-size: 28px; /* Reduzido */
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 8px;
@@ -431,18 +442,17 @@
 
         .page-subtitle {
             color: var(--text-muted);
-            font-size: 16px;
+            font-size: 14px; /* Reduzido */
         }
         
         .chart-container {
             position: relative;
-            height: 350px;
+            height: 300px; /* Reduzido para mobile */
             width: 100%;
             flex-grow: 1; 
         }
 
-
-        /* ===== RESPONSIVIDADE ===== */
+        /* ===== RESPONSIVIDADE MELHORADA ===== */
         .mobile-menu-toggle {
             display: none;
             position: fixed;
@@ -459,10 +469,12 @@
             box-shadow: var(--shadow-md);
         }
 
-        @media (max-width: 800px) { /* Aumentado o breakpoint para cobrir mais tablets */
+        /* CORREÇÕES PRINCIPAIS PARA MOBILE */
+        @media (max-width: 768px) { /* Breakpoint mais padrão */
             body {
                 font-size: 14px;
             }
+            
             .mobile-menu-toggle {
                 display: block;
             }
@@ -478,153 +490,227 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 80px 15px 20px; 
+                padding: 70px 12px 20px; /* Mais espaço no topo, menos nas laterais */
+            }
+
+            .container {
+                padding: 0 8px; /* Ainda menos padding */
             }
 
             .login-card {
-                padding: 32px 24px;
+                padding: 24px 20px; /* Reduzido */
+                margin: 0 12px; /* Margem lateral */
             }
 
             .card {
-                padding: 16px;
+                padding: 16px; /* Reduzido */
+                margin-bottom: 16px;
             }
             
-            /* Ajuste crucial para os grids em mobile */
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .card-title {
+                font-size: 16px; /* Ainda menor em mobile */
+            }
+            
+            /* CORREÇÃO CRUCIAL: Grids responsivos */
             .grid-2, .grid-3, .grid-4, .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important; /* Força uma coluna */
+                gap: 16px; /* Reduz o gap */
             }
             
             .page-title {
-                font-size: 24px;
+                font-size: 22px; /* Reduzido */
             }
             
-            /* Garante que grupos de botões em formulários empilhem verticalmente */
-            .form-group .flex.gap-2 {
+            .page-subtitle {
+                font-size: 13px;
+            }
+            
+            /* CORREÇÃO: Botões em formulários empilham */
+            .form-group .flex.gap-2,
+            .card-header .flex.gap-2 {
                 flex-direction: column;
                 align-items: stretch;
-            }
-            .form-group .flex.gap-2 .btn {
-                width: 100%;
+                gap: 8px;
             }
             
-            /* Empilha o total e o botão de finalizar na página de vendas */
+            .form-group .flex.gap-2 .btn,
+            .card-header .flex.gap-2 .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* CORREÇÃO: PDV - Total e botão finalizar */
             #salesPage .flex-between.mt-3 {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 16px;
                 text-align: center;
             }
+            
             #salesPage .flex-between.mt-3 .btn {
                 width: 100%;
             }
             
-            /* Empilha o conteúdo dos cabeçalhos dos cards */
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .card-header .flex.gap-2 {
-                 flex-direction: column;
-                 width: 100%;
-                 align-items: stretch;
+            /* CORREÇÃO: Inputs de quantidade menores */
+            #salesPage .table input[type="number"].form-input {
+                width: 60px;
+                padding: 4px 6px;
+                font-size: 12px;
             }
             
-            /* Melhorando a visualização do recibo no modal */
-            .receipt-professional-header, .receipt-sale-info .text-right {
+            /* CORREÇÃO: Recibo no modal */
+            .receipt-professional-header {
                 flex-direction: column;
                 align-items: flex-start;
                 text-align: left;
                 gap: 16px;
             }
+            
             .receipt-company-details {
                 text-align: left;
                 margin-top: 16px;
             }
+            
             .receipt-sale-info {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .receipt-sale-info .text-right {
+                text-align: left;
             }
             
             .receipt-summary {
                 justify-content: flex-start;
             }
+            
             .receipt-summary table {
                 width: 100%;
                 max-width: none;
             }
             
+            /* CORREÇÃO: Botões menores em mobile */
             .btn {
-                padding: 12px 18px; 
-                font-size: 14px;
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            
+            .btn-sm {
+                padding: 6px 10px;
+                font-size: 11px;
             }
 
             .form-input, .form-select {
                 font-size: 14px;
-                padding: 12px 16px;
+                padding: 10px 12px;
             }
 
             .chart-container {
-                max-height: 300px;
+                height: 250px; /* Ainda menor em mobile */
             }
 
             .modal-content {
                 width: 95%;
-                padding: 24px 16px;
+                max-width: none;
+                padding: 20px 16px;
+                margin: 20px auto;
+                max-height: 90vh;
             }
 
             .modal-title {
-                font-size: 20px;
+                font-size: 18px;
             }
 
-            /* --- RELATÓRIOS & TABELAS GERAIS: Ajustes para responsividade --- */
-            /* Garante que as colunas da tabela quebrem o texto em mobile */
-            .table th, .table td {
-                white-space: normal; /* Permite que o texto quebre */
-            }
-
-            /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
-            /* Isso é uma otimização, mas `overflow-x: auto` ainda é necessário para tabelas muito grandes */
-            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição/Produto */
-            .table th:nth-child(2), .table td:nth-child(2) { width: 30%; } /* Ex: Telefone/Qtd/Tipo */
-            .table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Ex: Cadastro/Valor/Categoria */
-            .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* Ex: Compras/Vencimento/Status */
-            /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
-            .table td:last-child, .table th:last-child {
-                width: auto; /* Deixa o navegador ajustar a última coluna */
-            }
-
-            /* Ajusta o input de quantidade no carrinho do PDV */
-            #salesPage .table input[type="number"].form-input {
-                width: 55px; /* Mais compacto */
-                padding: 4px;
+            /* CORREÇÃO: Tabelas - otimização de colunas */
+            .table {
+                min-width: 500px; /* Reduzido mas mantém estrutura */
                 font-size: 13px;
             }
+            
+            .table th, .table td {
+                padding: 8px 6px; /* Padding ainda menor */
+            }
+            
+            /* CORREÇÃO: Colunas específicas para mobile */
+            .table th:nth-child(1), .table td:nth-child(1) { 
+                min-width: 120px; /* Nome/Produto */
+            }
+            .table th:nth-child(2), .table td:nth-child(2) { 
+                min-width: 100px; /* Telefone/Qtd */
+            }
+            .table th:nth-child(3), .table td:nth-child(3) { 
+                min-width: 80px; /* Data/Valor */
+            }
+            .table th:nth-child(4), .table td:nth-child(4) { 
+                min-width: 80px; /* Compras/Status */
+            }
+            .table th:last-child, .table td:last-child {
+                min-width: 80px; /* Ações */
+            }
 
-            /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
+            /* CORREÇÃO: Relatórios - filtros empilham */
             #reportsPage .grid-4 {
-                grid-template-columns: 1fr; /* Força empilhamento em uma única coluna */
+                grid-template-columns: 1fr !important;
+                gap: 12px;
             }
 
-            /* Reduz o padding para filtros para usar melhor o espaço */
             #reportsPage .form-group {
-                margin-bottom: 15px;
+                margin-bottom: 12px;
             }
 
-            /* Garante que o botão de atualizar relatório ocupe a largura total */
             #reportsPage #generateReport {
                 width: 100%;
+                margin-top: 8px;
             }
 
-            /* Ajusta a disposição dos botões de exportar em mobile */
-            #reportsPage .card-header .flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
+            /* CORREÇÃO: Ações de tabela em mobile */
+            .table .flex.gap-1 {
+                flex-wrap: wrap;
+                gap: 4px;
             }
-            #reportsPage .card-header .flex.gap-2 .btn {
-                width: 100%;
+            
+            /* CORREÇÃO: Stats cards menores */
+            .stat-value {
+                font-size: 20px; /* Reduzido */
             }
-            /* --- FIM: RELATÓRIOS & TABELAS GERAIS --- */
+            
+            .stat-label {
+                font-size: 11px;
+            }
+            
+            /* CORREÇÃO: Notificações em mobile */
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                transform: none;
+                width: auto;
+            }
+            
+            .notification.show {
+                transform: none;
+            }
+        }
+
+        /* CORREÇÃO ADICIONAL: Tablets */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .main-content {
+                padding: 20px 16px;
+            }
         }
 
         /* ===== UTILITÁRIOS ===== */
@@ -654,19 +740,19 @@
 
         .grid {
             display: grid;
-            gap: 24px;
+            gap: 20px; /* Reduzido */
         }
 
         .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Reduzido */
         }
 
         .grid-3 {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Reduzido */
         }
 
         .grid-4 {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Reduzido */
         }
 
         .flex {
@@ -677,6 +763,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* CORREÇÃO: Permite quebra */
+            gap: 8px; /* CORREÇÃO: Adiciona espaçamento */
         }
 
         .flex-center {
@@ -684,16 +772,17 @@
             justify-content: center;
             align-items: center;
         }
-        .gap-1 { gap: 8px; }
-        .gap-2 { gap: 16px; }
-        .gap-3 { gap: 24px; }
+        
+        .gap-1 { gap: 6px; } /* Reduzido */
+        .gap-2 { gap: 12px; } /* Reduzido */
+        .gap-3 { gap: 20px; } /* Reduzido */
 
         /* ===== NOTIFICAÇÕES ===== */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 16px 20px;
+            padding: 14px 18px; /* Reduzido */
             border-radius: 8px;
             color: var(--text-primary);
             font-weight: 600;
@@ -701,6 +790,8 @@
             transform: translateX(400px);
             transition: var(--transition);
             box-shadow: var(--shadow-lg);
+            max-width: 300px; /* CORREÇÃO: Limita largura */
+            word-wrap: break-word; /* CORREÇÃO: Quebra texto longo */
         }
 
         .notification.show {
@@ -734,6 +825,7 @@
             opacity: 0;
             visibility: hidden;
             transition: var(--transition);
+            padding: 20px; /* CORREÇÃO: Adiciona padding */
         }
 
         .modal.show {
@@ -744,9 +836,9 @@
         .modal-content {
             background: var(--secondary-bg);
             border-radius: 12px;
-            padding: 32px;
+            padding: 28px; /* Reduzido */
             max-width: 600px;
-            width: 90%;
+            width: 100%;
             max-height: 85vh; 
             display: flex; 
             flex-direction: column; 
@@ -757,8 +849,8 @@
         
         #modalBody {
             overflow-y: auto; 
+            flex: 1;
         }
-
 
         .modal.show .modal-content {
             transform: scale(1);
@@ -768,13 +860,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px; /* Reduzido */
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; /* CORREÇÃO: Evita encolhimento */
         }
 
         .modal-title {
-            font-size: 24px;
+            font-size: 20px; /* Reduzido */
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -783,11 +876,12 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 24px;
+            font-size: 20px; /* Reduzido */
             cursor: pointer;
             padding: 8px;
             border-radius: 4px;
             transition: var(--transition);
+            flex-shrink: 0; /* CORREÇÃO: Evita encolhimento */
         }
 
         .modal-close:hover {
@@ -798,8 +892,8 @@
         /* ===== LOADING ===== */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 18px; /* Reduzido */
+            height: 18px; /* Reduzido */
             border: 2px solid var(--border-color);
             border-radius: 50%;
             border-top-color: var(--primary-color);
@@ -813,14 +907,14 @@
         /* ===== DASHBOARD ESPECÍFICO ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Reduzido */
+            gap: 20px; /* Reduzido */
+            margin-bottom: 28px; /* Reduzido */
         }
 
         .stat-card {
             background: var(--secondary-bg);
-            padding: 24px;
+            padding: 20px; /* Reduzido */
             border-radius: 12px;
             border: 1px solid var(--border-color);
             position: relative;
@@ -829,21 +923,22 @@
         
         .stat-icon {
             position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 32px;
+            top: 20px; /* Reduzido */
+            right: 20px; /* Reduzido */
+            font-size: 28px; /* Reduzido */
             color: var(--primary-color);
             opacity: 0.3;
         }
+        
         .stat-value {
-            font-size: 24px;
+            font-size: 22px; /* Reduzido */
             font-weight: 700;
             color: var(--primary-color);
             margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 11px; /* Reduzido */
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -855,110 +950,129 @@
             color: var(--text-primary);
         }
 
-        /* ===== NOVO ESTILO DE RECIBO PROFISSIONAL ===== */
+        /* ===== RECIBO PROFISSIONAL ===== */
         .receipt-professional-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
             color: #212529;
-            padding: 2rem;
+            padding: 1.5rem; /* Reduzido */
             border-radius: 8px;
             border: 1px solid #dee2e6;
         }
+        
         .receipt-professional-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             border-bottom: 2px solid #dee2e6;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding-bottom: 1.2rem; /* Reduzido */
+            margin-bottom: 1.2rem; /* Reduzido */
             flex-wrap: wrap; 
+            gap: 16px;
         }
+        
         .receipt-logo-container {
-            font-size: 2.5rem;
+            font-size: 2.2rem; /* Reduzido */
             color: var(--primary-color);
         }
+        
         .receipt-company-details {
             text-align: right;
         }
+        
         .receipt-company-details h3 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.3rem; /* Reduzido */
             color: #343a40;
         }
+        
         .receipt-company-details p {
             margin: 2px 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem; /* Reduzido */
             color: #6c757d;
         }
+        
         .receipt-sale-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 1.2rem; /* Reduzido */
+            font-size: 0.85rem; /* Reduzido */
         }
+        
         .receipt-info-block p {
             margin: 4px 0;
         }
+        
         .receipt-info-block .label {
             color: #6c757d;
             font-weight: 600;
         }
+        
         .receipt-items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem; /* Reduzido */
         }
+        
         .receipt-items-table thead {
             background-color: #e9ecef;
         }
+        
         .receipt-items-table th {
-            padding: 0.75rem;
+            padding: 0.6rem; /* Reduzido */
             text-align: left;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Reduzido */
             text-transform: uppercase;
             color: #495057;
-            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
+            white-space: normal; /* CORREÇÃO: Permite quebra */
         }
+        
         .receipt-items-table td {
-            padding: 0.75rem;
+            padding: 0.6rem; /* Reduzido */
             border-bottom: 1px solid #dee2e6;
-            font-size: 0.95rem;
-            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
+            font-size: 0.9rem; /* Reduzido */
+            white-space: normal; /* CORREÇÃO: Permite quebra */
         }
+        
         .receipt-items-table .text-right { text-align: right; }
         .receipt-items-table .text-center { text-align: center; }
+        
         .receipt-summary {
             display: flex;
             justify-content: flex-end;
         }
+        
         .receipt-summary table {
             width: 50%;
-            max-width: 300px;
+            max-width: 280px; /* Reduzido */
         }
+        
         .receipt-summary td {
-            padding: 0.5rem;
-            font-size: 1rem;
+            padding: 0.4rem; /* Reduzido */
+            font-size: 0.95rem; /* Reduzido */
         }
+        
         .receipt-summary .total-label {
             font-weight: bold;
             color: #495057;
         }
+        
         .receipt-summary .total-value {
             font-weight: bold;
-            font-size: 1.25rem;
+            font-size: 1.1rem; /* Reduzido */
             color: var(--primary-color);
         }
+        
         .receipt-footer {
-            margin-top: 2rem;
+            margin-top: 1.5rem; /* Reduzido */
             padding-top: 1rem;
             text-align: center;
             border-top: 1px solid #dee2e6;
-            font-size: 0.85rem;
+            font-size: 0.8rem; /* Reduzido */
             color: #6c757d;
         }
-
     </style>
 </head>
 <body>
@@ -1122,7 +1236,7 @@
                                 Contas Vencidas
                             </h3>
                         </div>
-                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
+                        <div id="overdueAccounts" style="max-height: 300px; overflow-y: auto;">
                             <p class="text-center" style="color: var(--text-muted); padding: 20px;">
                                 Nenhuma conta vencida
                             </p>
@@ -1418,7 +1532,7 @@
                     
                     <div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
                         <div>
-                            <strong style="font-size: 24px; color: var(--primary-color);">
+                            <strong style="font-size: 20px; color: var(--primary-color);">
                                 Total: <span id="cartTotal">R$ 0,00</span>
                             </strong>
                         </div>
@@ -2092,7 +2206,7 @@
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.2 (Responsiveness Fix) =====
+    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v2.9.3 (Responsiveness Enhanced) =====
     
     // Configurações globais
     const CONFIG = {
@@ -2222,17 +2336,18 @@
         }
     };
 
-    // Sistema de Navegação
+    // Sistema de Navegação MELHORADO
     const Navigation = {
         init() {
             const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
 
             document.querySelectorAll('.sidebar-nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     
-                    // CORREÇÃO: Fecha a sidebar no clique, antes de qualquer outra ação
-                    if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
+                    // CORREÇÃO MELHORADA: Fecha a sidebar no mobile após clique
+                    if (window.innerWidth <= 768) {
                         sidebar.classList.remove('active');
                     }
 
@@ -2243,12 +2358,23 @@
                 });
             });
 
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
 
-            // Fecha a sidebar se clicar fora dela
+            // CORREÇÃO: Fecha a sidebar se clicar fora dela em mobile
             document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('active') && 
+                    !sidebar.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // CORREÇÃO: Fecha sidebar ao redimensionar para desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
                     sidebar.classList.remove('active');
                 }
             });
@@ -2275,7 +2401,6 @@
             }
         },
         loadPageData(page) {
-            // O conteúdo desta função permanece o mesmo
             switch (page) {
                 case 'dashboard': Dashboard.loadData(); break;
                 case 'clients': Clients.loadClients(); break;
@@ -2496,7 +2621,6 @@
             const totalSpent = sales.reduce((sum, sale) => sum + sale.total, 0);
             const totalDebt = receivables.filter(r => r.status === 'Pendente' || (r.status !== 'Pago' && new Date(r.dueDate) < new Date())).reduce((sum, r) => sum + r.value, 0);
 
-            // CORREÇÃO: Adicionado .table-responsive em volta de cada tabela no modal
             let historyHtml = `
                 <h4>Histórico de Compras - ${client.name}</h4>
                 <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${sales.length} compra(s).</p>
@@ -2822,7 +2946,7 @@
                     <td>${item.name}</td>
                     <td>${Utils.formatCurrency(item.price)}</td>
                     <td>
-                        <input type="number" value="${item.quantity}" min="1" onchange="Sales.updateQuantity('${item.productId}', parseInt(this.value))" class="form-input" style="width: 80px; padding: 6px;">
+                        <input type="number" value="${item.quantity}" min="1" onchange="Sales.updateQuantity('${item.productId}', parseInt(this.value))" class="form-input" style="width: 60px; padding: 4px 6px; font-size: 12px;">
                     </td>
                     <td>${Utils.formatCurrency(item.price * item.quantity)}</td>
                     <td><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.productId}')"><i class="fas fa-trash"></i></button></td>
@@ -2838,200 +2962,79 @@
             }
         },
         finalizeSale() {
-            if (this.cart.length === 0) return Notification.error('Carrinho vazio!');
+            if (this.cart.length === 0) return Notification.error('Carrinho vazio!
+
+
+');
 
             const clientId = document.getElementById('saleClient').value;
             const paymentMethod = document.getElementById('salePaymentMethod').value;
             const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
-            
-            if (paymentMethod === 'Crediário' && !clientId) {
-                return Notification.error('Selecione um cliente para vendas em crediário!');
-            }
-
             const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Atualizar estoque
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            this.cart.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) product.quantity -= item.quantity;
+            });
+            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+
+            // Registrar venda
             const sale = {
                 id: Utils.generateUUID(),
                 clientId: clientId || null,
-                date: new Date().toISOString(),
+                items: [...this.cart],
                 total,
                 paymentMethod,
                 installments,
-                products: [...this.cart]
+                date: new Date().toISOString()
             };
-
             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
             sales.push(sale);
             Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
 
-            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            this.cart.forEach(cartItem => {
-                const product = products.find(p => p.id === cartItem.productId);
-                if (product) product.quantity -= cartItem.quantity;
+            // Registrar no fluxo de caixa
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            cashFlow.push({
+                id: Utils.generateUUID(),
+                type: 'entrada',
+                description: `Venda #${sale.id.substring(0, 8)} - ${paymentMethod}`,
+                value: total,
+                date: new Date().toISOString().split('T')[0]
             });
-            Utils.saveToStorage(CONFIG.storageKeys.products, products);
+            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
 
-            if (paymentMethod === 'Crediário') {
-                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            // Criar contas a receber se for crediário
+            if (paymentMethod === 'Crediário' && clientId) {
+                const accountsReceivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
                 const installmentValue = total / installments;
                 for (let i = 1; i <= installments; i++) {
                     const dueDate = new Date();
                     dueDate.setMonth(dueDate.getMonth() + i);
-                    receivables.push({
+                    accountsReceivable.push({
                         id: Utils.generateUUID(),
                         clientId,
-                        description: `Parcela ${i}/${installments} da Venda #${sale.id.substring(0, 8)}`,
+                        description: `Venda #${sale.id.substring(0, 8)} - Parcela ${i}/${installments}`,
                         value: installmentValue,
-                        dueDate: dueDate.toISOString(),
+                        dueDate: dueDate.toISOString().split('T')[0],
                         status: 'Pendente',
-                        saleId: sale.id,
-                        createdAt: new Date().toISOString()
+                        saleId: sale.id
                     });
                 }
-                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-                Notification.success('Venda em crediário registrada! Parcelas em "Contas a Receber".');
-            } else {
-                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-                cashFlow.push({
-                    id: Utils.generateUUID(),
-                    date: new Date().toISOString(),
-                    type: 'entrada',
-                    description: `Venda #${sale.id.substring(0, 8)} (${paymentMethod})`,
-                    value: total,
-                    relatedSaleId: sale.id
-                });
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-                Notification.success('Venda finalizada com sucesso!');
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, accountsReceivable);
             }
-            
-            Receipts.showReceipt(sale.id);
 
             this.cart = [];
             this.updateCartDisplay();
-            document.getElementById('saleClient').value = '';
-        }
-    };
-
-    // Módulo de Recibos
-    const Receipts = {
-        init() {
-            document.getElementById('receiptClientFilter').addEventListener('change', () => this.filterReceipts());
-            document.getElementById('receiptDateFilter').addEventListener('input', () => this.filterReceipts());
+            this.showReceipt(sale);
+            Notification.success('Venda finalizada!');
         },
-        initPage() {
-            this.loadClientsIntoFilter();
-            this.loadReceipts();
-        },
-        loadClientsIntoFilter() {
+        showReceipt(sale) {
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const select = document.getElementById('receiptClientFilter');
-            select.innerHTML = '<option value="">Todos os Clientes</option><option value="guest">Consumidor Final</option>';
-            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-            });
-        },
-        filterReceipts() {
-            const clientId = document.getElementById('receiptClientFilter').value;
-            const dateFilter = document.getElementById('receiptDateFilter').value;
-            this.loadReceipts(clientId, dateFilter);
-        },
-        loadReceipts(clientIdFilter = '', dateFilter = '') {
-            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-
-            if (clientIdFilter) {
-                if (clientIdFilter === 'guest') {
-                    sales = sales.filter(s => !s.clientId);
-                } else {
-                    sales = sales.filter(s => s.clientId === clientIdFilter);
-                }
-            }
-            if (dateFilter) {
-                sales = sales.filter(s => s.date.startsWith(dateFilter));
-            }
-
-            const tbody = document.getElementById('receiptsTableBody');
-            if (sales.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum recibo encontrado.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = sales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(sale => {
-                const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : null;
-                return `
-                    <tr>
-                        <td>#${sale.id.substring(0, 8)}</td>
-                        <td>${Utils.formatDateTime(sale.date)}</td>
-                        <td>${client ? client.name : 'Consumidor Final'}</td>
-                        <td>${Utils.formatCurrency(sale.total)}</td>
-                        <td>
-                           <div class="flex gap-1">
-                                <button class="btn btn-primary btn-sm" onclick="Receipts.showReceipt('${sale.id}')" title="Visualizar">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="Receipts.deleteReceipt('${sale.id}')" title="Excluir Venda">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                           </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        },
-        deleteReceipt(saleId) {
-            const confirmation = confirm('ATENÇÃO!\n\nDeseja excluir esta venda permanentemente?\n\nEsta ação irá:\n- Excluir a venda e seu recibo.\n- Remover o lançamento do caixa (se houver).\n- Excluir todas as parcelas em "Contas a Receber".\n- Devolver os produtos ao estoque.\n\nEsta ação não pode ser desfeita.');
-
-            if (!confirmation) {
-                return Notification.warning('Exclusão cancelada.');
-            }
-
-            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            let products = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-
-            const saleToDelete = sales.find(s => s.id === saleId);
-            if (!saleToDelete) {
-                return Notification.error('Venda não encontrada.');
-            }
-
-            saleToDelete.products.forEach(item => {
-                const productIndex = products.findIndex(p => p.id === item.productId);
-                if (productIndex > -1) {
-                    products[productIndex].quantity += item.quantity;
-                }
-            });
-
-            cashFlow = cashFlow.filter(cf => cf.relatedSaleId !== saleId);
-            receivables = receivables.filter(r => r.saleId !== saleId);
-            sales = sales.filter(s => s.id !== saleId);
-
-            Utils.saveToStorage(CONFIG.storageKeys.products, products);
-            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-            Utils.saveToStorage(CONFIG.storageKeys.sales, sales);
-
-            Notification.success('Venda excluída com sucesso! O estoque foi restaurado.');
-            this.loadReceipts(); 
-        },
-        showReceipt(saleId) {
-            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const sale = sales.find(s => s.id === saleId);
-            if (!sale) return Notification.error('Venda não encontrada!');
-
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
-
-            const receiptHtml = this.generateReceiptHTML(sale, client);
-            const actionsHtml = `
-                <div class="flex gap-2 justify-content-end">
-                    <button class="btn btn-success" onclick="Receipts.shareOnWhatsApp('${sale.id}')"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button>
-                    <button class="btn btn-secondary" onclick="Receipts.printReceipt()"><i class="fas fa-print"></i> Imprimir</button>
-                </div>
-            `;
-            Modal.show(`Recibo da Venda`, `<div id="receiptToPrint">${receiptHtml}</div>`, actionsHtml);
-        },
-        generateReceiptHTML(sale, client) {
-            return `
+            const client = clients.find(c => c.id === sale.clientId);
+            
+            const receiptHtml = `
                 <div class="receipt-professional-container">
                     <div class="receipt-professional-header">
                         <div class="receipt-logo-container">
@@ -3040,110 +3043,203 @@
                         <div class="receipt-company-details">
                             <h3>${CONFIG.company.name}</h3>
                             <p>${CONFIG.company.address}</p>
-                            <p>${CONFIG.company.cnpj}</p>
+                            <p>Tel: ${CONFIG.company.phone}</p>
+                            <p>CNPJ: ${CONFIG.company.cnpj}</p>
                         </div>
                     </div>
-
-                    <h4>Detalhes da Compra</h4>
+                    
                     <div class="receipt-sale-info">
                         <div class="receipt-info-block">
-                            <p><span class="label">Cliente:</span><br>${client.name}</p>
-                            <p><span class="label">Data:</span><br>${Utils.formatDateTime(sale.date)}</p>
+                            <p><span class="label">Venda ID:</span> #${sale.id.substring(0, 8)}</p>
+                            <p><span class="label">Data:</span> ${Utils.formatDateTime(sale.date)}</p>
+                            <p><span class="label">Cliente:</span> ${client ? client.name : 'Consumidor Final'}</p>
                         </div>
                         <div class="receipt-info-block text-right">
-                            <p><span class="label">Recibo N°:</span><br>#${sale.id.substring(0, 8).toUpperCase()}</p>
-                            <p><span class="label">Pagamento:</span><br>${sale.paymentMethod}${sale.installments > 1 ? ` (${sale.installments}x)` : ''}</p>
+                            <p><span class="label">Pagamento:</span> ${sale.paymentMethod}</p>
+                            ${sale.installments > 1 ? `<p><span class="label">Parcelas:</span> ${sale.installments}x</p>` : ''}
+                            <p><span class="label">Atendente:</span> Sistema</p>
                         </div>
                     </div>
-
-                    <div class="table-responsive">
-                        <table class="receipt-items-table">
-                            <thead>
+                    
+                    <table class="receipt-items-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th class="text-center">Qtd</th>
+                                <th class="text-right">Preço Unit.</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sale.items.map(item => `
                                 <tr>
-                                    <th>Produto</th>
-                                    <th class="text-center">Qtd.</th>
-                                    <th class="text-right">Subtotal</th>
+                                    <td>${item.name}</td>
+                                    <td class="text-center">${item.quantity}</td>
+                                    <td class="text-right">${Utils.formatCurrency(item.price)}</td>
+                                    <td class="text-right">${Utils.formatCurrency(item.price * item.quantity)}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                ${sale.products.map(p => `
-                                <tr>
-                                    <td>
-                                        ${p.name}
-                                        <small style="display: block; color: #6c757d;">(${Utils.formatCurrency(p.price)} / un.)</small>
-                                    </td>
-                                    <td class="text-center">${p.quantity}</td>
-                                    <td class="text-right">${Utils.formatCurrency(p.price * p.quantity)}</td>
-                                </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
                     <div class="receipt-summary">
                         <table>
                             <tr>
-                                <td class="total-label">Total</td>
-                                <td class="text-right total-value">${Utils.formatCurrency(sale.total)}</td>
+                                <td class="total-label">TOTAL:</td>
+                                <td class="total-value text-right">${Utils.formatCurrency(sale.total)}</td>
                             </tr>
                         </table>
                     </div>
-
+                    
                     <div class="receipt-footer">
-                        <p>Obrigado pela sua compra! Volte sempre!</p>
+                        <p>Obrigado pela preferência!</p>
+                        <p>Volte sempre!</p>
                     </div>
                 </div>
             `;
-        },
-        generateWhatsAppText(sale, client) {
-            let text = `*Recibo da Compra - ${CONFIG.company.name}*\n\n`;
-            text += `Olá ${client.name.split(' ')[0]}, agradecemos pela sua compra!\n\n`;
-            text += `*Recibo N°:* #${sale.id.substring(0, 8).toUpperCase()}\n`;
-            text += `*Data:* ${Utils.formatDateTime(sale.date)}\n\n`;
-            text += "*Resumo dos Itens:*\n";
-            sale.products.forEach(p => {
-                text += `- ${p.name} (Qtd: ${p.quantity}) - ${Utils.formatCurrency(p.price * p.quantity)}\n`;
-            });
-            text += `\n*Total da Compra:* *${Utils.formatCurrency(sale.total)}*\n`;
-            text += `*Forma de Pagamento:* ${sale.paymentMethod}${sale.installments > 1 ? ` (${sale.installments}x)` : ''}\n\n`;
-            text += "Qualquer dúvida, estamos à disposição!\n";
-            text += `${CONFIG.company.name}`;
-            return encodeURIComponent(text);
-        },
-        shareOnWhatsApp(saleId) {
-             const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-             const sale = sales.find(s => s.id === saleId);
-             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-             const client = sale.clientId ? clients.find(c => c.id === sale.clientId) : { name: 'Consumidor Final', phone: ''};
-
-            if (!client.phone) {
-                return Notification.warning('Cliente sem telefone cadastrado para envio via WhatsApp.');
-            }
-             const phoneNumber = client.phone.replace(/\D/g, '');
-             const message = this.generateWhatsAppText(sale, client);
-             const whatsappUrl = `https://api.whatsapp.com/send?phone=55${phoneNumber}&text=${message}`;
-             window.open(whatsappUrl, '_blank');
+            
+            const actionsHtml = `
+                <div class="flex gap-2">
+                    <button class="btn btn-primary" onclick="Sales.printReceipt()">
+                        <i class="fas fa-print"></i>
+                        Imprimir
+                    </button>
+                    <button class="btn btn-secondary" onclick="Modal.hide()">
+                        <i class="fas fa-times"></i>
+                        Fechar
+                    </button>
+                </div>
+            `;
+            
+            Modal.show('Recibo da Venda', receiptHtml, actionsHtml);
         },
         printReceipt() {
-            const printContent = document.getElementById('receiptToPrint').innerHTML;
-            const originalContent = document.body.innerHTML;
-            document.body.innerHTML = printContent;
-            window.print();
-            document.body.innerHTML = originalContent;
-            location.reload();
+            const receiptContent = document.querySelector('.receipt-professional-container').outerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Recibo - ${CONFIG.company.name}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .receipt-professional-container { max-width: 600px; margin: 0 auto; }
+                            .receipt-professional-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 15px; }
+                            .receipt-logo-container { font-size: 2rem; }
+                            .receipt-company-details h3 { margin: 0; font-size: 1.2rem; }
+                            .receipt-company-details p { margin: 2px 0; font-size: 0.9rem; }
+                            .receipt-sale-info { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 15px; font-size: 0.9rem; }
+                            .receipt-items-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                            .receipt-items-table th, .receipt-items-table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                            .receipt-items-table thead { background-color: #f5f5f5; }
+                            .text-center { text-align: center; }
+                            .text-right { text-align: right; }
+                            .receipt-summary { display: flex; justify-content: flex-end; }
+                            .receipt-summary table { width: 200px; }
+                            .receipt-summary td { padding: 5px; font-size: 1rem; }
+                            .total-label { font-weight: bold; }
+                            .total-value { font-weight: bold; font-size: 1.2rem; }
+                            .receipt-footer { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+                        </style>
+                    </head>
+                    <body>${receiptContent}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
         }
     };
-    
-    // Módulo Fluxo de Caixa
+
+    // Módulo de Recibos
+    const Receipts = {
+        init() {
+            document.getElementById('receiptClientFilter').addEventListener('change', () => this.filterReceipts());
+            document.getElementById('receiptDateFilter').addEventListener('change', () => this.filterReceipts());
+        },
+        initPage() {
+            this.loadClientFilter();
+            this.loadReceipts();
+        },
+        loadClientFilter() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('receiptClientFilter');
+            select.innerHTML = '<option value="">Todos os Clientes</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        filterReceipts() {
+            const clientFilter = document.getElementById('receiptClientFilter').value;
+            const dateFilter = document.getElementById('receiptDateFilter').value;
+            
+            let sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            
+            if (clientFilter) {
+                sales = sales.filter(s => s.clientId === clientFilter);
+            }
+            
+            if (dateFilter) {
+                sales = sales.filter(s => s.date.split('T')[0] === dateFilter);
+            }
+            
+            this.renderReceipts(sales);
+        },
+        loadReceipts() {
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            this.renderReceipts(sales);
+        },
+        renderReceipts(sales) {
+            const tbody = document.getElementById('receiptsTableBody');
+            if (sales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma venda encontrada</td></tr>`;
+                return;
+            }
+            
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            tbody.innerHTML = sales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(sale => {
+                const client = clients.find(c => c.id === sale.clientId);
+                return `
+                    <tr>
+                        <td>#${sale.id.substring(0, 8)}</td>
+                        <td>${Utils.formatDateTime(sale.date)}</td>
+                        <td>${client ? client.name : 'Consumidor Final'}</td>
+                        <td>${Utils.formatCurrency(sale.total)}</td>
+                        <td>
+                            <div class="flex gap-1">
+                                <button class="btn btn-primary btn-sm" onclick="Receipts.viewReceipt('${sale.id}')" title="Ver Recibo">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="Receipts.printReceipt('${sale.id}')" title="Imprimir">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        },
+        viewReceipt(saleId) {
+            const sale = Utils.loadFromStorage(CONFIG.storageKeys.sales).find(s => s.id === saleId);
+            if (sale) {
+                Sales.showReceipt(sale);
+            }
+        },
+        printReceipt(saleId) {
+            const sale = Utils.loadFromStorage(CONFIG.storageKeys.sales).find(s => s.id === saleId);
+            if (sale) {
+                Sales.showReceipt(sale);
+                setTimeout(() => Sales.printReceipt(), 500);
+            }
+        }
+    };
+
+    // Módulo de Fluxo de Caixa
     const CashFlow = {
         currentEditId: null,
         init() {
-            document.getElementById('cashFlowForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveEntry(); });
+            document.getElementById('cashFlowForm').addEventListener('submit', e => { e.preventDefault(); this.saveCashFlow(); });
             document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce((e) => this.filterEntries(e.target.value), 300));
+            document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce(e => this.filterCashFlow(e.target.value), 300));
             document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
+            document.getElementById('cashFlowDate').value = new Date().toISOString().split('T')[0];
         },
-        saveEntry() {
+        saveCashFlow() {
             const type = document.getElementById('cashFlowType').value;
             const description = document.getElementById('cashFlowDescription').value.trim();
             const value = parseFloat(document.getElementById('cashFlowValue').value) || 0;
@@ -3152,37 +3248,57 @@
             if (!description || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
 
             const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const newEntry = {
-                id: this.currentEditId || Utils.generateUUID(),
-                date: new Date(date + 'T00:00:00').toISOString(), type, description, value
-            };
-
             if (this.currentEditId) {
-                const index = cashFlow.findIndex(e => e.id === this.currentEditId);
-                if (index !== -1 && !cashFlow[index].relatedSaleId && !cashFlow[index].relatedExpenseId && !cashFlow[index].relatedAccountId) {
-                    cashFlow[index] = newEntry;
+                const index = cashFlow.findIndex(cf => cf.id === this.currentEditId);
+                if (index !== -1) {
+                    cashFlow[index] = { ...cashFlow[index], type, description, value, date, updatedAt: new Date().toISOString() };
                     Notification.success('Lançamento atualizado!');
-                } else {
-                    Notification.error('Não é possível editar lançamentos automáticos.');
                 }
             } else {
-                cashFlow.push(newEntry);
-                Notification.success('Lançamento salvo!');
+                cashFlow.push({ id: Utils.generateUUID(), type, description, value, date, createdAt: new Date().toISOString() });
+                Notification.success('Lançamento registrado!');
             }
-            
             Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-            this.loadCashFlow();
             this.clearForm();
+            this.loadCashFlow();
+        },
+        editCashFlow(id) {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(cf => cf.id === id);
+            if (cashFlow) {
+                document.getElementById('cashFlowType').value = cashFlow.type;
+                document.getElementById('cashFlowDescription').value = cashFlow.description;
+                document.getElementById('cashFlowValue').value = cashFlow.value;
+                document.getElementById('cashFlowDate').value = cashFlow.date;
+                this.currentEditId = id;
+                document.getElementById('cashFlowForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteCashFlow(id) {
+            if (confirm('Tem certeza que deseja excluir este lançamento?')) {
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                this.loadCashFlow();
+                Notification.success('Lançamento excluído!');
+            }
+        },
+        clearForm() {
+            document.getElementById('cashFlowForm').reset();
+            document.getElementById('cashFlowDate').value = new Date().toISOString().split('T')[0];
+            this.currentEditId = null;
+        },
+        filterCashFlow(searchTerm) {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            const filtered = cashFlow.filter(cf => cf.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.renderCashFlow(filtered);
         },
         loadCashFlow() {
-            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            this.updateSummary(entries);
-            this.displayEntries(entries);
-            document.getElementById('cashFlowDate').valueAsDate = new Date();
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            this.renderCashFlow(cashFlow);
+            this.updateStats(cashFlow);
         },
-        updateSummary(entries) {
-            const totalEntradas = entries.filter(e => e.type === 'entrada').reduce((sum, e) => sum + e.value, 0);
-            const totalSaidas = entries.filter(e => e.type === 'saida').reduce((sum, e) => sum + e.value, 0);
+        updateStats(cashFlow) {
+            const totalEntradas = cashFlow.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
+            const totalSaidas = cashFlow.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
             const saldoAtual = totalEntradas - totalSaidas;
 
             document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
@@ -3190,163 +3306,80 @@
             document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
             document.getElementById('saldoAtual').style.color = saldoAtual >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
         },
-        displayEntries(entries) {
+        renderCashFlow(cashFlow) {
             const tbody = document.getElementById('cashFlowTableBody');
-            if (entries.length === 0) {
+            if (cashFlow.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado</td></tr>`;
                 return;
             }
-            const sorted = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
-            tbody.innerHTML = sorted.map(entry => {
-                const isManual = !entry.relatedSaleId && !entry.relatedExpenseId && !entry.relatedAccountId;
-                return `
-                    <tr>
-                        <td>${Utils.formatDate(entry.date)}</td>
-                        <td><span class="badge ${entry.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${entry.type}</span></td>
-                        <td>${entry.description}</td>
-                        <td style="color: ${entry.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'};">
-                            ${entry.type === 'entrada' ? '+' : '-'} ${Utils.formatCurrency(entry.value)}
-                        </td>
-                        <td>
-                            <div class="flex gap-1">
-                                ${isManual ? `
-                                <button class="btn btn-secondary btn-sm" onclick="CashFlow.editEntry('${entry.id}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteEntry('${entry.id}')"><i class="fas fa-trash"></i></button>` : 
-                                `<i class="fas fa-lock" title="Lançamento automático"></i>`}
-                            </div>
-                        </td>
-                    </tr>`;
-            }).join('');
-        },
-        editEntry(id) {
-            const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
-            if(entry) {
-                document.getElementById('cashFlowType').value = entry.type;
-                document.getElementById('cashFlowDescription').value = entry.description;
-                document.getElementById('cashFlowValue').value = entry.value;
-                document.getElementById('cashFlowDate').value = entry.date.split('T')[0];
-                this.currentEditId = id;
-            }
-        },
-        deleteEntry(id) {
-            const entry = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).find(e => e.id === id);
-            if(entry && (entry.relatedSaleId || entry.relatedExpenseId || entry.relatedAccountId)) {
-                return Notification.error('Lançamentos automáticos não podem ser excluídos.');
-            }
-            if (confirm('Excluir este lançamento?')) {
-                const filtered = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(e => e.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, filtered);
-                this.loadCashFlow();
-                Notification.success('Lançamento excluído!');
-            }
-        },
-        clearForm() {
-            document.getElementById('cashFlowForm').reset();
-            document.getElementById('cashFlowDate').valueAsDate = new Date();
-            this.currentEditId = null;
-        },
-        filterEntries(searchTerm) {
-            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const filtered = entries.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase()));
-            this.displayEntries(filtered);
+            tbody.innerHTML = cashFlow.sort((a,b) => new Date(b.date) - new Date(a.date)).map(cf => `
+                <tr>
+                    <td>${Utils.formatDate(cf.date)}</td>
+                    <td><span class="badge ${cf.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${cf.type === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
+                    <td>${cf.description}</td>
+                    <td style="color: ${cf.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'};">${cf.type === 'entrada' ? '+' : '-'} ${Utils.formatCurrency(cf.value)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="CashFlow.editCashFlow('${cf.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteCashFlow('${cf.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
         },
         exportToCSV() {
-            const entries = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            if(entries.length === 0) return Notification.warning('Nenhum dado para exportar.');
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+            if (cashFlow.length === 0) return Notification.warning('Nenhum lançamento para exportar!');
             Clients.downloadCSV(
                 ['Data', 'Tipo', 'Descrição', 'Valor'].join(',') + '\n' +
-                entries.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.type}"`, `"${e.description}"`, e.value.toFixed(2)].join(',')).join('\n'),
-                'fluxo_de_caixa'
+                cashFlow.map(cf => [`"${Utils.formatDate(cf.date)}"`, `"${cf.type === 'entrada' ? 'Entrada' : 'Saída'}"`, `"${cf.description}"`, cf.value.toFixed(2)].join(',')).join('\n'), 'fluxo_caixa'
             );
         }
     };
-    
-    // Módulo Despesas
+
+    // Módulo de Despesas
     const Expenses = {
         currentEditId: null,
         init() {
-            document.getElementById('expenseForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveExpense(); });
+            document.getElementById('expenseForm').addEventListener('submit', e => { e.preventDefault(); this.saveExpense(); });
             document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.filterExpenses(), 300));
-            document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
+            document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(e => this.filterExpenses(e.target.value), 300));
+            document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterByCategory());
             document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
         },
         saveExpense() {
             const description = document.getElementById('expenseDescription').value.trim();
             const category = document.getElementById('expenseCategory').value;
             const value = parseFloat(document.getElementById('expenseValue').value) || 0;
             const date = document.getElementById('expenseDate').value;
+
             if (!description || !category || value <= 0 || !date) return Notification.error('Preencha todos os campos!');
 
             const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            
-            const expense = {
-                id: this.currentEditId || Utils.generateUUID(),
-                description, category, value, date: new Date(date + 'T00:00:00').toISOString()
-            };
-            
             if (this.currentEditId) {
-                const index = expenses.findIndex(exp => exp.id === this.currentEditId);
+                const index = expenses.findIndex(e => e.id === this.currentEditId);
                 if (index !== -1) {
-                    expenses[index] = expense;
-                    const cfIndex = cashFlow.findIndex(cf => cf.relatedExpenseId === this.currentEditId);
-                    if (cfIndex !== -1) {
-                        cashFlow[cfIndex].description = `Despesa: ${description}`;
-                        cashFlow[cfIndex].value = value;
-                        cashFlow[cfIndex].date = expense.date;
-                    }
+                    expenses[index] = { ...expenses[index], description, category, value, date, updatedAt: new Date().toISOString() };
                     Notification.success('Despesa atualizada!');
                 }
             } else {
-                expenses.push(expense);
+                expenses.push({ id: Utils.generateUUID(), description, category, value, date, createdAt: new Date().toISOString() });
+                Notification.success('Despesa registrada!');
+                
+                // Adicionar automaticamente ao fluxo de caixa
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
                 cashFlow.push({
                     id: Utils.generateUUID(),
-                    date: expense.date, type: 'saida',
-                    description: `Despesa: ${expense.description}`,
-                    value: expense.value,
-                    relatedExpenseId: expense.id
+                    type: 'saida',
+                    description: `Despesa: ${description} (${category})`,
+                    value,
+                    date
                 });
-                Notification.success('Despesa salva!');
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
             }
             Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
-            Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-            this.loadExpenses();
             this.clearForm();
-        },
-        loadExpenses() {
-            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            this.updateSummary(expenses);
-            this.displayExpenses(expenses);
-            document.getElementById('expenseDate').valueAsDate = new Date();
-        },
-        updateSummary(expenses) {
-            const today = new Date();
-            const monthExpenses = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear(); }).reduce((sum, e) => sum + e.value, 0);
-            const yearExpenses = expenses.filter(e => new Date(e.date).getFullYear() === today.getFullYear()).reduce((sum, e) => sum + e.value, 0);
-            document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(monthExpenses);
-            document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(yearExpenses);
-        },
-        displayExpenses(expenses) {
-            const tbody = document.getElementById('expensesTableBody');
-            if (expenses.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada</td></tr>`;
-                return;
-            }
-            const sorted = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
-            tbody.innerHTML = sorted.map(exp => `
-                <tr>
-                    <td>${Utils.formatDate(exp.date)}</td>
-                    <td>${exp.description}</td>
-                    <td><span class="badge badge-secondary">${exp.category}</span></td>
-                    <td style="color: var(--danger-color);">${Utils.formatCurrency(exp.value)}</td>
-                    <td>
-                        <div class="flex gap-1">
-                            <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${exp.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${exp.id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`).join('');
+            this.loadExpenses();
         },
         editExpense(id) {
             const expense = Utils.loadFromStorage(CONFIG.storageKeys.expenses).find(e => e.id === id);
@@ -3354,51 +3387,195 @@
                 document.getElementById('expenseDescription').value = expense.description;
                 document.getElementById('expenseCategory').value = expense.category;
                 document.getElementById('expenseValue').value = expense.value;
-                document.getElementById('expenseDate').value = expense.date.split('T')[0];
+                document.getElementById('expenseDate').value = expense.date;
                 this.currentEditId = id;
+                document.getElementById('expenseForm').scrollIntoView({ behavior: 'smooth' });
             }
         },
         deleteExpense(id) {
-            if (confirm('Excluir esta despesa? O lançamento no caixa também será removido.')) {
+            if (confirm('Tem certeza que deseja excluir esta despesa?')) {
                 const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses).filter(e => e.id !== id);
-                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.relatedExpenseId !== id);
                 Utils.saveToStorage(CONFIG.storageKeys.expenses, expenses);
-                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
                 this.loadExpenses();
                 Notification.success('Despesa excluída!');
             }
         },
         clearForm() {
             document.getElementById('expenseForm').reset();
-            document.getElementById('expenseDate').valueAsDate = new Date();
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
             this.currentEditId = null;
         },
-        filterExpenses() {
-            const searchTerm = document.getElementById('expenseSearch').value.toLowerCase();
+        filterExpenses(searchTerm) {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            const filtered = expenses.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.renderExpenses(filtered);
+        },
+        filterByCategory() {
             const category = document.getElementById('expenseFilterCategory').value;
             const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            const filtered = expenses.filter(e => e.description.toLowerCase().includes(searchTerm) && (!category || e.category === category));
-            this.displayExpenses(filtered);
+            const filtered = category ? expenses.filter(e => e.category === category) : expenses;
+            this.renderExpenses(filtered);
+        },
+        loadExpenses() {
+            const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+            this.renderExpenses(expenses);
+            this.updateStats(expenses);
+        },
+        updateStats(expenses) {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthlyExpenses = expenses.filter(e => {
+                const expenseDate = new Date(e.date);
+                return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
+            }).reduce((sum, e) => sum + e.value, 0);
+
+            const yearlyExpenses = expenses.filter(e => {
+                const expenseDate = new Date(e.date);
+                return expenseDate.getFullYear() === currentYear;
+            }).reduce((sum, e) => sum + e.value, 0);
+
+            document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(monthlyExpenses);
+            document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(yearlyExpenses);
+        },
+        renderExpenses(expenses) {
+            const tbody = document.getElementById('expensesTableBody');
+            if (expenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = expenses.sort((a,b) => new Date(b.date) - new Date(a.date)).map(expense => `
+                <tr>
+                    <td>${Utils.formatDate(expense.date)}</td>
+                    <td>${expense.description}</td>
+                    <td><span class="badge badge-secondary">${expense.category}</span></td>
+                    <td style="color: var(--danger-color);">${Utils.formatCurrency(expense.value)}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${expense.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${expense.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
         },
         exportToCSV() {
             const expenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            if(expenses.length === 0) return Notification.warning('Nenhum dado para exportar.');
+            if (expenses.length === 0) return Notification.warning('Nenhuma despesa para exportar!');
             Clients.downloadCSV(
                 ['Data', 'Descrição', 'Categoria', 'Valor'].join(',') + '\n' +
                 expenses.map(e => [`"${Utils.formatDate(e.date)}"`, `"${e.description}"`, `"${e.category}"`, e.value.toFixed(2)].join(',')).join('\n'), 'despesas'
             );
         }
     };
-    
-    // Módulo Contas a Receber
+
+    // Módulo de Contas a Receber
     const Receivables = {
         currentEditId: null,
         init() {
-            document.getElementById('receivableForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveReceivable(); });
+            document.getElementById('receivableForm').addEventListener('submit', e => { e.preventDefault(); this.saveReceivable(); });
             document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
-            document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
+            document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(e => this.filterReceivables(e.target.value), 300));
+            document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterByStatus());
             document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
+        },
+        saveReceivable() {
+            const clientId = document.getElementById('receivableClient').value;
+            const description = document.getElementById('receivableDescription').value.trim();
+            const value = parseFloat(document.getElementById('receivableValue').value) || 0;
+            const dueDate = document.getElementById('receivableDueDate').value;
+
+            if (!clientId || !description || value <= 0 || !dueDate) return Notification.error('Preencha todos os campos!');
+
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            if (this.currentEditId) {
+                const index = receivables.findIndex(r => r.id === this.currentEditId);
+                if (index !== -1) {
+                    receivables[index] = { ...receivables[index], clientId, description, value, dueDate, updatedAt: new Date().toISOString() };
+                    Notification.success('Conta atualizada!');
+                }
+            } else {
+                receivables.push({
+                    id: Utils.generateUUID(),
+                    clientId,
+                    description,
+                    value,
+                    dueDate,
+                    status: 'Pendente',
+                    createdAt: new Date().toISOString()
+                });
+                Notification.success('Conta registrada!');
+            }
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+            this.clearForm();
+            this.loadReceivables();
+        },
+        editReceivable(id) {
+            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
+            if (receivable) {
+                document.getElementById('receivableClient').value = receivable.clientId;
+                document.getElementById('receivableDescription').value = receivable.description;
+                document.getElementById('receivableValue').value = receivable.value;
+                document.getElementById('receivableDueDate').value = receivable.dueDate;
+                this.currentEditId = id;
+                document.getElementById('receivableForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+        deleteReceivable(id) {
+            if (confirm('Tem certeza que deseja excluir esta conta?')) {
+                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.id !== id);
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                this.loadReceivables();
+                Notification.success('Conta excluída!');
+            }
+        },
+        markAsPaid(id) {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const receivable = receivables.find(r => r.id === id);
+            if (receivable && receivable.status !== 'Pago') {
+                receivable.status = 'Pago';
+                receivable.paidAt = new Date().toISOString();
+                
+                // Adicionar ao fluxo de caixa
+                const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+                cashFlow.push({
+                    id: Utils.generateUUID(),
+                    type: 'entrada',
+                    description: `Recebimento: ${receivable.description}`,
+                    value: receivable.value,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
+                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+                this.loadReceivables();
+                Notification.success('Conta marcada como paga!');
+            }
+        },
+        clearForm() {
+            document.getElementById('receivableForm').reset();
+            this.currentEditId = null;
+        },
+        filterReceivables(searchTerm) {
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const filtered = receivables.filter(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                return r.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                       (client && client.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            });
+            this.renderReceivables(filtered);
+        },
+        filterByStatus() {
+            const status = document.getElementById('receivableFilterStatus').value;
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            const filtered = status ? receivables.filter(r => r.status === status) : receivables;
+            this.renderReceivables(filtered);
+        },
+        loadReceivables() {
+            this.loadClients();
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+            this.updateStatuses(receivables);
+            this.renderReceivables(receivables);
+            this.updateStats(receivables);
         },
         loadClients() {
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
@@ -3406,182 +3583,58 @@
             select.innerHTML = '<option value="">Selecione um cliente</option>';
             clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
         },
-        saveReceivable() {
-            const clientId = document.getElementById('receivableClient').value;
-            const description = document.getElementById('receivableDescription').value.trim();
-            const value = parseFloat(document.getElementById('receivableValue').value) || 0;
-            const dueDate = document.getElementById('receivableDueDate').value;
-            if (!clientId || !description || value <= 0 || !dueDate) return Notification.error('Preencha todos os campos!');
-
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const receivable = {
-                id: this.currentEditId || Utils.generateUUID(),
-                clientId, description, value, status: 'Pendente',
-                dueDate: new Date(dueDate + 'T00:00:00').toISOString(),
-                createdAt: this.currentEditId ? receivables.find(r=>r.id===this.currentEditId).createdAt : new Date().toISOString()
-            };
-
-            if (this.currentEditId) {
-                const index = receivables.findIndex(r => r.id === this.currentEditId);
-                if (index !== -1) {
-                    receivables[index] = receivable;
-                    Notification.success('Conta atualizada!');
-                }
-            } else {
-                receivables.push(receivable);
-                Notification.success('Conta salva!');
-            }
-            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-            this.loadReceivables();
-            this.clearForm();
-        },
-        loadReceivables() {
-            this.loadClients();
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            this.updateSummary(receivables);
-            this.displayReceivables(receivables);
-        },
-        updateSummary(receivables) {
+        updateStatuses(receivables) {
             const today = new Date();
-            today.setHours(0,0,0,0);
-            const pending = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) >= today).reduce((sum, r) => sum + r.value, 0);
-            const overdue = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) < today).reduce((sum, r) => sum + r.value, 0);
+            today.setHours(0, 0, 0, 0);
+            
+            receivables.forEach(receivable => {
+                if (receivable.status === 'Pendente' && new Date(receivable.dueDate) < today) {
+                    receivable.status = 'Vencido';
+                }
+            });
+            Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
+        },
+        updateStats(receivables) {
+            const pending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+            const overdue = receivables.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
             const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
 
             document.getElementById('totalReceivablesPending').textContent = Utils.formatCurrency(pending);
             document.getElementById('totalReceivablesOverdue').textContent = Utils.formatCurrency(overdue);
             document.getElementById('totalReceivablesPaid').textContent = Utils.formatCurrency(paid);
         },
-        displayReceivables(receivables) {
+        renderReceivables(receivables) {
             const tbody = document.getElementById('receivablesTableBody');
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
             if (receivables.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma conta encontrada</td></tr>`;
                 return;
             }
-            const sorted = [...receivables].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            tbody.innerHTML = sorted.map(r => {
-                const client = clients.find(c => c.id === r.clientId);
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                const isOverdue = r.status === 'Pendente' && new Date(r.dueDate) < today;
-                let statusBadge;
-                if (r.status === 'Pago') statusBadge = '<span class="badge badge-success">Pago</span>';
-                else if (isOverdue) statusBadge = '<span class="badge badge-danger">Vencido</span>';
-                else statusBadge = '<span class="badge badge-warning">Pendente</span>';
-                
+            
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            tbody.innerHTML = receivables.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).map(receivable => {
+                const client = clients.find(c => c.id === receivable.clientId);
+                const statusClass = receivable.status === 'Pago' ? 'badge-success' : (receivable.status === 'Vencido' ? 'badge-danger' : 'badge-warning');
                 return `
                     <tr>
                         <td>${client ? client.name : 'N/A'}</td>
-                        <td>${r.description}</td>
-                        <td style="color: var(--primary-color);">${Utils.formatCurrency(r.value)}</td>
-                        <td>${Utils.formatDate(r.dueDate)}</td>
-                        <td>${statusBadge}</td>
+                        <td>${receivable.description}</td>
+                        <td>${Utils.formatCurrency(receivable.value)}</td>
+                        <td>${Utils.formatDate(receivable.dueDate)}</td>
+                        <td><span class="badge ${statusClass}">${receivable.status}</span></td>
                         <td>
                             <div class="flex gap-1">
-                                ${r.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
-                                ${!r.saleId && r.status !== 'Pago' ? `<button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${r.id}')" title="Editar"><i class="fas fa-edit"></i></button>` : ''}
-                                <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${r.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                                ${receivable.status !== 'Pago' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${receivable.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
+                                <button class="btn btn-secondary btn-sm" onclick="Receivables.editReceivable('${receivable.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${receivable.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>`;
             }).join('');
         },
-        markAsPaid(id) {
-            if (confirm('Marcar esta conta como paga? Uma entrada será criada no caixa.')) {
-                const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-                const receivable = receivables.find(r => r.id === id);
-                if (receivable) {
-                    receivable.status = 'Pago';
-                    receivable.paymentDate = new Date().toISOString();
-                    
-                    const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-                    cashFlow.push({
-                        id: Utils.generateUUID(),
-                        date: receivable.paymentDate, type: 'entrada',
-                        description: `Recebimento: ${receivable.description}`,
-                        value: receivable.value,
-                        relatedAccountId: receivable.id
-                    });
-                    Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-                    Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-                    this.loadReceivables();
-                    Notification.success('Conta marcada como paga!');
-                }
-            }
-        },
-        editReceivable(id) {
-            const receivable = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).find(r => r.id === id);
-            if (receivable && !receivable.saleId) {
-                document.getElementById('receivableClient').value = receivable.clientId;
-                document.getElementById('receivableDescription').value = receivable.description;
-                document.getElementById('receivableValue').value = receivable.value;
-                document.getElementById('receivableDueDate').value = receivable.dueDate.split('T')[0];
-                this.currentEditId = id;
-            } else {
-                Notification.warning('Contas geradas por vendas não podem ser editadas aqui.');
-            }
-        },
-        deleteReceivable(id) {
-            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            let cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const receivable = receivables.find(r => r.id === id);
-
-            if (!receivable) return Notification.error("Conta não encontrada.");
-
-            let canDelete = false;
-            if (receivable.saleId) {
-                canDelete = confirm('ATENÇÃO: Esta conta faz parte de uma venda. Excluí-la pode gerar inconsistências nos relatórios. Deseja mesmo excluir?');
-            } else {
-                canDelete = confirm('Tem certeza que deseja excluir esta conta?');
-            }
-
-            if (canDelete) {
-                if (receivable.status === 'Pago') {
-                    cashFlow = cashFlow.filter(cf => cf.relatedAccountId !== id);
-                    Utils.saveToStorage(CONFIG.storageKeys.cashFlow, cashFlow);
-                }
-
-                receivables = receivables.filter(r => r.id !== id);
-                Utils.saveToStorage(CONFIG.storageKeys.accountsReceivable, receivables);
-                this.loadReceivables();
-                Notification.success('Conta excluída!');
-            } else {
-                Notification.warning('Exclusão cancelada.');
-            }
-        },
-        clearForm() {
-            document.getElementById('receivableForm').reset();
-            this.currentEditId = null;
-        },
-        filterReceivables() {
-            const searchTerm = document.getElementById('receivableSearch').value.toLowerCase();
-            const status = document.getElementById('receivableFilterStatus').value;
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            
-            const filtered = receivables.filter(r => {
-                const client = clients.find(c => c.id === r.clientId);
-                const clientName = client ? client.name.toLowerCase() : '';
-                const matchesSearch = r.description.toLowerCase().includes(searchTerm) || clientName.includes(searchTerm);
-                
-                let currentStatus = r.status;
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                    currentStatus = 'Vencido';
-                }
-
-                const matchesStatus = !status || currentStatus === status;
-
-                return matchesSearch && matchesStatus;
-            });
-            this.displayReceivables(filtered);
-        },
         exportToCSV() {
             const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            if(receivables.length === 0) return Notification.warning('Nenhum dado para exportar.');
             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            if (receivables.length === 0) return Notification.warning('Nenhuma conta para exportar!');
             Clients.downloadCSV(
                 ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'].join(',') + '\n' +
                 receivables.map(r => {
@@ -3591,547 +3644,452 @@
             );
         }
     };
-    
-    // Módulo Relatórios (VERSÃO PROFISSIONAL PDF)
+
+    // Módulo de Relatórios
     const Reports = {
         chart: null,
-        currentReportData: { headers: [], rows: [], rawData: [] }, // Inicializado corretamente
-        currentReportType: '',
-
         init() {
             document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
+            document.getElementById('reportType').addEventListener('change', () => this.updateFilters());
             document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
             document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
-            
-            document.getElementById('reportType').addEventListener('change', () => this.generateReport());
-            document.getElementById('reportStartDate').addEventListener('input', () => this.generateReport());
-            document.getElementById('reportEndDate').addEventListener('input', () => this.generateReport());
-            document.getElementById('reportReceivableStatus').addEventListener('change', () => this.generateReport());
-            document.getElementById('reportReceivableClient').addEventListener('change', () => this.generateReport());
         },
         initPage() {
-            const endDate = new Date();
-            const startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); 
-            document.getElementById('reportStartDate').valueAsDate = startDate;
-            document.getElementById('reportEndDate').valueAsDate = endDate;
-            this.loadClientFilter();
-            this.generateReport();
+            this.loadClients();
+            this.setDefaultDates();
+            this.updateFilters();
         },
-        loadClientFilter() {
-             const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-             const select = document.getElementById('reportReceivableClient');
-             select.innerHTML = '<option value="">Todos os Clientes</option>';
-             clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                 select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-             });
+        loadClients() {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const select = document.getElementById('reportReceivableClient');
+            select.innerHTML = '<option value="">Todos os Clientes</option>';
+            clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        },
+        setDefaultDates() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('reportStartDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
+        },
+        updateFilters() {
+            const reportType = document.getElementById('reportType').value;
+            const clientFilter = document.getElementById('reportClientFilterContainer');
+            const statusFilter = document.getElementById('reportStatusFilterContainer');
+            
+            if (reportType === 'contas_a_receber') {
+                clientFilter.classList.remove('hidden');
+                statusFilter.classList.remove('hidden');
+            } else {
+                clientFilter.classList.add('hidden');
+                statusFilter.classList.add('hidden');
+            }
         },
         generateReport() {
-            const startDateStr = document.getElementById('reportStartDate').value;
-            const endDateStr = document.getElementById('reportEndDate').value;
-            this.currentReportType = document.getElementById('reportType').value;
-            
-            const statusFilterContainer = document.getElementById('reportStatusFilterContainer');
-            const clientFilterContainer = document.getElementById('reportClientFilterContainer');
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            const reportType = document.getElementById('reportType').value;
 
-            if (this.currentReportType === 'contas_a_receber') {
-                statusFilterContainer.classList.remove('hidden');
-                clientFilterContainer.classList.remove('hidden');
-            } else {
-                statusFilterContainer.classList.add('hidden');
-                clientFilterContainer.classList.add('hidden');
+            if (!startDate || !endDate) return Notification.error('Selecione as datas!');
+            if (new Date(startDate) > new Date(endDate)) return Notification.error('Data inicial deve ser menor que a final!');
+
+            switch (reportType) {
+                case 'vendas': this.generateSalesReport(startDate, endDate); break;
+                case 'financeiro': this.generateFinancialReport(startDate, endDate); break;
+                case 'produtos': this.generateProductsReport(startDate, endDate); break;
+                case 'clientes': this.generateClientsReport(startDate, endDate); break;
+                case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate); break;
             }
+        },
+        generateSalesReport(startDate, endDate) {
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
+                const saleDate = s.date.split('T')[0];
+                return saleDate >= startDate && saleDate <= endDate;
+            });
 
-            if (!startDateStr || !endDateStr) return Notification.error('Selecione as datas!');
-            
-            const startDate = new Date(startDateStr + 'T00:00:00');
-            const endDate = new Date(endDateStr + 'T23:59:59');
-            
-            if (startDate > endDate) return Notification.error('Data inicial maior que a final!');
-
-            const allSales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const allExpenses = Utils.loadFromStorage(CONFIG.storageKeys.expenses);
-            const allProducts = Utils.loadFromStorage(CONFIG.storageKeys.products);
-            const allClients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            
-            const sales = allSales.filter(s => { const d = new Date(s.date); return d >= startDate && d <= endDate; });
-            const expenses = allExpenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
-            
             const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
-            const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
-            const profit = totalSales - totalExpenses;
+            const salesCount = sales.length;
 
-            document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalSales);
-            document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(totalExpenses);
-            document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
-            document.getElementById('reportProfit').style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
-            document.getElementById('reportSalesCount').textContent = sales.length;
-            
-            switch (this.currentReportType) {
-                case 'vendas': this.generateSalesReport(sales, startDate, endDate, allClients); break;
-                case 'financeiro': this.generateFinancialReport(sales, expenses, startDate, endDate); break;
-                case 'produtos': this.generateProductsReport(sales, allProducts); break;
-                case 'clientes': this.generateClientsReport(sales, allClients); break;
-                case 'contas_a_receber': this.generateReceivablesReport(startDate, endDate, allClients); break;
-            }
-        },
-        
-        generateReceivablesReport(startDate, endDate, clients) {
-            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const statusFilter = document.getElementById('reportReceivableStatus').value;
-            const clientFilter = document.getElementById('reportReceivableClient').value;
-
-            const filteredReceivables = receivables.filter(r => {
-                const creationDate = new Date(r.createdAt || r.date); 
-                const matchesDate = creationDate >= startDate && creationDate <= endDate;
-
-                let currentStatus = r.status;
-                 const today = new Date();
-                 today.setHours(0,0,0,0);
-                 if (currentStatus === 'Pendente' && new Date(r.dueDate) < today) {
-                        currentStatus = 'Vencido';
-                 }
-                
-                let matchesStatus = !statusFilter || currentStatus === statusFilter;
-                let matchesClient = !clientFilter || r.clientId === clientFilter;
-
-                return matchesDate && matchesStatus && matchesClient;
-            });
-
-            const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
-            const rows = filteredReceivables.map(r => {
-                const client = clients.find(c => c.id === r.clientId);
-                 let status = r.status;
-                        const today = new Date();
-                        today.setHours(0,0,0,0);
-                 if (status === 'Pendente' && new Date(r.dueDate) < today) {
-                            status = 'Vencido';
-                 }
-                return [
-                    client ? client.name : 'N/A',
-                    r.description,
-                    Utils.formatCurrency(r.value),
-                    Utils.formatDate(r.dueDate),
-                    status
-                ];
-            });
-            this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows, rawData: filteredReceivables };
-
-            const statusSummary = { 'Pago': 0, 'Pendente': 0, 'Vencido': 0 };
-            filteredReceivables.forEach(r => {
-                 const today = new Date();
-                 today.setHours(0,0,0,0);
-                 if (r.status === 'Pago') {
-                        statusSummary['Pago'] += r.value;
-                 } else if (new Date(r.dueDate) < today) {
-                        statusSummary['Vencido'] += r.value;
-                 } else {
-                        statusSummary['Pendente'] += r.value;
-                 }
-            });
-            
-            this.renderChart('pie', 
-                ['Pagas', 'Pendentes', 'Vencidas'], 
-                'Valor (R$)', 
-                [statusSummary.Pago, statusSummary.Pendente, statusSummary.Vencido],
-                ['#10B981', '#F59E0B', '#EF4444']
-            );
-            
-            const debtors = {};
-            filteredReceivables.filter(r => r.status !== 'Pago').forEach(r => {
-                const clientName = (clients.find(c => c.id === r.clientId) || {name: 'N/A'}).name;
-                debtors[clientName] = (debtors[clientName] || 0) + r.value;
-            });
-            const topDebtors = Object.entries(debtors).sort(([, a], [, b]) => b - a).slice(0, 5)
-                .map(([name, value]) => [name, Utils.formatCurrency(value)]);
-
-            document.getElementById('topProductsList').innerHTML = topDebtors.length > 0 ?
-                topDebtors.map(([name, value]) => `
-                    <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                        <span>${name}</span>
-                        <span style="font-weight: bold;">${value}</span>
-                    </div>`).join('') :
-                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum devedor no período.</p>';
-
-            Notification.success('Relatório de contas a receber gerado!');
-        },
-
-        generateSalesReport(sales, startDate, endDate, clients) {
-            const headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
-            const rows = sales.map(s => {
-                const client = s.clientId ? clients.find(c => c.id === s.clientId) : null;
-                return [Utils.formatDate(s.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(s.total), s.paymentMethod];
-            });
-            this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows, rawData: sales };
-            this.updateTopList(sales, 'products');
-            this.createSalesChart(sales, startDate, endDate);
-            Notification.success('Relatório de vendas gerado!');
-        },
-        generateFinancialReport(sales, expenses, startDate, endDate) {
-            const data = [
-                ...sales.map(s => ({ date: s.date, type: 'Entrada', description: `Venda #${s.id.substring(0,6)}`, value: s.total })),
-                ...expenses.map(e => ({ date: e.date, type: 'Saída', description: e.description, value: e.value }))
-            ].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            const headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
-            const rows = data.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
-            this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows, rawData: data };
-            
-            document.getElementById('topProductsList').innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">N/A para este relatório.</p>';
-
-            this.createFinancialChart(sales, expenses);
-            Notification.success('Relatório financeiro gerado!');
-        },
-        
-        generateProductsReport(sales, products) {
-            const productStats = {};
+            // Produtos mais vendidos
+            const productSales = {};
             sales.forEach(sale => {
-                sale.products.forEach(item => {
-                    if (!productStats[item.productId]) {
-                        const pInfo = products.find(p => p.id === item.productId);
-                        productStats[item.productId] = { name: pInfo ? pInfo.name : 'Produto Excluído', quantity: 0, revenue: 0 };
-                    }
-                    productStats[item.productId].quantity += item.quantity;
-                    productStats[item.productId].revenue += item.price * item.quantity;
+                sale.items.forEach(item => {
+                    productSales[item.name] = (productSales[item.name] || 0) + item.quantity;
                 });
             });
-            
-            const sortedProducts = Object.values(productStats).sort((a,b) => b.revenue - a.revenue);
+            const topProducts = Object.entries(productSales).sort((a,b) => b[1] - a[1]).slice(0, 5);
 
-            const headers = ['Produto', 'Qtd. Vendida', 'Receita Total'];
-            const rows = sortedProducts.map(p => [p.name, p.quantity, Utils.formatCurrency(p.revenue)]);
-            this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows, rawData: sortedProducts };
-
-            this.updateTopList(sales, 'products');
-            this.createProductChart(sortedProducts.slice(0, 10));
-            Notification.success('Relatório de produtos gerado!');
+            this.updateSummary(totalSales, 0, totalSales, salesCount);
+            this.updateTopList(topProducts.map(([name, qty]) => `${name}: ${qty} vendidos`));
+            this.updateChart(sales, 'vendas');
+            this.updateDetailTable(sales, 'vendas');
         },
-        generateClientsReport(sales, clients) {
-            const clientStats = {};
+        generateFinancialReport(startDate, endDate) {
+            const cashFlow = Utils.loadFromStorage(CONFIG.storageKeys.cashFlow).filter(cf => cf.date >= startDate && cf.date <= endDate);
+            
+            const totalEntradas = cashFlow.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
+            const totalSaidas = cashFlow.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
+            const profit = totalEntradas - totalSaidas;
+
+            this.updateSummary(totalEntradas, totalSaidas, profit, cashFlow.length);
+            this.updateTopList(['Relatório financeiro gerado com sucesso']);
+            this.updateChart(cashFlow, 'financeiro');
+            this.updateDetailTable(cashFlow, 'financeiro');
+        },
+        generateProductsReport(startDate, endDate) {
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
+                const saleDate = s.date.split('T')[0];
+                return saleDate >= startDate && saleDate <= endDate;
+            });
+
+            // Produtos com baixo estoque
+            const lowStock = products.filter(p => p.quantity <= 5).slice(0, 5);
+
+            this.updateSummary(0, 0, 0, products.length);
+            this.updateTopList(lowStock.length > 0 ? lowStock.map(p => `${p.name}: ${p.quantity} em estoque`) : ['Todos os produtos com estoque adequado']);
+            this.updateChart(products, 'produtos');
+            this.updateDetailTable(products, 'produtos');
+        },
+        generateClientsReport(startDate, endDate) {
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales).filter(s => {
+                const saleDate = s.date.split('T')[0];
+                return saleDate >= startDate && saleDate <= endDate;
+            });
+
+            // Clientes que mais compraram
+            const clientSales = {};
             sales.forEach(sale => {
-                const clientId = sale.clientId || 'guest';
-                if (!clientStats[clientId]) {
-                    const cInfo = clients.find(c => c.id === clientId);
-                    clientStats[clientId] = { name: cInfo ? cInfo.name : 'Consumidor Final', purchases: 0, total: 0 };
+                if (sale.clientId) {
+                    clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
                 }
-                clientStats[clientId].purchases++;
-                clientStats[clientId].total += sale.total;
             });
-            
-            const sortedClients = Object.values(clientStats).sort((a,b) => b.total - a.total);
-            const headers = ['Cliente', 'Nº de Compras', 'Total Gasto'];
-            const rows = sortedClients.map(c => [c.name, c.purchases, Utils.formatCurrency(c.total)]);
-            this.updateReportTable(headers, rows);
-            this.currentReportData = { headers, rows, rawData: sortedClients };
+            const topClients = Object.entries(clientSales).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            const topClientsNames = topClients.map(([id, total]) => {
+                const client = clients.find(c => c.id === id);
+                return `${client ? client.name : 'N/A'}: ${Utils.formatCurrency(total)}`;
+            });
 
-            this.updateTopList(sales, 'clients', clients);
-            this.createClientChart(sortedClients.slice(0, 10));
-            Notification.success('Relatório de clientes gerado!');
+            this.updateSummary(0, 0, 0, clients.length);
+            this.updateTopList(topClientsNames.length > 0 ? topClientsNames : ['Nenhuma compra no período']);
+            this.updateChart(clients, 'clientes');
+            this.updateDetailTable(clients, 'clientes');
         },
-        updateTopList(sales, type, clients = []) {
-            let topList = [];
-            if (type === 'products') {
-                const productSales = {};
-                sales.forEach(sale => sale.products.forEach(p => productSales[p.name] = (productSales[p.name] || 0) + p.quantity));
-                topList = Object.entries(productSales).sort(([, a], [, b]) => b - a).slice(0, 5);
-            } else { // clients
-                const clientSales = {};
-                sales.forEach(sale => {
-                    if(sale.clientId) clientSales[sale.clientId] = (clientSales[sale.clientId] || 0) + sale.total;
-                });
-                topList = Object.entries(clientSales).sort(([,a],[,b])=>b-a).slice(0,5).map(([id, total]) => {
-                    const client = clients.find(c => c.id === id);
-                    return [client ? client.name : 'Excluído', Utils.formatCurrency(total)];
-                });
-            }
-             document.getElementById('topProductsList').innerHTML = topList.length > 0 ?
-                 topList.map(([name, value]) => `
-                                <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                                        <span>${name}</span>
-                                        <span style="font-weight: bold;">${value}</span>
-                                </div>`).join('') :
-                '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum dado no período.</p>';
-        },
-        
-        createSalesChart(sales, startDate, endDate) {
-            const chartData = {};
-            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                chartData[d.toISOString().split('T')[0]] = 0;
-            }
-            sales.forEach(s => chartData[s.date.split('T')[0]] += s.total);
-
-            this.renderChart('line', Object.keys(chartData).map(d => Utils.formatDate(d)), 'Vendas (R$)', Object.values(chartData), '#3B82F6');
-        },
-        
-        createFinancialChart(sales, expenses) {
-            const totalSales = sales.reduce((sum, s) => sum + s.total, 0);
-            const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
+        generateReceivablesReport(startDate, endDate) {
+            let receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).filter(r => r.dueDate >= startDate && r.dueDate <= endDate);
             
-            this.renderChart('doughnut', ['Vendas', 'Despesas'], '', [totalSales, totalExpenses], ['#10B981', '#EF4444']);
+            // Filtros adicionais
+            const clientFilter = document.getElementById('reportReceivableClient').value;
+            const statusFilter = document.getElementById('reportReceivableStatus').value;
+            
+            if (clientFilter) receivables = receivables.filter(r => r.clientId === clientFilter);
+            if (statusFilter) receivables = receivables.filter(r => r.status === statusFilter);
+
+            const totalPending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+            const totalOverdue = receivables.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
+            const totalPaid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
+
+            // Maiores devedores
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const debtors = {};
+            receivables.filter(r => r.status !== 'Pago').forEach(r => {
+                debtors[r.clientId] = (debtors[r.clientId] || 0) + r.value;
+            });
+            const topDebtors = Object.entries(debtors).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            const topDebtorsNames = topDebtors.map(([id, debt]) => {
+                const client = clients.find(c => c.id === id);
+                return `${client ? client.name : 'N/A'}: ${Utils.formatCurrency(debt)}`;
+            });
+
+            this.updateSummary(totalPaid, totalOverdue, totalPending, receivables.length);
+            this.updateTopList(topDebtorsNames.length > 0 ? topDebtorsNames : ['Nenhum devedor no período']);
+            this.updateChart(receivables, 'contas_a_receber');
+            this.updateDetailTable(receivables, 'contas_a_receber');
         },
-        
-        createProductChart(products) {
-            this.renderChart('bar', products.map(p => p.name), 'Receita (R$)', products.map(p => p.revenue), '#10B981');
+        updateSummary(sales, expenses, profit, count) {
+            document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(sales);
+            document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(expenses);
+            document.getElementById('reportProfit').textContent = Utils.formatCurrency(profit);
+            document.getElementById('reportSalesCount').textContent = count;
+            
+            const profitElement = document.getElementById('reportProfit');
+            profitElement.style.color = profit >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
         },
-        createClientChart(clients) {
-            this.renderChart('bar', clients.map(c => c.name), 'Total Gasto (R$)', clients.map(c => c.total), '#3B82F6');
+        updateTopList(items) {
+            const container = document.getElementById('topProductsList');
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhum destaque encontrado.</p>';
+            } else {
+                container.innerHTML = items.map((item, index) => `
+                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--primary-color); font-weight: 600;">${index + 1}.</span> ${item}
+                    </div>
+                `).join('');
+            }
         },
-        renderChart(type, labels, label, data, color) {
+        updateChart(data, type) {
             const ctx = document.getElementById('reportChart').getContext('2d');
             if (this.chart) this.chart.destroy();
+
+            let chartData = {};
+            switch (type) {
+                case 'vendas':
+                    const salesByDay = {};
+                    data.forEach(sale => {
+                        const day = Utils.formatDate(sale.date.split('T')[0]);
+                        salesByDay[day] = (salesByDay[day] || 0) + sale.total;
+                    });
+                    chartData = { labels: Object.keys(salesByDay), datasets: [{ label: 'Vendas (R$)', data: Object.values(salesByDay), backgroundColor: '#3B82F6' }] };
+                    break;
+                case 'financeiro':
+                    const entradas = data.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
+                    const saidas = data.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
+                    chartData = { labels: ['Entradas', 'Saídas'], datasets: [{ data: [entradas, saidas], backgroundColor: ['#10B981', '#EF4444'] }] };
+                    break;
+                case 'produtos':
+                    const inStock = data.filter(p => p.quantity > 0).length;
+                    const outOfStock = data.filter(p => p.quantity <= 0).length;
+                    chartData = { labels: ['Em Estoque', 'Esgotados'], datasets: [{ data: [inStock, outOfStock], backgroundColor: ['#10B981', '#EF4444'] }] };
+                    break;
+                case 'clientes':
+                    chartData = { labels: ['Total de Clientes'], datasets: [{ label: 'Clientes', data: [data.length], backgroundColor: '#3B82F6' }] };
+                    break;
+                case 'contas_a_receber':
+                    const pending = data.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+                    const overdue = data.filter(r => r.status === 'Vencido').reduce((sum, r) => sum + r.value, 0);
+                    const paid = data.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
+                    chartData = { labels: ['Pendentes', 'Vencidas', 'Pagas'], datasets: [{ data: [pending, overdue, paid], backgroundColor: ['#F59E0B', '#EF4444', '#10B981'] }] };
+                    break;
+            }
+
             this.chart = new Chart(ctx, {
-                type,
-                data: {
-                    labels,
-                    datasets: [{ label, data, backgroundColor: color, borderColor: color, fill: type === 'line' }]
-                },
+                type: type === 'vendas' || type === 'clientes' ? 'bar' : 'doughnut',
+                data: chartData,
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#F1F5F9' } } },
-                    scales: {
-                        y: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        x: { display: type !== 'doughnut' && type !== 'pie', ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
-                    }
+                    scales: type === 'vendas' || type === 'clientes' ? {
+                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                    } : {}
                 }
             });
         },
-        updateReportTable(headers, rows) {
+        updateDetailTable(data, type) {
             const thead = document.getElementById('reportTableHead');
             const tbody = document.getElementById('reportTableBody');
-            
-            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado</td></tr>`;
-                return;
+
+            let headers = [];
+            let rows = [];
+
+            switch (type) {
+                case 'vendas':
+                    headers = ['Data', 'Cliente', 'Total', 'Pagamento'];
+                    const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+                    rows = data.map(sale => {
+                        const client = clients.find(c => c.id === sale.clientId);
+                        return [Utils.formatDateTime(sale.date), client ? client.name : 'Consumidor Final', Utils.formatCurrency(sale.total), sale.paymentMethod];
+                    });
+                    break;
+                case 'financeiro':
+                    headers = ['Data', 'Tipo', 'Descrição', 'Valor'];
+                    rows = data.map(cf => [Utils.formatDate(cf.date), cf.type === 'entrada' ? 'Entrada' : 'Saída', cf.description, Utils.formatCurrency(cf.value)]);
+                    break;
+                case 'produtos':
+                    headers = ['Código', 'Nome', 'Estoque', 'Preço Venda'];
+                    rows = data.map(p => [p.refCode, p.name, p.quantity, Utils.formatCurrency(p.salePrice)]);
+                    break;
+                case 'clientes':
+                    headers = ['Nome', 'Telefone', 'Cadastro'];
+                    rows = data.map(c => [c.name, c.phone, Utils.formatDate(c.createdAt)]);
+                    break;
+                case 'contas_a_receber':
+                    headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
+                    const clientsReceivables = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+                    rows = data.map(r => {
+                        const client = clientsReceivables.find(c => c.id === r.clientId);
+                        return [client ? client.name : 'N/A', r.description, Utils.formatCurrency(r.value), Utils.formatDate(r.dueDate), r.status];
+                    });
+                    break;
             }
-            tbody.innerHTML = rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
+
+            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            tbody.innerHTML = rows.length > 0 ? rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${headers.length}" class="text-center" style="padding: 40px;">Nenhum dado encontrado</td></tr>`;
         },
-        
         exportToPDF() {
-            try {
-                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-                    return Notification.error('Biblioteca jsPDF não carregada.');
-                }
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
-                if (typeof doc.autoTable !== 'function') {
-                    return Notification.error('Plugin jsPDF-AutoTable não está funcionando. Recarregue a página.');
-                }
+            if (!window.jsPDF) return Notification.error('Biblioteca PDF não carregada!');
+            
+            const { jsPDF } = window.jsPDF;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(20);
+            doc.text('Relatório - ' + CONFIG.company.name, 20, 30);
+            
+            // Período
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            doc.setFontSize(12);
+            doc.text(`Período: ${Utils.formatDate(startDate)} a ${Utils.formatDate(endDate)}`, 20, 45);
+            
+            // Resumo
+            const totalSales = document.getElementById('reportTotalSales').textContent;
+            const totalExpenses = document.getElementById('reportTotalExpenses').textContent;
+            const profit = document.getElementById('reportProfit').textContent;
+            
+            doc.text(`Total de Vendas: ${totalSales}`, 20, 60);
+            doc.text(`Total de Despesas: ${totalExpenses}`, 20, 70);
+            doc.text(`Lucro Líquido: ${profit}`, 20, 80);
+            
+            // Tabela
+            const table = document.getElementById('reportDetailTable');
+            if (table && window.jsPDF.autoTable) {
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+                const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
+                    Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+                );
                 
-                if (!this.currentReportData || this.currentReportData.rows.length === 0) {
-                    return Notification.warning('Gere um relatório com dados para poder exportar.');
-                }
-                
-                const { headers, rows } = this.currentReportData;
-                const startDate = Utils.formatDate(document.getElementById('reportStartDate').value);
-                const endDate = Utils.formatDate(document.getElementById('reportEndDate').value);
-                const reportType = document.getElementById('reportType').options[document.getElementById('reportType').selectedIndex].text;
-                
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const margin = 15;
-                let finalY = margin;
-
-                const drawFooter = () => {
-                    const pageCount = doc.internal.getNumberOfPages();
-                    doc.setFontSize(8);
-                    doc.setTextColor(150);
-                    for (let i = 1; i <= pageCount; i++) {
-                        doc.setPage(i);
-                        doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-                        doc.text(`Gerado em: ${Utils.formatDateTime(new Date())}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
-                    }
-                };
-                
-                doc.setFontSize(18);
-                doc.setFont('helvetica', 'bold');
-                doc.text(CONFIG.company.name, margin, finalY);
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(100);
-                doc.text(`Relatório de ${reportType}`, margin, finalY + 8);
-                doc.text(`Período: ${startDate} a ${endDate}`, margin, finalY + 14);
-
-                finalY += 25;
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Resumo do Período', margin, finalY);
-                doc.setLineWidth(0.2);
-                doc.line(margin, finalY + 1, pageWidth - margin, finalY + 1);
-                finalY += 8;
-                
-                doc.setFont('helvetica', 'normal');
-                const summary = [
-                    ['Total de Vendas:', document.getElementById('reportTotalSales').textContent],
-                    ['Total de Despesas:', document.getElementById('reportTotalExpenses').textContent],
-                    ['Lucro Líquido:', document.getElementById('reportProfit').textContent],
-                    ['Nº de Vendas:', document.getElementById('reportSalesCount').textContent + ' venda(s)']
-                ];
-
-                // AJUSTE PARA TOTAL PENDENTE DO CLIENTE
-                if (this.currentReportType === 'contas_a_receber') {
-                    const clientId = document.getElementById('reportReceivableClient').value;
-                    if (clientId && this.currentReportData.rawData) {
-                        const clientName = document.getElementById('reportReceivableClient').options[document.getElementById('reportReceivableClient').selectedIndex].text;
-                        
-                        const clientTotalPending = this.currentReportData.rawData
-                            .filter(r => r.status !== 'Pago')
-                            .reduce((sum, item) => sum + item.value, 0);
-
-                        if (clientTotalPending > 0) {
-                            summary.push([`Total a Receber (${clientName.split(' ')[0]}):`, Utils.formatCurrency(clientTotalPending)]);
-                        }
-                    }
-                }
-
-                summary.forEach(item => {
-                    doc.text(item[0], margin, finalY);
-                    doc.text(item[1], pageWidth / 2, finalY, { align: 'left' });
-                    finalY += 6;
-                });
-                
-                finalY += 5;
-
-                const bodyData = rows.map(row => row.map(cell => String(cell).replace(/<[^>]*>/g, '')));
-
                 doc.autoTable({
                     head: [headers],
-                    body: bodyData,
-                    startY: finalY,
-                    theme: 'grid',
-                    headStyles: {
-                        fillColor: [59, 130, 246],
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold'
-                    },
-                    alternateRowStyles: {
-                        fillColor: [245, 245, 245]
-                    },
-                    styles: {
-                        fontSize: 9,
-                        cellPadding: 2.5
-                    },
-                    margin: { left: margin, right: margin },
+                    body: rows,
+                    startY: 90,
+                    styles: { fontSize: 8 }
                 });
-                
-                drawFooter();
-
-                doc.save(`relatorio_${this.currentReportType}_${new Date().toISOString().split('T')[0]}.pdf`);
-                Notification.success('Relatório PDF gerado com sucesso!');
-
-            } catch (error) {
-                console.error("ERRO AO GERAR PDF:", error);
-                Notification.error(`Falha ao gerar o PDF: ${error.message}`);
             }
+            
+            doc.save(`relatorio_${new Date().toISOString().split('T')[0]}.pdf`);
+            Notification.success('Relatório PDF exportado!');
         },
-
         exportToCSV() {
-            if (!this.currentReportData || this.currentReportData.rows.length === 0) {
-                return Notification.warning('Gere um relatório primeiro para exportar.');
-            }
-            const { headers, rows } = this.currentReportData;
-            const csvContent = [
-                headers.join(','),
-                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""').replace(/<[^>]*>/g, '')}"`).join(','))
-            ].join('\n');
-            Clients.downloadCSV(csvContent, `relatorio_${this.currentReportType}`);
+            const table = document.getElementById('reportDetailTable');
+            if (!table) return Notification.warning('Nenhum relatório para exportar!');
+            
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
+                Array.from(tr.querySelectorAll('td')).map(td => `"${td.textContent}"`)
+            );
+            
+            const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+            Clients.downloadCSV(csvContent, 'relatorio');
         }
     };
 
-    // Módulo Configurações
+    // Módulo de Configurações
     const Settings = {
         init() {
             document.getElementById('downloadBackup').addEventListener('click', () => this.downloadBackup());
+            document.getElementById('restoreFile').addEventListener('change', (e) => this.handleFileSelect(e));
             document.getElementById('restoreBackup').addEventListener('click', () => this.restoreBackup());
-            document.getElementById('restoreFile').addEventListener('change', e => {
-                document.getElementById('restoreBackup').disabled = !e.target.files.length;
-            });
             document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
         },
         updateBackupStats() {
-            document.getElementById('backupClientsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.clients).length;
-            document.getElementById('backupProductsCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.products).length;
-            document.getElementById('backupSalesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.sales).length;
-            document.getElementById('backupReceivablesCount').textContent = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable).length;
+            const clients = Utils.loadFromStorage(CONFIG.storageKeys.clients);
+            const products = Utils.loadFromStorage(CONFIG.storageKeys.products);
+            const sales = Utils.loadFromStorage(CONFIG.storageKeys.sales);
+            const receivables = Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+
+            document.getElementById('backupClientsCount').textContent = clients.length;
+            document.getElementById('backupProductsCount').textContent = products.length;
+            document.getElementById('backupSalesCount').textContent = sales.length;
+            document.getElementById('backupReceivablesCount').textContent = receivables.length;
         },
         downloadBackup() {
-            const backupData = {
-                version: '2.9.2', timestamp: new Date().toISOString(),
-                data: {}
-            };
-            for (const key in CONFIG.storageKeys) {
-                if (key !== 'lastActivePage') {
-                    backupData.data[key] = Utils.loadFromStorage(CONFIG.storageKeys[key]);
+            const backup = {
+                version: '2.9.3',
+                timestamp: new Date().toISOString(),
+                company: CONFIG.company,
+                data: {
+                    clients: Utils.loadFromStorage(CONFIG.storageKeys.clients),
+                    products: Utils.loadFromStorage(CONFIG.storageKeys.products),
+                    sales: Utils.loadFromStorage(CONFIG.storageKeys.sales),
+                    cashFlow: Utils.loadFromStorage(CONFIG.storageKeys.cashFlow),
+                    expenses: Utils.loadFromStorage(CONFIG.storageKeys.expenses),
+                    accountsReceivable: Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable)
                 }
-            }
-            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `backup_flor_de_maria_${new Date().toISOString().split('T')[0]}.json`;
             link.click();
-            Notification.success('Backup baixado!');
+            Notification.success('Backup baixado com sucesso!');
+        },
+        handleFileSelect(event) {
+            const file = event.target.files[0];
+            document.getElementById('restoreBackup').disabled = !file;
         },
         restoreBackup() {
-            const file = document.getElementById('restoreFile').files[0];
-            if (!file) return Notification.error('Selecione um arquivo!');
-            if (!confirm('Restaurar backup? Todos os dados atuais serão substituídos!')) return;
+            const fileInput = document.getElementById('restoreFile');
+            const file = fileInput.files[0];
+            
+            if (!file) return Notification.error('Selecione um arquivo de backup!');
+            if (!confirm('Tem certeza? Isso substituirá todos os dados atuais!')) return;
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const backupData = JSON.parse(e.target.result);
-                    if (!backupData.data) throw new Error('Formato inválido.');
-                    for (const key in backupData.data) {
-                        if (CONFIG.storageKeys[key]) {
-                            Utils.saveToStorage(CONFIG.storageKeys[key], backupData.data[key]);
+                    const backup = JSON.parse(e.target.result);
+                    
+                    if (!backup.data) throw new Error('Formato de backup inválido');
+                    
+                    // Restaurar dados
+                    Object.entries(backup.data).forEach(([key, data]) => {
+                        const storageKey = CONFIG.storageKeys[key];
+                        if (storageKey) {
+                            Utils.saveToStorage(storageKey, data || []);
                         }
-                    }
-                    this.updateBackupStats();
-                    Navigation.navigateTo('dashboard');
+                    });
+                    
                     Notification.success('Backup restaurado com sucesso!');
+                    setTimeout(() => location.reload(), 1500);
                 } catch (error) {
-                    Notification.error('Erro ao restaurar: ' + error.message);
+                    console.error('Erro ao restaurar backup:', error);
+                    Notification.error('Erro ao restaurar backup. Verifique o arquivo.');
                 }
             };
             reader.readAsText(file);
         },
         clearAllData() {
-            if (prompt("Para confirmar, digite 'LIMPAR DADOS' em maiúsculas.") !== 'LIMPAR DADOS') {
-                return Notification.warning('Ação cancelada.');
-            }
+            if (!confirm('ATENÇÃO: Isso apagará TODOS os dados do sistema. Tem certeza?')) return;
+            if (!confirm('Última confirmação: Todos os dados serão perdidos permanentemente!')) return;
+
             Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
-            
-            this.updateBackupStats();
-            Navigation.navigateTo('dashboard');
-            Notification.success('Todos os dados foram limpos!');
+            Notification.success('Todos os dados foram apagados!');
+            setTimeout(() => location.reload(), 1500);
         }
     };
-    
+
     // Inicialização do Sistema
     document.addEventListener('DOMContentLoaded', () => {
-        Auth.init();
-        Navigation.init();
-        Clients.init();
-        Products.init();
-        Sales.init();
-        Receipts.init();
-        CashFlow.init();
-        Expenses.init();
-        Receivables.init();
-        Reports.init();
-        Settings.init();
+        try {
+            // Inicializar módulos
+            Auth.init();
+            Navigation.init();
+            Clients.init();
+            Products.init();
+            Sales.init();
+            Receipts.init();
+            CashFlow.init();
+            Expenses.init();
+            Receivables.init();
+            Reports.init();
+            Settings.init();
 
-        document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') Modal.hide();
-        });
+            // Event listeners globais
+            document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target.id === 'modal') Modal.hide();
+            });
 
-        console.log('SGI - Flor de Maria v2.9.2 (Responsiveness Fix) iniciado!');
+            console.log('Sistema de Gestão Integrado - Flor de Maria v2.9.3 (Responsiveness Enhanced) carregado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao inicializar o sistema:', error);
+            Notification.error('Erro ao carregar o sistema. Verifique o console.');
+        }
     });
     </script>
 </body>
 </html>
+
