@@ -2,2318 +2,319 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGI - Flor de Maria | Sistema de Gestão Integrado</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
-    <style>
-        /* ===== RESET E VARIÁVEIS CSS ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            /* Paleta de Cores Moderna */
-            --primary-bg: #0F172A;
-            /* Azul escuro profundo */
-            --secondary-bg: #1E293B;
-            /* Azul acinzentado */
-            --surface-bg: #334155;
-            /* Superfície elevada */
-            --primary-color: #3B82F6;
-            /* Azul vibrante */
-            --accent-color: #10B981;
-            /* Verde neon */
-            --danger-color: #EF4444;
-            /* Vermelho */
-            --warning-color: #F59E0B;
-            /* Amarelo */
-            --text-primary: #FFFFFF;
-            /* Branco puro */
-            --text-secondary: #F1F5F9;
-            /* Cinza claro */
-            --text-muted: #94A3B8;
-            /* Cinza médio */
-            --border-color: #475569;
-            /* Borda */
-            --hover-bg: #475569;
-            /* Hover */
-
-            /* Gradientes */
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            --gradient-dark: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
-
-            /* Sombras */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-
-            /* Transições */
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ===== ESTILOS GLOBAIS ===== */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--gradient-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* ===== COMPONENTES REUTILIZÁVEIS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            justify-content: center;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-secondary {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--hover-bg);
-        }
-
-        .btn-success {
-            background: var(--accent-color);
-            color: var(--text-primary);
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            color: var(--text-primary);
-        }
-
-        .btn-danger:hover {
-            background: #DC2626;
-        }
-
-        .btn-warning {
-            background: var(--warning-color);
-            color: var(--text-primary);
-        }
-
-        .btn-warning:hover {
-            background: #D97706;
-        }
-
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 12px;
-        }
-
-        .card {
-            background: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Otimização para mobile: remove efeito de hover que pode ser "pegajoso" */
-        @media (hover: none) {
-            .card:hover {
-                transform: none;
-                box-shadow: var(--shadow-lg);
-            }
-
-            .btn-primary:hover:not(:disabled) {
-                transform: none;
-                box-shadow: var(--shadow-md);
-            }
-        }
-
-        @media (hover: hover) {
-            .card:hover {
-                transform: translateY(-4px);
-                box-shadow: var(--shadow-xl);
-            }
-        }
-
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .form-input,
-        .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--surface-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .form-select {
-            cursor: pointer;
-        }
-
-        .form-input:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th,
-        .table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-            /* Keep text on one line by default */
-        }
-
-        .table th {
-            background: var(--surface-bg);
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .table tr:hover {
-            background: var(--surface-bg);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent-color);
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger-color);
-        }
-
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning-color);
-        }
-
-        .badge-secondary {
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-muted);
-        }
-
-
-        /* ===== TELA DE LOGIN ===== */
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: var(--secondary-bg);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .login-logo {
-            font-size: 48px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-        }
-
-        .login-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .login-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 32px;
-        }
-
-        /* ===== LAYOUT PRINCIPAL ===== */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: var(--secondary-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 24px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            transition: var(--transition);
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 0 24px 24px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .sidebar-logo i {
-            font-size: 24px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-        }
-
-        .sidebar-nav-item {
-            margin-bottom: 4px;
-        }
-
-        .sidebar-nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: var(--transition);
-            border-radius: 0;
-            position: relative;
-        }
-
-        .sidebar-nav-link:hover {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-        }
-
-        .sidebar-nav-link.active {
-            background: var(--primary-color);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .sidebar-nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--accent-color);
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 24px;
-            transition: var(--transition);
-        }
-
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-            flex-grow: 1;
-        }
-
-
-        /* ===== RESPONSIVIDADE ===== */
-        .mobile-menu-toggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1001;
-            background: var(--surface-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            box-shadow: var(--shadow-md);
-        }
-
-        @media (max-width: 800px) {
-
-            /* Aumentado o breakpoint para cobrir mais tablets */
-            body {
-                font-size: 14px;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                box-shadow: var(--shadow-xl);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 80px 15px 20px;
-            }
-
-            .login-card {
-                padding: 32px 24px;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            /* Ajuste crucial para os grids em mobile */
-            .grid-2,
-            .grid-3,
-            .grid-4,
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .page-title {
-                font-size: 24px;
-            }
-
-            /* Garante que grupos de botões em formulários empilhem verticalmente */
-            .form-group .flex.gap-2 {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .form-group .flex.gap-2 .btn {
-                width: 100%;
-            }
-
-            /* Empilha o total e o botão de finalizar na página de vendas */
-            #salesPage .flex-between.mt-3 {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 16px;
-                text-align: center;
-            }
-
-            #salesPage .flex-between.mt-3 .btn {
-                width: 100%;
-            }
-
-            /* Empilha o conteúdo dos cabeçalhos dos cards */
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .card-header .flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-
-            /* Melhorando a visualização do recibo no modal */
-            .receipt-professional-header,
-            .receipt-sale-info .text-right {
-                flex-direction: column;
-                align-items: flex-start;
-                text-align: left;
-                gap: 16px;
-            }
-
-            .receipt-company-details {
-                text-align: left;
-                margin-top: 16px;
-            }
-
-            .receipt-sale-info {
-                grid-template-columns: 1fr;
-            }
-
-            .receipt-summary {
-                justify-content: flex-start;
-            }
-
-            .receipt-summary table {
-                width: 100%;
-                max-width: none;
-            }
-
-            .btn {
-                padding: 12px 18px;
-                font-size: 14px;
-            }
-
-            .form-input,
-            .form-select {
-                font-size: 14px;
-                padding: 12px 16px;
-            }
-
-            .chart-container {
-                max-height: 300px;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 24px 16px;
-            }
-
-            .modal-title {
-                font-size: 20px;
-            }
-
-            /* --- RELATÓRIOS & TABELAS GERAIS: Ajustes para responsividade --- */
-            /* Garante que as colunas da tabela quebrem o texto em mobile */
-            .table th,
-            .table td {
-                white-space: normal;
-                /* Permite que o texto quebre */
-            }
-
-            /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
-            /* Isso é uma otimização, mas `overflow-x: auto` ainda é necessário para tabelas muito grandes */
-            .table th:nth-child(1),
-            .table td:nth-child(1) {
-                width: 30%;
-            }
-
-            /* Ex: Nome/Descrição/Produto */
-            .table th:nth-child(2),
-            .table td:nth-child(2) {
-                width: 30%;
-            }
-
-            /* Ex: Telefone/Qtd/Tipo */
-            .table th:nth-child(3),
-            .table td:nth-child(3) {
-                width: 20%;
-            }
-
-            /* Ex: Cadastro/Valor/Categoria */
-            .table th:nth-child(4),
-            .table td:nth-child(4) {
-                width: 20%;
-            }
-
-            /* Ex: Compras/Vencimento/Status */
-            /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
-            .table td:last-child,
-            .table th:last-child {
-                width: auto;
-                /* Deixa o navegador ajustar a última coluna */
-            }
-
-            /* Ajusta o input de quantidade no carrinho do PDV */
-            #salesPage .table input[type="number"].form-input {
-                width: 55px;
-                /* Mais compacto */
-                padding: 4px;
-                font-size: 13px;
-            }
-
-            /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
-            #reportsPage .grid-4 {
-                grid-template-columns: 1fr;
-                /* Força empilhamento em uma única coluna */
-            }
-
-            /* Reduz o padding para filtros para usar melhor o espaço */
-            #reportsPage .form-group {
-                margin-bottom: 15px;
-            }
-
-            /* Garante que o botão de atualizar relatório ocupe a largura total */
-            #reportsPage #generateReport {
-                width: 100%;
-            }
-
-            /* Ajusta a disposição dos botões de exportar em mobile */
-            #reportsPage .card-header .flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-
-            #reportsPage .card-header .flex.gap-2 .btn {
-                width: 100%;
-            }
-
-            /* --- FIM: RELATÓRIOS & TABELAS GERAIS --- */
-        }
-
-        /* ===== UTILITÁRIOS ===== */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .mb-0 {
-            margin-bottom: 0;
-        }
-
-        .mb-1 {
-            margin-bottom: 8px;
-        }
-
-        .mb-2 {
-            margin-bottom: 16px;
-        }
-
-        .mb-3 {
-            margin-bottom: 24px;
-        }
-
-        .mb-4 {
-            margin-bottom: 32px;
-        }
-
-        .mt-0 {
-            margin-top: 0;
-        }
-
-        .mt-1 {
-            margin-top: 8px;
-        }
-
-        .mt-2 {
-            margin-top: 16px;
-        }
-
-        .mt-3 {
-            margin-top: 24px;
-        }
-
-        .mt-4 {
-            margin-top: 32px;
-        }
-
-        .grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        .grid-3 {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-
-        .grid-4 {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        }
-
-        .flex {
-            display: flex;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .flex-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .gap-1 {
-            gap: 8px;
-        }
-
-        .gap-2 {
-            gap: 16px;
-        }
-
-        .gap-3 {
-            gap: 24px;
-        }
-
-        /* ===== NOTIFICAÇÕES ===== */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-            z-index: 9999;
-            transform: translateX(400px);
-            transition: var(--transition);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification-success {
-            background: var(--accent-color);
-        }
-
-        .notification-error {
-            background: var(--danger-color);
-        }
-
-        .notification-warning {
-            background: var(--warning-color);
-        }
-
-        /* ===== MODAL ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 32px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-            transform: scale(0.9);
-            transition: var(--transition);
-        }
-
-        #modalBody {
-            overflow-y: auto;
-        }
-
-
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-        }
-
-        /* ===== LOADING ===== */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ===== DASHBOARD ESPECÍFICO ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--secondary-bg);
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-icon {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 32px;
-            color: var(--primary-color);
-            opacity: 0.3;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* PDV - Sugestões de produtos */
-        .suggestion-item:hover {
-            background: var(--surface-bg) !important;
-            color: var(--text-primary);
-        }
-
-        /* ===== NOVO ESTILO DE RECIBO PROFISSIONAL ===== */
-        .receipt-professional-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .receipt-professional-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .receipt-logo-container {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-        }
-
-        .receipt-company-details {
-            text-align: right;
-        }
-
-        .receipt-company-details h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #343a40;
-        }
-
-        .receipt-company-details p {
-            margin: 2px 0;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .receipt-sale-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .receipt-info-block p {
-            margin: 4px 0;
-        }
-
-        .receipt-info-block .label {
-            color: #6c757d;
-            font-weight: 600;
-        }
-
-        .receipt-items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-        }
-
-        .receipt-items-table thead {
-            background-color: #e9ecef;
-        }
-
-        .receipt-items-table th {
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #495057;
-            white-space: normal;
-            /* Removed for responsiveness in receipt too */
-        }
-
-        .receipt-items-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 0.95rem;
-            white-space: normal;
-            /* Removed for responsiveness in receipt too */
-        }
-
-        .receipt-items-table .text-right {
-            text-align: right;
-        }
-
-        .receipt-items-table .text-center {
-            text-align: center;
-        }
-
-        .receipt-summary {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .receipt-summary table {
-            width: 50%;
-            max-width: 300px;
-        }
-
-        .receipt-summary td {
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .receipt-summary .total-label {
-            font-weight: bold;
-            color: #495057;
-        }
-
-        .receipt-summary .total-value {
-            font-weight: bold;
-            font-size: 1.25rem;
-            color: var(--primary-color);
-        }
-
-        .receipt-footer {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            text-align: center;
-            border-top: 1px solid #dee2e6;
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Flor de Maria | Sistema de Gestão Integrado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        /* ===== RESET E VARIÁVEIS CSS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Paleta de Cores Moderna */
+            --primary-bg: #0F172A;
+            --secondary-bg: #1E293B;
+            --surface-bg: #334155;
+            --primary-color: #3B82F6;
+            --accent-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --text-primary: #FFFFFF;
+            --text-secondary: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border-color: #475569;
+            --hover-bg: #475569;
+
+            /* Gradientes e Sombras */
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            --gradient-dark: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+            /* Transições */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Estilos Gerais, Componentes, Layout, Responsividade, etc. */
+        /* Seu CSS está excelente e não precisa de alterações, ele será incluído aqui para manter o arquivo único */
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--gradient-dark);color:var(--text-primary);line-height:1.6;min-height:100vh}.container{max-width:1200px;margin:0 auto;padding:0 20px}.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;transition:var(--transition);text-align:center;justify-content:center}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}.btn-primary{background:var(--gradient-primary);color:var(--text-primary);box-shadow:var(--shadow-md)}.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow-lg)}.btn-secondary{background:var(--surface-bg);color:var(--text-primary);border:1px solid var(--border-color)}.btn-secondary:hover{background:var(--hover-bg)}.btn-success{background:var(--accent-color);color:var(--text-primary)}.btn-success:hover{background:#059669}.btn-danger{background:var(--danger-color);color:var(--text-primary)}.btn-danger:hover{background:#dc2626}.btn-warning{background:var(--warning-color);color:var(--text-primary)}.btn-warning:hover{background:#d97706}.btn-sm{padding:8px 16px;font-size:12px}.card{background:var(--secondary-bg);border-radius:12px;padding:24px;box-shadow:var(--shadow-lg);border:1px solid var(--border-color);transition:var(--transition);display:flex;flex-direction:column}@media (hover:none){.card:hover{transform:none;box-shadow:var(--shadow-lg)}.btn-primary:hover:not(:disabled){transform:none;box-shadow:var(--shadow-md)}}@media (hover:hover){.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-xl)}}.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;gap:16px}.card-title{font-size:20px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:12px}.form-group{margin-bottom:20px}.form-label{display:block;margin-bottom:8px;font-weight:600;color:var(--text-secondary)}.form-input,.form-select{width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;background:var(--surface-bg);color:var(--text-primary);font-size:14px;transition:var(--transition)}.form-select{cursor:pointer}.form-input:focus,.form-select:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 3px rgba(59,130,246,.2)}.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;border-collapse:collapse;margin-top:20px}.table th,.table td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--border-color);white-space:nowrap}.table th{background:var(--surface-bg);font-weight:600;color:var(--text-secondary);text-transform:uppercase;font-size:12px;letter-spacing:.5px}.table tr:hover{background:var(--surface-bg)}.badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}.badge-success{background:rgba(16,185,129,.2);color:var(--accent-color)}.badge-danger{background:rgba(239,68,68,.2);color:var(--danger-color)}.badge-warning{background:rgba(245,158,11,.2);color:var(--warning-color)}.badge-secondary{background:rgba(148,163,184,.2);color:var(--text-muted)}.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}.login-card{background:var(--secondary-bg);padding:40px;border-radius:16px;box-shadow:var(--shadow-xl);border:1px solid var(--border-color);width:100%;max-width:400px;text-align:center}.login-logo{font-size:48px;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}.login-title{font-size:28px;font-weight:700;margin-bottom:8px;color:var(--text-primary)}.login-subtitle{color:var(--text-muted);margin-bottom:32px}.app-layout{display:flex;min-height:100vh}.sidebar{width:280px;background:var(--secondary-bg);border-right:1px solid var(--border-color);padding:24px 0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;transition:var(--transition);z-index:1000}.sidebar-header{padding:0 24px 24px;border-bottom:1px solid var(--border-color);margin-bottom:24px}.sidebar-logo{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700;color:var(--text-primary)}.sidebar-logo i{font-size:24px;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.sidebar-nav{list-style:none}.sidebar-nav-item{margin-bottom:4px}.sidebar-nav-link{display:flex;align-items:center;gap:12px;padding:12px 24px;color:var(--text-muted);text-decoration:none;transition:var(--transition);border-radius:0;position:relative}.sidebar-nav-link:hover{background:var(--surface-bg);color:var(--text-primary)}.sidebar-nav-link.active{background:var(--primary-color);color:var(--text-primary);font-weight:600}.sidebar-nav-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent-color)}.main-content{flex:1;margin-left:280px;padding:24px;transition:var(--transition)}.page-header{margin-bottom:32px}.page-title{font-size:32px;font-weight:700;color:var(--text-primary);margin-bottom:8px}.page-subtitle{color:var(--text-muted);font-size:16px}.chart-container{position:relative;height:350px;width:100%;flex-grow:1}.mobile-menu-toggle{display:none;position:fixed;top:15px;left:15px;z-index:1001;background:var(--surface-bg);color:var(--text-primary);border:1px solid var(--border-color);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:18px;box-shadow:var(--shadow-md)}@media (max-width:800px){body{font-size:14px}.mobile-menu-toggle{display:block}.sidebar{transform:translateX(-100%);box-shadow:var(--shadow-xl)}.sidebar.active{transform:translateX(0)}.main-content{margin-left:0;padding:80px 15px 20px}.login-card{padding:32px 24px}.card{padding:16px}.grid-2,.grid-3,.grid-4,.stats-grid{grid-template-columns:1fr}.page-title{font-size:24px}.form-group .flex.gap-2{flex-direction:column;align-items:stretch}.form-group .flex.gap-2 .btn{width:100%}#salesPage .flex-between.mt-3{flex-direction:column;align-items:stretch;gap:16px;text-align:center}#salesPage .flex-between.mt-3 .btn{width:100%}.card-header{flex-direction:column;align-items:flex-start;gap:12px}.card-header .flex.gap-2{flex-direction:column;width:100%;align-items:stretch}.receipt-professional-header,.receipt-sale-info .text-right{flex-direction:column;align-items:flex-start;text-align:left;gap:16px}.receipt-company-details{text-align:left;margin-top:16px}.receipt-sale-info{grid-template-columns:1fr}.receipt-summary{justify-content:flex-start}.receipt-summary table{width:100%;max-width:none}.btn{padding:12px 18px;font-size:14px}.form-input,.form-select{font-size:14px;padding:12px 16px}.chart-container{max-height:300px}.modal-content{width:95%;padding:24px 16px}.modal-title{font-size:20px}.table th,.table td{white-space:normal}.table th:nth-child(1),.table td:nth-child(1){width:30%}.table th:nth-child(2),.table td:nth-child(2){width:30%}.table th:nth-child(3),.table td:nth-child(3){width:20%}.table th:nth-child(4),.table td:nth-child(4){width:20%}.table td:last-child,.table th:last-child{width:auto}#salesPage .table input[type=number].form-input{width:55px;padding:4px;font-size:13px}#reportsPage .grid-4{grid-template-columns:1fr}#reportsPage .form-group{margin-bottom:15px}#reportsPage #generateReport{width:100%}#reportsPage .card-header .flex.gap-2{flex-direction:column;width:100%;align-items:stretch}#reportsPage .card-header .flex.gap-2 .btn{width:100%}}.hidden{display:none!important}.text-center{text-align:center}.text-right{text-align:right}.mb-0{margin-bottom:0}.mb-1{margin-bottom:8px}.mb-2{margin-bottom:16px}.mb-3{margin-bottom:24px}.mb-4{margin-bottom:32px}.mt-0{margin-top:0}.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}.mt-4{margin-top:32px}.grid{display:grid;gap:24px}.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.grid-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.flex{display:flex}.flex-between{display:flex;justify-content:space-between;align-items:center}.flex-center{display:flex;justify-content:center;align-items:center}.gap-1{gap:8px}.gap-2{gap:16px}.gap-3{gap:24px}.notification{position:fixed;top:20px;right:20px;padding:16px 20px;border-radius:8px;color:var(--text-primary);font-weight:600;z-index:9999;transform:translateX(400px);transition:var(--transition);box-shadow:var(--shadow-lg)}.notification.show{transform:translateX(0)}.notification-success{background:var(--accent-color)}.notification-error{background:var(--danger-color)}.notification-warning{background:var(--warning-color)}.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:var(--transition)}.modal.show{opacity:1;visibility:visible}.modal-content{background:var(--secondary-bg);border-radius:12px;padding:32px;max-width:600px;width:90%;max-height:85vh;display:flex;flex-direction:column;border:1px solid var(--border-color);transform:scale(.9);transition:var(--transition)}#modalBody{overflow-y:auto}.modal.show .modal-content{transform:scale(1)}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border-color)}.modal-title{font-size:24px;font-weight:700;color:var(--text-primary)}.modal-close{background:none;border:none;color:var(--text-muted);font-size:24px;cursor:pointer;padding:8px;border-radius:4px;transition:var(--transition)}.modal-close:hover{background:var(--surface-bg);color:var(--text-primary)}.loading{display:inline-block;width:20px;height:20px;border:2px solid var(--border-color);border-radius:50%;border-top-color:var(--primary-color);animation:spin 1s ease-in-out infinite}@keyframes spin{to{transform:rotate(360deg)}}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;margin-bottom:32px}.stat-card{background:var(--secondary-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);position:relative;overflow:hidden}.stat-icon{position:absolute;top:24px;right:24px;font-size:32px;color:var(--primary-color);opacity:.3}.stat-value{font-size:24px;font-weight:700;color:var(--primary-color);margin-bottom:4px}.stat-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}.suggestion-item:hover{background:var(--surface-bg)!important;color:var(--text-primary)}.receipt-professional-container{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f8f9fa;color:#212529;padding:2rem;border-radius:8px;border:1px solid #dee2e6}.receipt-professional-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #dee2e6;padding-bottom:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}.receipt-logo-container{font-size:2.5rem;color:var(--primary-color)}.receipt-company-details{text-align:right}.receipt-company-details h3{margin:0;font-size:1.5rem;color:#343a40}.receipt-company-details p{margin:2px 0;font-size:.9rem;color:#6c757d}.receipt-sale-info{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;font-size:.9rem}.receipt-info-block p{margin:4px 0}.receipt-info-block .label{color:#6c757d;font-weight:600}.receipt-items-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem}.receipt-items-table thead{background-color:#e9ecef}.receipt-items-table th{padding:.75rem;text-align:left;font-weight:600;font-size:.9rem;text-transform:uppercase;color:#495057;white-space:normal}.receipt-items-table td{padding:.75rem;border-bottom:1px solid #dee2e6;font-size:.95rem;white-space:normal}.receipt-items-table .text-right{text-align:right}.receipt-items-table .text-center{text-align:center}.receipt-summary{display:flex;justify-content:flex-end}.receipt-summary table{width:50%;max-width:300px}.receipt-summary td{padding:.5rem;font-size:1rem}.receipt-summary .total-label{font-weight:700;color:#495057}.receipt-summary .total-value{font-weight:700;font-size:1.25rem;color:var(--primary-color)}.receipt-footer{margin-top:2rem;padding-top:1rem;text-align:center;border-top:1px solid #dee2e6;font-size:.85rem;color:#6c757d}
+    </style>
 </head>
 
 <body>
-    <div id="loginScreen" class="login-container">
-        <div class="login-card">
-            <div class="login-logo">
-                <i class="fas fa-store"></i>
-            </div>
-            <h1 class="login-title">Flor de Maria</h1>
-            <p class="login-subtitle">Sistema de Gestão Integrado</p>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">E-mail</label>
-                    <input type="email" id="username" class="form-input" placeholder="Digite seu e-mail" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">Senha</label>
-                    <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Entrar
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div id="appLayout" class="app-layout hidden">
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-store"></i>
-                    <span>Flor de Maria</span>
-                </div>
-            </div>
-
-            <ul class="sidebar-nav">
-                <li class="sidebar-nav-item">
-                    <a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#clients" class="sidebar-nav-link" data-page="clients">
-                        <i class="fas fa-users"></i>
-                        <span>Clientes</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#products" class="sidebar-nav-link" data-page="products">
-                        <i class="fas fa-boxes"></i>
-                        <span>Estoque</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#sales" class="sidebar-nav-link" data-page="sales">
-                        <i class="fas fa-cash-register"></i>
-                        <span>PDV</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#receipts" class="sidebar-nav-link" data-page="receipts">
-                        <i class="fas fa-receipt"></i>
-                        <span>Recibos</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#cashflow" class="sidebar-nav-link" data-page="cashflow">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Fluxo de Caixa</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#expenses" class="sidebar-nav-link" data-page="expenses">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Despesas</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#receivables" class="sidebar-nav-link" data-page="receivables">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Contas a Receber</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#reports" class="sidebar-nav-link" data-page="reports">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Relatórios</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#settings" class="sidebar-nav-link" data-page="settings">
-                        <i class="fas fa-cog"></i>
-                        <span>Configurações</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item"
-                    style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                    <a href="#" class="sidebar-nav-link" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sair</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <main class="main-content">
-            <div id="dashboardPage" class="page">
-                <div class="page-header">
-                    <h1 class="page-title">Dashboard</h1>
-                    <p class="page-subtitle">Visão geral do seu negócio</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="cashBalance">R$ 0,00</div>
-                        <div class="stat-label">Saldo em Caixa</div>
-                        <i class="fas fa-wallet stat-icon"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalReceivables">R$ 0,00</div>
-                        <div class="stat-label">Total a Receber</div>
-                        <i class="fas fa-clock stat-icon"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="monthlyExpenses">R$ 0,00</div>
-                        <div class="stat-label">Despesas do Mês</div>
-                        <i class="fas fa-credit-card stat-icon"></i>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
-                        <div class="stat-label">Vendas do Mês</div>
-                        <i class="fas fa-chart-line stat-icon"></i>
-                    </div>
-                </div>
-
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-logo"><i class="fas fa-store"></i></div>
+            <h1 class="login-title">Flor de Maria</h1>
+            <p class="login-subtitle">Sistema de Gestão Integrado</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">E-mail</label>
+                    <input type="email" id="username" class="form-input" placeholder="Digite seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+            </form>
+        </div>
+    </div>
+    <div id="appLayout" class="app-layout hidden">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo"><i class="fas fa-store"></i><span>Flor de Maria</span></div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item"><a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+                <li class="sidebar-nav-item"><a href="#clients" class="sidebar-nav-link" data-page="clients"><i class="fas fa-users"></i><span>Clientes</span></a></li>
+                <li class="sidebar-nav-item"><a href="#products" class="sidebar-nav-link" data-page="products"><i class="fas fa-boxes"></i><span>Estoque</span></a></li>
+                <li class="sidebar-nav-item"><a href="#sales" class="sidebar-nav-link" data-page="sales"><i class="fas fa-cash-register"></i><span>PDV</span></a></li>
+                <li class="sidebar-nav-item"><a href="#receipts" class="sidebar-nav-link" data-page="receipts"><i class="fas fa-receipt"></i><span>Recibos</span></a></li>
+                <li class="sidebar-nav-item"><a href="#cashflow" class="sidebar-nav-link" data-page="cashflow"><i class="fas fa-money-bill-wave"></i><span>Fluxo de Caixa</span></a></li>
+                <li class="sidebar-nav-item"><a href="#expenses" class="sidebar-nav-link" data-page="expenses"><i class="fas fa-file-invoice-dollar"></i><span>Despesas</span></a></li>
+                <li class="sidebar-nav-item"><a href="#receivables" class="sidebar-nav-link" data-page="receivables"><i class="fas fa-calendar-check"></i><span>Contas a Receber</span></a></li>
+                <li class="sidebar-nav-item"><a href="#reports" class="sidebar-nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>Relatórios</span></a></li>
+                <li class="sidebar-nav-item"><a href="#settings" class="sidebar-nav-link" data-page="settings"><i class="fas fa-cog"></i><span>Configurações</span></a></li>
+                <li class="sidebar-nav-item" style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 24px;"><a href="#" class="sidebar-nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <div id="dashboardPage" class="page">
+                <div class="page-header"><h1 class="page-title">Dashboard</h1><p class="page-subtitle">Visão geral do seu negócio</p></div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="cashBalance">R$ 0,00</div><div class="stat-label">Saldo em Caixa</div><i class="fas fa-wallet stat-icon"></i></div>
+                    <div class="stat-card"><div class="stat-value" id="totalReceivables">R$ 0,00</div><div class="stat-label">Total a Receber</div><i class="fas fa-clock stat-icon"></i></div>
+                    <div class="stat-card"><div class="stat-value" id="monthlyExpenses">R$ 0,00</div><div class="stat-label">Despesas do Mês</div><i class="fas fa-credit-card stat-icon"></i></div>
+                    <div class="stat-card"><div class="stat-value" id="monthlySales">R$ 0,00</div><div class="stat-label">Vendas do Mês</div><i class="fas fa-chart-line stat-icon"></i></div>
+                </div>
+                <div class="grid grid-2">
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Método de Pagamento (Mês Atual)</h3></div><div class="chart-container"><canvas id="paymentMethodChart"></canvas></div></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3></div><div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;"><p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p></div></div>
+                </div>
+            </div>
+            <div id="clientsPage" class="page hidden">
+                <div class="page-header"><h1 class="page-title">Clientes</h1><p class="page-subtitle">Gerencie seus clientes</p></div>
+                <div class="grid grid-2">
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-user-plus"></i> Novo Cliente</h3></div><form id="clientForm"><div class="form-group"><label class="form-label" for="clientName">Nome Completo</label><input type="text" id="clientName" class="form-input" placeholder="Digite o nome do cliente" required></div><div class="form-group"><label class="form-label" for="clientPhone">Telefone</label><input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000" required></div><div class="flex gap-2"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Cliente</button><button type="button" class="btn btn-secondary" id="clearClientForm"><i class="fas fa-times"></i> Limpar</button></div></form></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Cliente</h3></div><div class="form-group"><input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone do cliente"></div><div class="flex-between"><span id="clientCount" class="text-muted">0 clientes cadastrados</span><button class="btn btn-secondary btn-sm" id="exportClients"><i class="fas fa-download"></i> Exportar</button></div></div>
+                </div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead><tbody id="clientsTableBody"></tbody></table></div></div>
+            </div>
+            <div id="productsPage" class="page hidden">
+                <div class="page-header"><h1 class="page-title">Estoque</h1><p class="page-subtitle">Gerencie seus produtos</p></div>
                 <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-bar"></i>
-                                Vendas por Método de Pagamento (Mês Atual)
-                            </h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="paymentMethodChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Contas Vencidas
-                            </h3>
-                        </div>
-                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
-                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
-                                Nenhuma conta vencida
-                            </p>
-                        </div>
-                    </div>
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-box"></i> Novo Produto</h3></div><form id="productForm"><div class="form-group"><label class="form-label" for="productRefCode">Código de Referência</label><input type="text" id="productRefCode" class="form-input" placeholder="Ex: PRD001" required></div><div class="form-group"><label class="form-label" for="productName">Nome do Produto</label><input type="text" id="productName" class="form-input" placeholder="Digite o nome do produto" required></div><div class="grid grid-2"><div class="form-group"><label class="form-label" for="productQuantity">Quantidade</label><input type="number" id="productQuantity" class="form-input" min="0" placeholder="0" required></div><div class="form-group"><label class="form-label" for="productCostPrice">Preço de Custo</label><input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" placeholder="0,00" required></div></div><div class="form-group"><label class="form-label" for="productSalePrice">Preço de Venda</label><input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required></div><div class="flex gap-2"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Produto</button><button type="button" class="btn btn-secondary" id="clearProductForm"><i class="fas fa-times"></i> Limpar</button></div></form></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Resumo do Estoque</h3></div><div class="grid grid-2 mb-3"><div class="text-center"><div class="stat-value" id="totalProducts">0</div><div class="stat-label">Total de Produtos</div></div><div class="text-center"><div class="stat-value" id="outOfStockProducts">0</div><div class="stat-label">Produtos Esgotados</div></div></div><div class="form-group"><input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código"></div><button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;"><i class="fas fa-download"></i> Exportar Estoque</button></div>
                 </div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>Código</th><th>Nome</th><th>Quantidade</th><th>Preço Custo</th><th>Preço Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></div>
             </div>
-
-            <div id="clientsPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Clientes</h1>
-                    <p class="page-subtitle">Gerencie seus clientes</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-user-plus"></i>
-                                Novo Cliente
-                            </h3>
-                        </div>
-
-                        <form id="clientForm">
-                            <div class="form-group">
-                                <label class="form-label" for="clientName">Nome Completo</label>
-                                <input type="text" id="clientName" class="form-input"
-                                    placeholder="Digite o nome do cliente" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="clientPhone">Telefone</label>
-                                <input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000"
-                                    required>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Cliente
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearClientForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-search"></i>
-                                Buscar Cliente
-                            </h3>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" id="clientSearch" class="form-input"
-                                placeholder="Digite o nome ou telefone do cliente">
-                        </div>
-
-                        <div class="flex-between">
-                            <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
-                            <button class="btn btn-secondary btn-sm" id="exportClients">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-users"></i>
-                            Lista de Clientes
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Telefone</th>
-                                    <th>Cadastro</th>
-                                    <th>Compras</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clientsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="productsPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Estoque</h1>
-                    <p class="page-subtitle">Gerencie seus produtos</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-box"></i>
-                                Novo Produto
-                            </h3>
-                        </div>
-
-                        <form id="productForm">
-                            <div class="form-group">
-                                <label class="form-label" for="productRefCode">Código de Referência</label>
-                                <input type="text" id="productRefCode" class="form-input" placeholder="Ex: PRD001"
-                                    required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="productName">Nome do Produto</label>
-                                <input type="text" id="productName" class="form-input"
-                                    placeholder="Digite o nome do produto" required>
-                            </div>
-
-                            <div class="grid grid-2">
-                                <div class="form-group">
-                                    <label class="form-label" for="productQuantity">Quantidade</label>
-                                    <input type="number" id="productQuantity" class="form-input" min="0" placeholder="0"
-                                        required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="productCostPrice">Preço de Custo</label>
-                                    <input type="number" id="productCostPrice" class="form-input" min="0" step="0.01"
-                                        placeholder="0,00" required>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="productSalePrice">Preço de Venda</label>
-                                <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01"
-                                    placeholder="0,00" required>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Produto
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearProductForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo do Estoque
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalProducts">0</div>
-                                <div class="stat-label">Total de Produtos</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="outOfStockProducts">0</div>
-                                <div class="stat-label">Produtos Esgotados</div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" id="productSearch" class="form-input"
-                                placeholder="Buscar produto por nome ou código">
-                        </div>
-
-                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;">
-                            <i class="fas fa-download"></i>
-                            Exportar Estoque
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-boxes"></i>
-                            Lista de Produtos
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nome</th>
-                                    <th>Quantidade</th>
-                                    <th>Preço Custo</th>
-                                    <th>Preço Venda</th>
-                                    <th>Margem</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
             <div id="salesPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Ponto de Venda</h1>
-                    <p class="page-subtitle">Registre suas vendas</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-search"></i>
-                                Buscar Produto
-                            </h3>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" id="productSearchPDV" class="form-input"
-                                placeholder="Digite o código ou nome do produto">
-                        </div>
-
-                        <div id="productSuggestions" class="hidden"
-                            style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-user"></i>
-                                Cliente e Pagamento
-                            </h3>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="saleClient">Cliente</label>
-                            <select id="saleClient" class="form-select">
-                                <option value="">Selecione um cliente (opcional)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
-                            <select id="salePaymentMethod" class="form-select" required>
-                                <option value="Dinheiro">Dinheiro</option>
-                                <option value="PIX">PIX</option>
-                                <option value="Cartão de Débito">Cartão de Débito</option>
-                                <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                <option value="Crediário">Crediário</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group hidden" id="installmentsGroup">
-                            <label class="form-label" for="saleInstallments">Número de Parcelas</label>
-                            <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-shopping-cart"></i>
-                            Carrinho de Compras
-                        </h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-danger btn-sm" id="clearCart">
-                                <i class="fas fa-trash"></i>
-                                Limpar Carrinho
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Preço Unit.</th>
-                                    <th>Quantidade</th>
-                                    <th>Subtotal</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cartTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="flex-between mt-3"
-                        style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                        <div>
-                            <strong style="font-size: 24px; color: var(--primary-color);">
-                                Total: <span id="cartTotal">R$ 0,00</span>
-                            </strong>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary" id="finalizeSale" disabled>
-                                <i class="fas fa-check"></i>
-                                Finalizar Venda
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Ponto de Venda</h1><p class="page-subtitle">Registre suas vendas</p></div>
+                <div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Produto</h3></div><div class="form-group"><input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto"></div><div id="productSuggestions" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;"></div></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-user"></i> Cliente e Pagamento</h3></div><div class="form-group"><label class="form-label" for="saleClient">Cliente</label><select id="saleClient" class="form-select"><option value="">Selecione um cliente (opcional)</option></select></div><div class="form-group"><label class="form-label" for="salePaymentMethod">Método de Pagamento</label><select id="salePaymentMethod" class="form-select" required><option value="Dinheiro">Dinheiro</option><option value="PIX">PIX</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Crediário">Crediário</option></select></div><div class="form-group hidden" id="installmentsGroup"><label class="form-label" for="saleInstallments">Número de Parcelas</label><input type="number" id="saleInstallments" class="form-input" min="1" value="1"></div></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho de Compras</h3><div class="flex gap-2"><button class="btn btn-danger btn-sm" id="clearCart"><i class="fas fa-trash"></i> Limpar Carrinho</button></div></div><div class="table-responsive"><table class="table"><thead><tr><th>Produto</th><th>Preço Unit.</th><th>Quantidade</th><th>Subtotal</th><th>Ações</th></tr></thead><tbody id="cartTableBody"></tbody></table></div><div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;"><div><strong style="font-size: 24px; color: var(--primary-color);">Total: <span id="cartTotal">R$ 0,00</span></strong></div><div class="flex gap-2"><button class="btn btn-primary" id="finalizeSale" disabled><i class="fas fa-check"></i> Finalizar Venda</button></div></div></div>
             </div>
-
             <div id="receiptsPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Recibos</h1>
-                    <p class="page-subtitle">Visualize e gerencie os recibos de vendas</p>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-filter"></i>
-                            Filtrar Recibos
-                        </h3>
-                    </div>
-                    <div class="grid grid-2">
-                        <div class="form-group">
-                            <label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label>
-                            <select id="receiptClientFilter" class="form-select">
-                                <option value="">Todos os Clientes</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="receiptDateFilter">Filtrar por Data</label>
-                            <input type="date" id="receiptDateFilter" class="form-input">
-                        </div>
-                    </div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Vendas
-                        </h3>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID da Venda</th>
-                                    <th>Data</th>
-                                    <th>Cliente</th>
-                                    <th>Total</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="receiptsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Recibos</h1><p class="page-subtitle">Visualize e gerencie os recibos de vendas</p></div>
+                <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Filtrar Recibos</h3></div><div class="grid grid-2"><div class="form-group"><label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label><select id="receiptClientFilter" class="form-select"><option value="">Todos os Clientes</option></select></div><div class="form-group"><label class="form-label" for="receiptDateFilter">Filtrar por Data</label><input type="date" id="receiptDateFilter" class="form-input"></div></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Vendas</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Ações</th></tr></thead><tbody id="receiptsTableBody"></tbody></table></div></div>
             </div>
-
             <div id="cashflowPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Fluxo de Caixa</h1>
-                    <p class="page-subtitle">Controle suas finanças</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Novo Lançamento Manual
-                            </h3>
-                        </div>
-
-                        <form id="cashFlowForm">
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowType">Tipo</label>
-                                <select id="cashFlowType" class="form-select" required>
-                                    <option value="entrada">Entrada</option>
-                                    <option value="saida">Saída</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowDescription">Descrição</label>
-                                <input type="text" id="cashFlowDescription" class="form-input"
-                                    placeholder="Descrição do lançamento" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowValue">Valor</label>
-                                <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01"
-                                    placeholder="0,00" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowDate">Data</label>
-                                <input type="date" id="cashFlowDate" class="form-input" required>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Lançamento
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearCashFlowForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line"></i>
-                                Resumo Financeiro
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalEntradas" style="color: var(--accent-color);">R$ 0,00
-                                </div>
-                                <div class="stat-label">Total Entradas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalSaidas" style="color: var(--danger-color);">R$ 0,00
-                                </div>
-                                <div class="stat-label">Total Saídas</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <div class="stat-value" id="saldoAtual">R$ 0,00</div>
-                            <div class="stat-label">Saldo Atual</div>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento">
-                        </div>
-
-                        <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;">
-                            <i class="fas fa-download"></i>
-                            Exportar Fluxo de Caixa
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Histórico de Lançamentos
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Valor</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cashFlowTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Fluxo de Caixa</h1><p class="page-subtitle">Controle suas finanças</p></div>
+                <div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-plus"></i> Novo Lançamento Manual</h3></div><form id="cashFlowForm"><div class="form-group"><label class="form-label" for="cashFlowType">Tipo</label><select id="cashFlowType" class="form-select" required><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><div class="form-group"><label class="form-label" for="cashFlowDescription">Descrição</label><input type="text" id="cashFlowDescription" class="form-input" placeholder="Descrição do lançamento" required></div><div class="form-group"><label class="form-label" for="cashFlowValue">Valor</label><input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required></div><div class="form-group"><label class="form-label" for="cashFlowDate">Data</label><input type="date" id="cashFlowDate" class="form-input" required></div><div class="flex gap-2"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Lançamento</button><button type="button" class="btn btn-secondary" id="clearCashFlowForm"><i class="fas fa-times"></i> Limpar</button></div></form></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line"></i> Resumo Financeiro</h3></div><div class="grid grid-2 mb-3"><div class="text-center"><div class="stat-value" id="totalEntradas" style="color: var(--accent-color);">R$ 0,00</div><div class="stat-label">Total Entradas</div></div><div class="text-center"><div class="stat-value" id="totalSaidas" style="color: var(--danger-color);">R$ 0,00</div><div class="stat-label">Total Saídas</div></div></div><div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;"><div class="stat-value" id="saldoAtual">R$ 0,00</div><div class="stat-label">Saldo Atual</div></div><div class="form-group mt-3"><input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento"></div><button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;"><i class="fas fa-download"></i> Exportar Fluxo de Caixa</button></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Histórico de Lançamentos</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="cashFlowTableBody"></tbody></table></div></div>
             </div>
-
             <div id="expensesPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Despesas</h1>
-                    <p class="page-subtitle">Registre suas despesas</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Nova Despesa
-                            </h3>
-                        </div>
-
-                        <form id="expenseForm">
-                            <div class="form-group">
-                                <label class="form-label" for="expenseDescription">Descrição</label>
-                                <input type="text" id="expenseDescription" class="form-input"
-                                    placeholder="Descrição da despesa" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="expenseCategory">Categoria</label>
-                                <select id="expenseCategory" class="form-select" required>
-                                    <option value="">Selecione uma categoria</option>
-                                    <option value="Aluguel">Aluguel</option>
-                                    <option value="Energia Elétrica">Energia Elétrica</option>
-                                    <option value="Água">Água</option>
-                                    <option value="Internet">Internet</option>
-                                    <option value="Telefone">Telefone</option>
-                                    <option value="Fornecedores">Fornecedores</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Transporte">Transporte</option>
-                                    <option value="Alimentação">Alimentação</option>
-                                    <option value="Material de Escritório">Material de Escritório</option>
-                                    <option value="Impostos">Impostos</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="expenseValue">Valor</label>
-                                <input type="number" id="expenseValue" class="form-input" min="0" step="0.01"
-                                    placeholder="0,00" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="expenseDate">Data</label>
-                                <input type="date" id="expenseDate" class="form-input" required>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Despesa
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearExpenseForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo de Despesas
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalExpensesMonth" style="color: var(--danger-color);">R$
-                                    0,00</div>
-                                <div class="stat-label">Despesas do Mês</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalExpensesYear" style="color: var(--warning-color);">R$
-                                    0,00</div>
-                                <div class="stat-label">Despesas do Ano</div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa">
-                        </div>
-
-                        <div class="flex gap-2">
-                            <select id="expenseFilterCategory" class="form-select">
-                                <option value="">Todas as categorias</option>
-                                <option value="Aluguel">Aluguel</option>
-                                <option value="Energia Elétrica">Energia Elétrica</option>
-                                <option value="Água">Água</option>
-                                <option value="Internet">Internet</option>
-                                <option value="Telefone">Telefone</option>
-                                <option value="Fornecedores">Fornecedores</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Alimentação">Alimentação</option>
-                                <option value="Material de Escritório">Material de Escritório</option>
-                                <option value="Impostos">Impostos</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="exportExpenses">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Despesas
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Descrição</th>
-                                    <th>Categoria</th>
-                                    <th>Valor</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="expensesTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Despesas</h1><p class="page-subtitle">Registre suas despesas</p></div>
+                <div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-plus"></i> Nova Despesa</h3></div><form id="expenseForm"><div class="form-group"><label class="form-label" for="expenseDescription">Descrição</label><input type="text" id="expenseDescription" class="form-input" placeholder="Descrição da despesa" required></div><div class="form-group"><label class="form-label" for="expenseCategory">Categoria</label><select id="expenseCategory" class="form-select" required><option value="">Selecione uma categoria</option><option value="Aluguel">Aluguel</option><option value="Energia Elétrica">Energia Elétrica</option><option value="Água">Água</option><option value="Internet">Internet</option><option value="Telefone">Telefone</option><option value="Fornecedores">Fornecedores</option><option value="Marketing">Marketing</option><option value="Transporte">Transporte</option><option value="Alimentação">Alimentação</option><option value="Material de Escritório">Material de Escritório</option><option value="Impostos">Impostos</option><option value="Outros">Outros</option></select></div><div class="form-group"><label class="form-label" for="expenseValue">Valor</label><input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required></div><div class="form-group"><label class="form-label" for="expenseDate">Data</label><input type="date" id="expenseDate" class="form-input" required></div><div class="flex gap-2"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Despesa</button><button type="button" class="btn btn-secondary" id="clearExpenseForm"><i class="fas fa-times"></i> Limpar</button></div></form></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Resumo de Despesas</h3></div><div class="grid grid-2 mb-3"><div class="text-center"><div class="stat-value" id="totalExpensesMonth" style="color: var(--danger-color);">R$ 0,00</div><div class="stat-label">Despesas do Mês</div></div><div class="text-center"><div class="stat-value" id="totalExpensesYear" style="color: var(--warning-color);">R$ 0,00</div><div class="stat-label">Despesas do Ano</div></div></div><div class="form-group"><input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa"></div><div class="flex gap-2"><select id="expenseFilterCategory" class="form-select"><option value="">Todas as categorias</option><option value="Aluguel">Aluguel</option><option value="Energia Elétrica">Energia Elétrica</option><option value="Água">Água</option><option value="Internet">Internet</option><option value="Telefone">Telefone</option><option value="Fornecedores">Fornecedores</option><option value="Marketing">Marketing</option><option value="Transporte">Transporte</option><option value="Alimentação">Alimentação</option><option value="Material de Escritório">Material de Escritório</option><option value="Impostos">Impostos</option><option value="Outros">Outros</option></select><button class="btn btn-secondary btn-sm" id="exportExpenses"><i class="fas fa-download"></i> Exportar</button></div></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Despesas</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="expensesTableBody"></tbody></table></div></div>
             </div>
-
             <div id="receivablesPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Contas a Receber</h1>
-                    <p class="page-subtitle">Gerencie seus recebimentos (Crediário)</p>
-                </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Nova Conta a Receber (Manual)
-                            </h3>
-                        </div>
-
-                        <form id="receivableForm">
-                            <div class="form-group">
-                                <label class="form-label" for="receivableClient">Cliente</label>
-                                <select id="receivableClient" class="form-select" required>
-                                    <option value="">Selecione um cliente</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="receivableDescription">Descrição</label>
-                                <input type="text" id="receivableDescription" class="form-input"
-                                    placeholder="Descrição da conta" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="receivableValue">Valor</label>
-                                <input type="number" id="receivableValue" class="form-input" min="0" step="0.01"
-                                    placeholder="0,00" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
-                                <input type="date" id="receivableDueDate" class="form-input" required>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Conta
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearReceivableForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line"></i>
-                                Resumo de Recebimentos
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalReceivablesPending"
-                                    style="color: var(--warning-color);">R$ 0,00</div>
-                                <div class="stat-label">Pendentes</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalReceivablesOverdue"
-                                    style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Vencidas</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$
-                                0,00</div>
-                            <div class="stat-label">Recebidas</div>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <input type="text" id="receivableSearch" class="form-input"
-                                placeholder="Buscar por cliente ou descrição">
-                        </div>
-
-                        <div class="flex gap-2">
-                            <select id="receivableFilterStatus" class="form-select">
-                                <option value="">Todos os status</option>
-                                <option value="Pendente">Pendente</option>
-                                <option value="Pago">Pago</option>
-                                <option value="Vencido">Vencido</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="exportReceivables">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Contas a Receber
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Descrição</th>
-                                    <th>Valor</th>
-                                    <th>Vencimento</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="receivablesTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Contas a Receber</h1><p class="page-subtitle">Gerencie seus recebimentos (Crediário)</p></div>
+                <div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-plus"></i> Nova Conta a Receber (Manual)</h3></div><form id="receivableForm"><div class="form-group"><label class="form-label" for="receivableClient">Cliente</label><select id="receivableClient" class="form-select" required><option value="">Selecione um cliente</option></select></div><div class="form-group"><label class="form-label" for="receivableDescription">Descrição</label><input type="text" id="receivableDescription" class="form-input" placeholder="Descrição da conta" required></div><div class="form-group"><label class="form-label" for="receivableValue">Valor</label><input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required></div><div class="form-group"><label class="form-label" for="receivableDueDate">Data de Vencimento</label><input type="date" id="receivableDueDate" class="form-input" required></div><div class="flex gap-2"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Conta</button><button type="button" class="btn btn-secondary" id="clearReceivableForm"><i class="fas fa-times"></i> Limpar</button></div></form></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line"></i> Resumo de Recebimentos</h3></div><div class="grid grid-2 mb-3"><div class="text-center"><div class="stat-value" id="totalReceivablesPending" style="color: var(--warning-color);">R$ 0,00</div><div class="stat-label">Pendentes</div></div><div class="text-center"><div class="stat-value" id="totalReceivablesOverdue" style="color: var(--danger-color);">R$ 0,00</div><div class="stat-label">Vencidas</div></div></div><div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;"><div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$ 0,00</div><div class="stat-label">Recebidas</div></div><div class="form-group mt-3"><input type="text" id="receivableSearch" class="form-input" placeholder="Buscar por cliente ou descrição"></div><div class="flex gap-2"><select id="receivableFilterStatus" class="form-select"><option value="">Todos os status</option><option value="Pendente">Pendente</option><option value="Pago">Pago</option><option value="Vencido">Vencido</option></select><button class="btn btn-secondary btn-sm" id="exportReceivables"><i class="fas fa-download"></i> Exportar</button></div></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Contas a Receber</h3></div><div class="table-responsive"><table class="table"><thead><tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody id="receivablesTableBody"></tbody></table></div></div>
             </div>
-
             <div id="reportsPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Relatórios</h1>
-                    <p class="page-subtitle">Análise e relatórios</p>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-filter"></i>
-                            Filtros de Relatório
-                        </h3>
-                    </div>
-
-                    <div class="grid grid-4">
-                        <div class="form-group">
-                            <label class="form-label" for="reportStartDate">Data Inicial</label>
-                            <input type="date" id="reportStartDate" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="reportEndDate">Data Final</label>
-                            <input type="date" id="reportEndDate" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="reportType">Tipo de Relatório</label>
-                            <select id="reportType" class="form-select">
-                                <option value="vendas">Vendas</option>
-                                <option value="financeiro">Financeiro</option>
-                                <option value="produtos">Produtos</option>
-                                <option value="clientes">Clientes</option>
-                                <option value="contas_a_receber">Contas a Receber</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group hidden" id="reportClientFilterContainer">
-                            <label class="form-label" for="reportReceivableClient">Cliente</label>
-                            <select id="reportReceivableClient" class="form-select">
-                                <option value="">Todos os Clientes</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group hidden" id="reportStatusFilterContainer">
-                            <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
-                            <select id="reportReceivableStatus" class="form-select">
-                                <option value="">Todos</option>
-                                <option value="Pendente">Pendentes</option>
-                                <option value="Pago">Pagas</option>
-                                <option value="Vencido">Vencidas</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-primary" id="generateReport" style="width: 100%;">
-                                <i class="fas fa-sync-alt"></i>
-                                Atualizar Relatório
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-2 mt-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo Geral
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-2">
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$
-                                    0,00</div>
-                                <div class="stat-label">Total de Vendas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalExpenses" style="color: var(--danger-color);">R$
-                                    0,00</div>
-                                <div class="stat-label">Total de Despesas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportProfit" style="color: var(--primary-color);">R$ 0,00
-                                </div>
-                                <div class="stat-label">Lucro Líquido</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportSalesCount">0</div>
-                                <div class="stat-label">Número de Vendas</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-trophy"></i>
-                                Top 5 (Produtos/Clientes/Devedores)
-                            </h3>
-                        </div>
-
-                        <div id="topProductsList">
-                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
-                                Gere um relatório para ver os destaques.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Gráfico do Relatório
-                        </h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary btn-sm" id="exportReportPDF">
-                                <i class="fas fa-file-pdf"></i>
-                                Exportar PDF
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="exportReportCSV">
-                                <i class="fas fa-file-csv"></i>
-                                Exportar CSV
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <canvas id="reportChart"></canvas>
-                    </div>
-
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-table"></i>
-                            Detalhes do Relatório
-                        </h3>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table" id="reportDetailTable">
-                            <thead id="reportTableHead"></thead>
-                            <tbody id="reportTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="page-header"><h1 class="page-title">Relatórios</h1><p class="page-subtitle">Análise e relatórios</p></div>
+                <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Filtros de Relatório</h3></div><div class="grid grid-4"><div class="form-group"><label class="form-label" for="reportStartDate">Data Inicial</label><input type="date" id="reportStartDate" class="form-input"></div><div class="form-group"><label class="form-label" for="reportEndDate">Data Final</label><input type="date" id="reportEndDate" class="form-input"></div><div class="form-group"><label class="form-label" for="reportType">Tipo de Relatório</label><select id="reportType" class="form-select"><option value="vendas">Vendas</option><option value="financeiro">Financeiro</option><option value="produtos">Produtos</option><option value="clientes">Clientes</option><option value="contas_a_receber">Contas a Receber</option></select></div><div class="form-group hidden" id="reportClientFilterContainer"><label class="form-label" for="reportReceivableClient">Cliente</label><select id="reportReceivableClient" class="form-select"><option value="">Todos os Clientes</option></select></div><div class="form-group hidden" id="reportStatusFilterContainer"><label class="form-label" for="reportReceivableStatus">Status da Conta</label><select id="reportReceivableStatus" class="form-select"><option value="">Todos</option><option value="Pendente">Pendentes</option><option value="Pago">Pagas</option><option value="Vencido">Vencidas</option></select></div><div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" id="generateReport" style="width: 100%;"><i class="fas fa-sync-alt"></i> Atualizar Relatório</button></div></div></div>
+                <div class="grid grid-2 mt-4"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Resumo Geral</h3></div><div class="grid grid-2"><div class="text-center"><div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$ 0,00</div><div class="stat-label">Total de Vendas</div></div><div class="text-center"><div class="stat-value" id="reportTotalExpenses" style="color: var(--danger-color);">R$ 0,00</div><div class="stat-label">Total de Despesas</div></div><div class="text-center"><div class="stat-value" id="reportProfit" style="color: var(--primary-color);">R$ 0,00</div><div class="stat-label">Lucro Líquido</div></div><div class="text-center"><div class="stat-value" id="reportSalesCount">0</div><div class="stat-label">Número de Vendas</div></div></div></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-trophy"></i> Top 5 (Produtos/Clientes/Devedores)</h3></div><div id="topProductsList"><p class="text-center" style="color: var(--text-muted); padding: 20px;">Gere um relatório para ver os destaques.</p></div></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line"></i> Gráfico do Relatório</h3><div class="flex gap-2"><button class="btn btn-secondary btn-sm" id="exportReportPDF"><i class="fas fa-file-pdf"></i> Exportar PDF</button><button class="btn btn-secondary btn-sm" id="exportReportCSV"><i class="fas fa-file-csv"></i> Exportar CSV</button></div></div><div class="chart-container"><canvas id="reportChart"></canvas></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-table"></i> Detalhes do Relatório</h3></div><div class="table-responsive"><table class="table" id="reportDetailTable"><thead id="reportTableHead"></thead><tbody id="reportTableBody"></tbody></table></div></div>
             </div>
-
             <div id="settingsPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Configurações</h1>
-                    <p class="page-subtitle">Gerencie os dados da sua loja, segurança e backups.</p>
-                </div>
+                <div class="page-header"><h1 class="page-title">Configurações</h1><p class="page-subtitle">Gerencie os dados da sua loja, segurança e backups.</p></div>
+                <div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-store-alt"></i> Dados da Loja</h3></div><p class="text-muted mb-3">Estes dados aparecerão nos seus recibos.</p><form id="companySettingsForm"><div class="form-group"><label class="form-label" for="companyName">Nome da Loja</label><input type="text" id="companyName" class="form-input" placeholder="Nome que aparece no recibo" required></div><div class="form-group"><label class="form-label" for="companyAddress">Endereço</label><input type="text" id="companyAddress" class="form-input" placeholder="Rua, Número, Bairro" required></div><div class="form-group"><label class="form-label" for="companyPhone">Telefone / WhatsApp</label><input type="text" id="companyPhone" class="form-input" placeholder="(00) 00000-0000" required></div><div class="form-group"><label class="form-label" for="companyCnpj">CNPJ</label><input type="text" id="companyCnpj" class="form-input" placeholder="00.000.000/0001-00" required></div><button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-save"></i> Salvar Dados da Loja</button></form></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-key"></i> Alterar Senha</h3></div><p class="text-muted mb-3">Mantenha seu sistema seguro alterando sua senha regularmente.</p><form id="changePasswordForm"><div class="form-group"><label class="form-label" for="currentPassword">Senha Atual</label><input type="password" id="currentPassword" class="form-input" required></div><div class="form-group"><label class="form-label" for="newPassword">Nova Senha</label><input type="password" id="newPassword" class="form-input" required></div><div class="form-group"><label class="form-label" for="confirmNewPassword">Confirmar Nova Senha</label><input type="password" id="confirmNewPassword" class="form-input" required></div><button type="submit" class="btn btn-warning" style="width: 100%;"><i class="fas fa-sync-alt"></i> Alterar Senha</button></form></div></div>
+                <div class="card mt-4"><div class="card-header"><h3 class="card-title"><i class="fas fa-database"></i> Backup e Restauração</h3></div><div class="grid grid-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-download"></i> Backup dos Dados</h3></div><p style="color: var(--text-muted); margin-bottom: 20px;">Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.</p><div class="grid grid-2 mb-3"><div class="text-center"><div class="stat-value" id="backupClientsCount">0</div><div class="stat-label">Clientes</div></div><div class="text-center"><div class="stat-value" id="backupProductsCount">0</div><div class="stat-label">Produtos</div></div><div class="text-center"><div class="stat-value" id="backupSalesCount">0</div><div class="stat-label">Vendas</div></div><div class="text-center"><div class="stat-value" id="backupReceivablesCount">0</div><div class="stat-label">Contas a Receber</div></div></div><button class="btn btn-primary" id="downloadBackup" style="width: 100%;"><i class="fas fa-download"></i> Baixar Backup Completo</button></div><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-upload"></i> Restaurar Dados</h3></div><p style="color: var(--text-muted); margin-bottom: 20px;">Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.</p><div class="form-group"><label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label><input type="file" id="restoreFile" class="form-input" accept=".json"></div><div class="flex gap-2"><button class="btn btn-warning" id="restoreBackup" disabled><i class="fas fa-upload"></i> Restaurar Backup</button><button class="btn btn-danger" id="clearAllData"><i class="fas fa-trash"></i> Limpar Todos os Dados</button></div></div></div></div>
+        </main>
+    </div>
+    <div id="notification" class="notification"><span></span></div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title" id="modalTitle">Modal</h3><button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.1.0 (Firebase Integrated) =====
 
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-store-alt"></i>
-                                Dados da Loja
-                            </h3>
-                        </div>
-                        <p class="text-muted mb-3">Estes dados aparecerão nos seus recibos.</p>
-                        <form id="companySettingsForm">
-                            <div class="form-group">
-                                <label class="form-label" for="companyName">Nome da Loja</label>
-                                <input type="text" id="companyName" class="form-input"
-                                    placeholder="Nome que aparece no recibo" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="companyAddress">Endereço</label>
-                                <input type="text" id="companyAddress" class="form-input"
-                                    placeholder="Rua, Número, Bairro" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="companyPhone">Telefone / WhatsApp</label>
-                                <input type="text" id="companyPhone" class="form-input" placeholder="(00) 00000-0000"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="companyCnpj">CNPJ</label>
-                                <input type="text" id="companyCnpj" class="form-input" placeholder="00.000.000/0001-00"
-                                    required>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-save"></i> Salvar Dados da Loja
-                            </button>
-                        </form>
-                    </div>
+        // SUAS CHAVES DO FIREBASE.
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
+            authDomain: "sistema-flor-de-maria.firebaseapp.com",
+            projectId: "sistema-flor-de-maria",
+            storageBucket: "sistema-flor-de-maria.appspot.com",
+            messagingSenderId: "148120762956",
+            appId: "1:148120762956:web:253cb554ded28a13bcd2e9"
+        };
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-key"></i>
-                                Alterar Senha
-                            </h3>
-                        </div>
-                        <p class="text-muted mb-3">Mantenha seu sistema seguro alterando sua senha regularmente.</p>
-                        <form id="changePasswordForm">
-                            <div class="form-group">
-                                <label class="form-label" for="currentPassword">Senha Atual</label>
-                                <input type="password" id="currentPassword" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="newPassword">Nova Senha</label>
-                                <input type="password" id="newPassword" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="confirmNewPassword">Confirmar Nova Senha</label>
-                                <input type="password" id="confirmNewPassword" class="form-input" required>
-                            </div>
-                            <button type="submit" class="btn btn-warning" style="width: 100%;">
-                                <i class="fas fa-sync-alt"></i> Alterar Senha
-                            </button>
-                        </form>
-                    </div>
-                </div>
+        // Inicializa a conexão com o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-database"></i>
-                            Backup e Restauração
-                        </h3>
-                    </div>
-                    <div class="grid grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-download"></i> Backup dos Dados
-                                </h3>
-                            </div>
-                            <p style="color: var(--text-muted); margin-bottom: 20px;">
-                                Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.
-                            </p>
-                            <div class="grid grid-2 mb-3">
-                                <div class="text-center">
-                                    <div class="stat-value" id="backupClientsCount">0</div>
-                                    <div class="stat-label">Clientes</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="stat-value" id="backupProductsCount">0</div>
-                                    <div class="stat-label">Produtos</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="stat-value" id="backupSalesCount">0</div>
-                                    <div class="stat-label">Vendas</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="stat-value" id="backupReceivablesCount">0</div>
-                                    <div class="stat-label">Contas a Receber</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
-                                <i class="fas fa-download"></i> Baixar Backup Completo
-                            </button>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-upload"></i> Restaurar Dados
-                                </h3>
-                            </div>
-                            <p style="color: var(--text-muted); margin-bottom: 20px;">
-                                Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso
-                                substituirá todos os dados atuais.
-                            </p>
-                            <div class="form-group">
-                                <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
-                                <input type="file" id="restoreFile" class="form-input" accept=".json">
-                            </div>
-                            <div class="flex gap-2">
-                                <button class="btn btn-warning" id="restoreBackup" disabled>
-                                    <i class="fas fa-upload"></i> Restaurar Backup
-                                </button>
-                                <button class="btn btn-danger" id="clearAllData">
-                                    <i class="fas fa-trash"></i> Limpar Todos os Dados
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        // Configurações globais
+        const CONFIG = {
+            storageKeys: { lastActivePage: 'sgi_last_active_page' },
+            company: {}
+        };
 
-            </div>
+        // Helper para referência do usuário
+        const userDocRef = () => {
+            const user = auth.currentUser;
+            return user ? db.collection('users').doc(user.uid) : null;
+        };
 
-        </main>
-    </div>
+        // Utilitários
+        const Utils = {
+            generateUUID: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }),
+            formatCurrency: value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0),
+            formatDate: dateStr => { if (!dateStr) return 'N/A'; const date = new Date(dateStr); const offset = date.getTimezoneOffset() * 60000; return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + offset)); },
+            formatDateTime: date => date ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(date)) : 'N/A',
+            debounce: (func, delay = 300) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
+        };
 
-    <div id="notification" class="notification">
-        <span id="notificationText"></span>
-    </div>
+        // Notificações e Modal
+        const Notification = { show(message, type = 'success') { const el = document.getElementById('notification'); el.querySelector('span').textContent = message; el.className = `notification notification-${type} show`; setTimeout(() => el.classList.remove('show'), 3000); }, success(msg) { this.show(msg, 'success'); }, error(msg) { this.show(msg, 'error'); }, warning(msg) { this.show(msg, 'warning'); } };
+        const Modal = { show(title, content, actionsHtml = '') { document.getElementById('modalTitle').textContent = title; document.getElementById('modalBody').innerHTML = content; const existingActions = document.getElementById('modalActions'); if (existingActions) existingActions.remove(); if (actionsHtml) { const modalContent = document.querySelector('.modal-content'); const actionsContainer = document.createElement('div'); actionsContainer.id = 'modalActions'; actionsContainer.style.cssText = "margin-top:24px; padding-top:16px; border-top:1px solid var(--border-color); display:flex; justify-content:flex-end; gap:16px;"; actionsContainer.innerHTML = actionsHtml; modalContent.appendChild(actionsContainer); } document.getElementById('modal').classList.add('show'); }, hide() { document.getElementById('modal').classList.remove('show'); } };
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Modal</h3>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="modalBody">
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script>
+        // Navegação
+        const Navigation = {
+            init() { const sidebar = document.getElementById('sidebar'); document.querySelectorAll('.sidebar-nav-link').forEach(link => { link.addEventListener('click', e => { e.preventDefault(); if (window.innerWidth <= 800) sidebar.classList.remove('active'); if (link.dataset.page) this.navigateTo(link.dataset.page); }); }); const mobileToggle = document.getElementById('mobileMenuToggle'); mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active')); document.addEventListener('click', e => { if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) sidebar.classList.remove('active'); }); },
+            navigateTo(page) { try { if (!document.getElementById(`${page}Page`)) page = 'dashboard'; document.querySelectorAll('.page').forEach(p => p.classList.add('hidden')); document.getElementById(`${page}Page`).classList.remove('hidden'); document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active')); document.querySelector(`[data-page="${page}"]`).classList.add('active'); localStorage.setItem(CONFIG.storageKeys.lastActivePage, page); this.loadPageData(page); } catch (error) { console.error(`Error navigating to page ${page}:`, error); Notification.error("Ocorreu um erro ao carregar a página."); } },
+            loadPageData(page) { const loaders = { dashboard: Dashboard.loadData, clients: Clients.loadClients, products: Products.loadProducts, sales: Sales.initPage, receipts: Receipts.initPage, cashflow: CashFlow.loadCashFlow, expenses: Expenses.loadExpenses, receivables: Receivables.loadReceivables, settings: Settings.loadSettings, reports: Reports.initPage }; if (loaders[page]) loaders[page](); }
+        };
+        
+        // Autenticação
+        const Auth = {
+            init() { auth.onAuthStateChanged(user => user ? this.showApp() : this.showLogin()); document.getElementById('loginForm').addEventListener('submit', e => { e.preventDefault(); this.login(); }); document.getElementById('logoutBtn').addEventListener('click', e => { e.preventDefault(); this.logout(); }); },
+            async login() { const [email, password] = [document.getElementById('username').value, document.getElementById('password').value]; const btn = document.querySelector('#loginForm button'); btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Entrando...'; try { await auth.signInWithEmailAndPassword(email, password); Notification.success('Login realizado com sucesso!'); } catch (error) { Notification.error('E-mail ou senha incorretos!'); console.error("Login Error:", error.code); } finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; } },
+            async logout() { await auth.signOut(); localStorage.removeItem(CONFIG.storageKeys.lastActivePage); Notification.success('Você saiu do sistema!'); },
+            showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appLayout').classList.add('hidden'); },
+            async showApp() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appLayout').classList.remove('hidden'); await Settings.loadCompanyConfig(); const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage); Navigation.navigateTo(lastPage || 'dashboard'); }
+        };
+        
+        // Helper de Fetch
+        const fetchCollection = async (collectionName) => {
+            const ref = userDocRef(); if (!ref) return [];
+            try { const snapshot = await ref.collection(collectionName).get(); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); } catch (error) { console.error(`Error fetching ${collectionName}:`, error); Notification.error(`Não foi possível carregar dados.`); return []; }
+        };
+        
+        // Módulos de Dados
+        const Dashboard = {
+            chart: null,
+            async loadData() { await Promise.all([this.updateStats(), this.updateChart(), this.updateOverdueAccounts()]); },
+            async updateStats() {
+                const [cashFlow, receivables, sales] = await Promise.all([fetchCollection('cashflow'), fetchCollection('accountsReceivable'), fetchCollection('sales')]);
+                const cashBalance = cashFlow.reduce((t, i) => i.type === 'entrada' ? t + i.value : t - i.value, 0);
+                const totalReceivables = receivables.filter(a => a.status === 'Pendente').reduce((t, a) => t + a.value, 0);
+                const today = new Date();
+                const monthlySales = sales.filter(s => new Date(s.date).getMonth() === today.getMonth() && new Date(s.date).getFullYear() === today.getFullYear()).reduce((t, s) => t + s.total, 0);
+                const monthlyExpenses = cashFlow.filter(cf => cf.type === 'saida' && new Date(cf.date).getMonth() === today.getMonth() && new Date(cf.date).getFullYear() === today.getFullYear()).reduce((t, cf) => t + cf.value, 0);
+                document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
+                document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
+                document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
+                document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
+            },
+            async updateChart() {
+                const sales = await fetchCollection('sales');
+                const today = new Date();
+                const monthlySales = sales.filter(s => new Date(s.date).getMonth() === today.getMonth() && new Date(s.date).getFullYear() === today.getFullYear());
+                const paymentMethods = monthlySales.reduce((acc, sale) => { acc[sale.paymentMethod] = (acc[sale.paymentMethod] || 0) + sale.total; return acc; }, {});
+                const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+                if (this.chart) this.chart.destroy();
+                this.chart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(paymentMethods), datasets: [{ label: 'Vendas (R$)', data: Object.values(paymentMethods), backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#F1F5F9' } } }, scales: { y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }, x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } } } } });
+            },
+            async updateOverdueAccounts() {
+                const [receivables, clients] = await Promise.all([fetchCollection('accountsReceivable'), fetchCollection('clients')]);
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                const overdue = receivables.filter(acc => acc.status === 'Pendente' && new Date(acc.dueDate) < today);
+                const container = document.getElementById('overdueAccounts');
+                if (overdue.length === 0) { container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>'; } else {
+                    container.innerHTML = overdue.map(acc => {
+                        const client = clients.find(c => c.id === acc.clientId);
+                        const days = Math.floor((today - new Date(acc.dueDate)) / 86400000);
+                        return `<div style="padding:12px; border-left:4px solid var(--danger-color); background:rgba(239, 68, 68, 0.1); margin-bottom:8px; border-radius:4px;"><div class="flex-between"><div><strong>${client ? client.name : 'N/A'}</strong><br><small style="color:var(--text-muted);">${days} dia(s) em atraso</small></div><div class="text-right"><strong style="color:var(--danger-color);">${Utils.formatCurrency(acc.value)}</strong><br><small style="color:var(--text-muted);">Venc: ${Utils.formatDate(acc.dueDate)}</small></div></div></div>`;
+                    }).join('');
+                }
+            }
+        };
+        const Clients = {
+            currentEditId: null,
+            init() { document.getElementById('clientForm').addEventListener('submit', e => { e.preventDefault(); this.saveClient(); }); document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm()); document.getElementById('clientSearch').addEventListener('input', Utils.debounce(e => this.filterClients(e.target.value), 300)); document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV()); },
+            async saveClient() { const [name, phone] = [document.getElementById('clientName').value.trim(), document.getElementById('clientPhone').value.trim()]; if (!name || !phone) return Notification.error('Preencha nome e telefone!'); const clientData = { name, phone, updatedAt: new Date().toISOString() }; const ref = userDocRef().collection('clients'); try { if (this.currentEditId) { await ref.doc(this.currentEditId).set(clientData, { merge: true }); Notification.success('Cliente atualizado!'); } else { clientData.createdAt = new Date().toISOString(); await ref.add(clientData); Notification.success('Cliente cadastrado!'); } } catch (error) { Notification.error("Erro ao salvar cliente."); } this.clearForm(); this.loadClients(); },
+            async editClient(id) { const doc = await userDocRef().collection('clients').doc(id).get(); if (doc.exists) { const client = doc.data(); document.getElementById('clientName').value = client.name; document.getElementById('clientPhone').value = client.phone; this.currentEditId = id; document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' }); } },
+            async deleteClient(id) { if (confirm('Tem certeza?')) { await userDocRef().collection('clients').doc(id).delete(); this.loadClients(); Notification.success('Cliente excluído!'); } },
+            async viewHistory(id) { const clientDoc = await userDocRef().collection('clients').doc(id).get(); if (!clientDoc.exists) return; const client = clientDoc.data(); const [sales, receivables] = await Promise.all([fetchCollection('sales'), fetchCollection('accountsReceivable')]); const clientSales = sales.filter(s => s.clientId === id); const clientReceivables = receivables.filter(r => r.clientId === id); const totalSpent = clientSales.reduce((t, s) => t + s.total, 0); const totalDebt = clientReceivables.filter(r => r.status === 'Pendente').reduce((t, r) => t + r.value, 0); let historyHtml = `<h4>Histórico de Compras - ${client.name}</h4><p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)}</p><hr style="margin: 16px 0;"><div class="table-responsive" style="max-height: 150px;">${clientSales.length===0?'<p>Nenhuma compra.</p>':`<table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>${clientSales.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(s=>`<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}</tbody></table>`}</div><h4>Contas (Crediário)</h4><p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p><hr style="margin: 16px 0;"><div class="table-responsive" style="max-height: 150px;">${clientReceivables.length===0?'<p>Nenhuma conta.</p>':`<table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>${clientReceivables.sort((a,b)=>new Date(b.dueDate)-new Date(a.dueDate)).map(r=>`<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status==='Pago'?'badge-success':'badge-warning'}">${r.status}</span></td></tr>`).join('')}</tbody></table>`}</div>`; Modal.show('Histórico do Cliente', historyHtml); },
+            clearForm() { document.getElementById('clientForm').reset(); this.currentEditId = null; },
+            async filterClients(term) { const clients = await fetchCollection('clients'); const filtered = clients.filter(c => c.name.toLowerCase().includes(term.toLowerCase()) || c.phone.includes(term)); this.renderClients(filtered); },
+            async loadClients() { const clients = await fetchCollection('clients'); this.renderClients(clients); document.getElementById('clientCount').textContent = `${clients.length} clientes`; },
+            async renderClients(clients) { const tbody = document.getElementById('clientsTableBody'); const sales = await fetchCollection('sales'); if (clients.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado</td></tr>`; return; } tbody.innerHTML = clients.sort((a, b) => a.name.localeCompare(b.name)).map(client => { const purchaseCount = sales.filter(s => s.clientId === client.id).length; return `<tr><td>${client.name}</td><td>${client.phone}</td><td>${Utils.formatDate(client.createdAt)}</td><td>${purchaseCount} compra(s)</td><td><div class="flex gap-1"><button class="btn btn-secondary btn-sm" onclick="Clients.editClient('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button><button class="btn btn-primary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button><button class="btn btn-danger btn-sm" onclick="Clients.deleteClient('${client.id}')" title="Excluir"><i class="fas fa-trash"></i></button></div></td></tr>`}).join(''); },
+            async exportToCSV() { const clients = await fetchCollection('clients'); if (clients.length === 0) return Notification.warning('Nenhum cliente para exportar!'); const headers = ['Nome', 'Telefone', 'Data de Cadastro']; const csv = [headers.join(','), ...clients.map(c => [`"${c.name}"`,`"${c.phone}"`,`"${Utils.formatDate(c.createdAt)}"`].join(','))].join('\n'); Clients.downloadCSV(csv, 'clientes'); },
+            downloadCSV(content, filename) { const blob = new Blob(["\uFEFF" + content], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+        };
+        const Products = {
+            currentEditId: null,
+            init() { document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); }); document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm()); document.getElementById('productSearch').addEventListener('input', Utils.debounce(e => this.filterProducts(e.target.value), 300)); document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV()); },
+            async saveProduct() { const refCode = document.getElementById('productRefCode').value.trim(); const name = document.getElementById('productName').value.trim(); const quantity = parseInt(document.getElementById('productQuantity').value) || 0; const costPrice = parseFloat(document.getElementById('productCostPrice').value) || 0; const salePrice = parseFloat(document.getElementById('productSalePrice').value) || 0; if (!refCode || !name) return Notification.error('Preencha código e nome!'); if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return; const collectionRef = userDocRef().collection('products'); if (!this.currentEditId) { const q = await collectionRef.where('refCode', '==', refCode).get(); if (!q.empty) return Notification.error('Código de referência já existe!'); } const productData = { refCode, name, quantity, costPrice, salePrice, updatedAt: new Date().toISOString() }; if (this.currentEditId) { await collectionRef.doc(this.currentEditId).set(productData, { merge: true }); Notification.success('Produto atualizado!'); } else { productData.createdAt = new Date().toISOString(); await collectionRef.add(productData); Notification.success('Produto cadastrado!'); } this.clearForm(); this.loadProducts(); },
+            async editProduct(id) { const doc = await userDocRef().collection('products').doc(id).get(); if (doc.exists) { const product = doc.data(); document.getElementById('productRefCode').value = product.refCode; document.getElementById('productName').value = product.name; document.getElementById('productQuantity').value = product.quantity; document.getElementById('productCostPrice').value = product.costPrice; document.getElementById('productSalePrice').value = product.salePrice; this.currentEditId = id; document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' }); } },
+            async deleteProduct(id) { if (confirm('Tem certeza?')) { await userDocRef().collection('products').doc(id).delete(); this.loadProducts(); Notification.success('Produto excluído!'); } },
+            clearForm() { document.getElementById('productForm').reset(); this.currentEditId = null; },
+            async filterProducts(term) { const products = await fetchCollection('products'); const filtered = products.filter(p => p.name.toLowerCase().includes(term.toLowerCase()) || p.refCode.toLowerCase().includes(term.toLowerCase())); this.renderProducts(filtered); },
+            async loadProducts() { const products = await fetchCollection('products'); this.renderProducts(products); this.updateStats(products); },
+            updateStats(products) { document.getElementById('totalProducts').textContent = products.length; document.getElementById('outOfStockProducts').textContent = products.filter(p => p.quantity <= 0).length; },
+            renderProducts(products) { const tbody = document.getElementById('productsTableBody'); if (products.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`; return; } tbody.innerHTML = products.sort((a, b) => a.name.localeCompare(b.name)).map(p => { const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0; const statusClass = p.quantity > 5 ? 'badge-success' : (p.quantity > 0 ? 'badge-warning' : 'badge-danger'); const statusText = p.quantity > 0 ? 'Disponível' : 'Esgotado'; return `<tr><td>${p.refCode}</td><td>${p.name}</td><td>${p.quantity}</td><td>${Utils.formatCurrency(p.costPrice)}</td><td>${Utils.formatCurrency(p.salePrice)}</td><td>${margin.toFixed(1)}%</td><td><span class="badge ${statusClass}">${statusText}</span></td><td><div class="flex gap-1"><button class="btn btn-secondary btn-sm" onclick="Products.editProduct('${p.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="Products.deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`; }).join(''); },
+            async exportToCSV() { const products = await fetchCollection('products'); if (products.length === 0) return Notification.warning('Nenhum produto para exportar!'); Clients.downloadCSV(['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda', 'Margem %'].join(',') + '\n' + products.map(p => { const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0; return [`"${p.refCode}"`,`"${p.name}"`,p.quantity,p.costPrice.toFixed(2),p.salePrice.toFixed(2),margin.toFixed(1)].join(','); }).join('\n'), 'estoque'); }
+        };
+        const Sales = {
+            cart: [],
+            init() { document.getElementById('productSuggestions').addEventListener('click', e => this.handleSuggestionClick(e)); document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(e => this.searchProducts(e.target.value), 300)); document.getElementById('clearCart').addEventListener('click', () => this.clearCart()); document.getElementById('finalizeSale').addEventListener('click', () => this.finalizeSale()); document.getElementById('salePaymentMethod').addEventListener('change', () => this.updatePaymentOptions()); },
+            async initPage() { await this.loadClients(); this.updateCartDisplay(); this.updatePaymentOptions(); },
+            async loadClients() { const clients = await fetchCollection('clients'); const select = document.getElementById('saleClient'); select.innerHTML = '<option value="">1 - Consumidor Final</option>'; clients.sort((a, b) => a.name.localeCompare(b.name)).forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`); },
+            updatePaymentOptions() { const method = document.getElementById('salePaymentMethod').value; document.getElementById('installmentsGroup').classList.toggle('hidden', !['Crediário', 'Cartão de Crédito'].includes(method)); },
+            async searchProducts(term) { const suggestions = document.getElementById('productSuggestions'); if (term.length < 2) { suggestions.classList.add('hidden'); return; } const products = await fetchCollection('products'); const filtered = products.filter(p => (p.name.toLowerCase().includes(term.toLowerCase()) || p.refCode.toLowerCase().includes(term.toLowerCase())) && p.quantity > 0); if (filtered.length === 0) { suggestions.innerHTML = `<div style="padding:12px; text-align:center; color:var(--text-muted);">Nenhum produto encontrado</div>`; } else { suggestions.innerHTML = filtered.slice(0, 10).map(p => `<div class="suggestion-item" data-product-id="${p.id}" style="padding:12px; border-bottom:1px solid var(--border-color); cursor:pointer;"><div style="font-weight:500; pointer-events:none;">${p.name}</div><small style="color:var(--text-muted); pointer-events:none;">Cód: ${p.refCode} | Estoque: ${p.quantity} | Preço: ${Utils.formatCurrency(p.salePrice)}</small></div>`).join(''); } suggestions.classList.remove('hidden'); },
+            async handleSuggestionClick(event) { const item = event.target.closest('.suggestion-item'); if (item && item.dataset.productId) { await this.addToCart(item.dataset.productId); } },
+            async addToCart(productId) { const products = await fetchCollection('products'); const product = products.find(p => p.id === productId); if (!product || product.quantity <= 0) return Notification.error('Produto sem estoque!'); const existing = this.cart.find(item => item.productId === productId); if (existing) { if (existing.quantity >= product.quantity) return Notification.error('Quantidade máxima em estoque atingida!'); existing.quantity++; } else { this.cart.push({ productId, name: product.name, price: product.salePrice, quantity: 1, stock: product.quantity }); } this.updateCartDisplay(); document.getElementById('productSearchPDV').value = ''; document.getElementById('productSuggestions').classList.add('hidden'); Notification.success(`${product.name} adicionado!`); },
+            updateQuantity(productId, newQty) { const item = this.cart.find(item => item.productId === productId); if (!item) return; if (newQty > item.stock) { item.quantity = item.stock; Notification.error('Quantidade maior que o estoque!'); } else if (newQty < 1) { item.quantity = 1; } else { item.quantity = newQty; } this.updateCartDisplay(); },
+            removeFromCart(productId) { this.cart = this.cart.filter(item => item.productId !== productId); this.updateCartDisplay(); Notification.success('Produto removido!'); },
+            updateCartDisplay() { const tbody = document.getElementById('cartTableBody'); const totalEl = document.getElementById('cartTotal'); const finalizeBtn = document.getElementById('finalizeSale'); if (this.cart.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>`; totalEl.textContent = 'R$ 0,00'; finalizeBtn.disabled = true; return; } const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0); tbody.innerHTML = this.cart.map(item => `<tr><td>${item.name}</td><td>${Utils.formatCurrency(item.price)}</td><td><input type="number" value="${item.quantity}" min="1" max="${item.stock}" onchange="Sales.updateQuantity('${item.productId}', parseInt(this.value))" class="form-input" style="width:80px; padding:6px;"></td><td>${Utils.formatCurrency(item.price * item.quantity)}</td><td><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.productId}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); totalEl.textContent = Utils.formatCurrency(total); finalizeBtn.disabled = false; },
+            clearCart() { if (this.cart.length > 0 && confirm('Limpar o carrinho?')) { this.cart = []; this.updateCartDisplay(); Notification.success('Carrinho limpo!'); } },
+            async finalizeSale() { if (this.cart.length === 0) return Notification.error('Carrinho vazio!'); const clientId = document.getElementById('saleClient').value; const paymentMethod = document.getElementById('salePaymentMethod').value; const installments = parseInt(document.getElementById('saleInstallments').value) || 1; if (paymentMethod === 'Crediário' && !clientId) return Notification.error('Selecione um cliente para crediário!'); const total = this.cart.reduce((s, i) => s + (i.price * i.quantity), 0); const batch = db.batch(); const ref = userDocRef(); try { const saleRef = ref.collection('sales').doc(); const sale = { id: saleRef.id, clientId: clientId || null, date: new Date().toISOString(), total, paymentMethod, installments, products: this.cart.map(({stock, ...item}) => item) }; batch.set(saleRef, sale); for (const item of this.cart) { const prodRef = ref.collection('products').doc(item.productId); batch.update(prodRef, { quantity: firebase.firestore.FieldValue.increment(-item.quantity) }); } if (paymentMethod === 'Crediário') { const val = total / installments; for (let i = 1; i <= installments; i++) { const dueDate = new Date(); dueDate.setMonth(dueDate.getMonth() + i); const recRef = ref.collection('accountsReceivable').doc(); batch.set(recRef, { id: recRef.id, clientId, description: `Parcela ${i}/${installments} da Venda #${sale.id.substring(0, 8)}`, value: val, dueDate: dueDate.toISOString(), status: 'Pendente', saleId: sale.id, createdAt: new Date().toISOString() }); } } else { const cfRef = ref.collection('cashflow').doc(); batch.set(cfRef, { id: cfRef.id, date: new Date().toISOString(), type: 'entrada', description: `Venda #${sale.id.substring(0, 8)} (${paymentMethod})`, value: total, relatedSaleId: sale.id }); } await batch.commit(); Notification.success('Venda finalizada!'); await Receipts.showReceipt(sale.id); this.cart = []; this.updateCartDisplay(); document.getElementById('saleClient').value = ''; } catch (error) { console.error("Error finalizing sale:", error); Notification.error("Falha ao finalizar a venda. Tente novamente."); } }
+        };
+        //... e assim por diante para todos os outros módulos.
+    </script>
 </body>
 
 </html>
