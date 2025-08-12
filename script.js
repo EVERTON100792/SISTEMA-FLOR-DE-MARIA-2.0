@@ -1,13 +1,9 @@
 // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.0 (Firebase Integration) =====
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// 1. Initialize Firebase
+// TODO: Cole aqui a configuração do SEU projeto Firebase.
 const firebaseConfig = {
-  apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
+    apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
   authDomain: "sistema-flor-de-maria.firebaseapp.com",
   projectId: "sistema-flor-de-maria",
   storageBucket: "sistema-flor-de-maria.firebasestorage.app",
@@ -16,7 +12,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
