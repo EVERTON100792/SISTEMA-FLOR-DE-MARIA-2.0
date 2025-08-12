@@ -3,7 +3,7 @@
 // 1. Initialize Firebase
 // TODO: Cole aqui a configuração do SEU projeto Firebase.
 const firebaseConfig = {
-    apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
+  apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
   authDomain: "sistema-flor-de-maria.firebaseapp.com",
   projectId: "sistema-flor-de-maria",
   storageBucket: "sistema-flor-de-maria.firebasestorage.app",
