@@ -1,4 +1,4 @@
-/* ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.2 (Correções e Melhorias) ===== */
+/* ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.4 (Correção de Rolagem) ===== */
 
 /* ===== RESET E VARIÁVEIS CSS ===== */
 * {
@@ -303,13 +303,14 @@ body::before {
 }
 .sidebar-nav-link i { width: 20px; text-align: center; }
 
+/* --- CORREÇÃO DE ROLAGEM --- */
 .main-content {
     flex: 1;
     margin-left: 260px;
     padding: 32px;
     transition: margin-left 0.3s ease-in-out;
-    overflow-y: auto;
-    height: 100vh;
+    /* As linhas 'height: 100vh' e 'overflow-y: auto' foram removidas */
+    /* para permitir que a rolagem principal da página funcione. */
 }
 .page-header { margin-bottom: 32px; }
 .page-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
@@ -343,6 +344,7 @@ body::before {
 .grid-layout-pdv { grid-template-columns: 2fr 1fr; }
 .align-items-end { align-items: end; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex { display: flex; }
 .gap-2 { gap: 16px; }
 
 /* NOTIFICAÇÃO E MODAL */
@@ -480,45 +482,53 @@ body::before {
     .flex.gap-2 { flex-direction: column; align-items: stretch; }
     .flex.gap-2 .btn { width: 100%; }
 
-    /* --- CORREÇÃO GERAL DE RESPONSIVIDADE PARA TABELAS --- */
-    .table {
-        border: 0;
+    /* Layout de "Card" para todas as tabelas em telas pequenas */
+    .table thead {
+        display: none;
     }
-    .table th, .table td {
-        white-space: normal; /* Permite quebra de linha */
-    }
-
-    /* --- NOVA CORREÇÃO: Layout de Card para a tabela do PDV --- */
-    #pdvCartTable {
-        border: none;
-    }
-    #pdvCartTable thead {
-        display: none; /* Esconde o cabeçalho original */
-    }
-    #pdvCartTable tr {
+    .table, .table tbody, .table tr, .table td {
         display: block;
+        width: 100%;
+    }
+    .table tr {
+        margin-bottom: 1rem;
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        margin-bottom: 1rem;
         padding: 1rem;
         background: rgba(30, 41, 59, 0.4);
     }
-    #pdvCartTable td {
+    .table td {
         display: flex;
-        justify-content: space-between; /* Alinha label e valor */
+        justify-content: space-between;
         align-items: center;
-        padding: 0.5rem 0;
+        padding: 0.75rem 0.25rem;
         border-bottom: 1px dashed var(--border-color);
-        text-align: right; /* Alinha o valor à direita */
+        text-align: right;
+        white-space: normal;
     }
-    #pdvCartTable td:last-child {
+     .table tr td:last-child {
         border-bottom: none;
     }
-    #pdvCartTable td::before {
-        content: attr(data-label); /* Puxa o texto do atributo data-label */
+    .table td::before {
+        content: attr(data-label);
         font-weight: bold;
         color: var(--text-secondary);
-        text-align: left; /* Alinha a label à esquerda */
+        text-align: left;
         padding-right: 1rem;
+    }
+
+    /* Exceção para a tabela do carrinho no PDV, que já tinha um estilo de card */
+    #pdvCartTable td {
+        padding: 0.5rem 0;
+    }
+    
+    /* Ajuste para botões de ação não ficarem muito grandes */
+    .table td[data-label="Ações"] .flex {
+        flex-direction: row;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    .table td[data-label="Ações"] .btn {
+        width: auto;
     }
 }
