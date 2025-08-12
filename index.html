@@ -61,35 +61,105 @@
 
         <main class="main-content">
             <div id="dashboardPage" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Visão geral do seu negócio</p>
                 </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="cashBalance">R$ 0,00</div>
+                        <div class="stat-label">Saldo em Caixa</div>
+                        <i class="fas fa-wallet stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalReceivables">R$ 0,00</div>
+                        <div class="stat-label">Total a Receber</div>
+                        <i class="fas fa-clock stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="monthlyExpenses">R$ 0,00</div>
+                        <div class="stat-label">Despesas do Mês</div>
+                        <i class="fas fa-credit-card stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
+                        <div class="stat-label">Vendas do Mês</div>
+                        <i class="fas fa-chart-line stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Método de Pagamento (Mês Atual)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="paymentMethodChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3>
+                        </div>
+                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
+                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div id="clientsPage" class="page hidden">
+                 <div class="page-header">
+                    <h1 class="page-title">Clientes</h1>
+                    <p class="page-subtitle">Gerencie seus clientes</p>
                 </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user-plus"></i> Novo Cliente</h3></div>
+                        <form id="clientForm">
+                            <div class="form-group">
+                                <label class="form-label" for="clientName">Nome Completo</label>
+                                <input type="text" id="clientName" class="form-input" placeholder="Digite o nome do cliente" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="clientPhone">Telefone</label>
+                                <input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000" required>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Cliente</button>
+                                <button type="button" class="btn btn-secondary" id="clearClientForm"><i class="fas fa-times"></i> Limpar</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Cliente</h3></div>
+                        <div class="form-group">
+                            <input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone do cliente">
+                        </div>
+                        <div class="flex-between">
+                            <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
+                            <button class="btn btn-secondary btn-sm" id="exportClients"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead>
+                            <tbody id="clientsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <div id="productsPage" class="page hidden">
-                 </div>
-            
-            <div id="salesPage" class="page hidden">
-                </div>
-            
-            <div id="receiptsPage" class="page hidden">
                 </div>
 
-            <div id="cashflowPage" class="page hidden">
-                </div>
-
-            <div id="expensesPage" class="page hidden">
-                </div>
-
-            <div id="receivablesPage" class="page hidden">
-                </div>
-            
-            <div id="reportsPage" class="page hidden">
-                </div>
-
-            <div id="settingsPage" class="page hidden">
-                </div>
-        </main>
+            </main>
     </div>
 
     <div id="notification" class="notification"><span id="notificationText"></span></div>
