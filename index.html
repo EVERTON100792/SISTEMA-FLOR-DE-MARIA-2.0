@@ -2099,676 +2099,1833 @@
 
     <script>
     // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.0 (Firebase Integration) =====
-    
-    // 1. Initialize Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
+
+// 1. Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
   authDomain: "sistema-flor-de-maria.firebaseapp.com",
   projectId: "sistema-flor-de-maria",
   storageBucket: "sistema-flor-de-maria.firebasestorage.app",
   messagingSenderId: "148120762956",
   appId: "1:148120762956:web:253cb554ded28a13bcd2e9"
-    };
+};
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(); // Get Firestore instance
-    const auth = firebase.auth();   // Get Auth instance
-    
-    // Configurações globais
-    const CONFIG = {
-        storageKeys: {
-            lastActivePage: 'sgi_last_active_page', 
-            // Os nomes das coleções agora serão usados diretamente
-            clients: 'sgi_clients',
-            products: 'sgi_products',
-            sales: 'sgi_sales',
-            cashFlow: 'sgi_cashflow',
-            expenses: 'sgi_expenses',
-            accountsReceivable: 'sgi_accounts_receivable'
-        },
-        company: { 
-            name: 'Flor de Maria',
-            address: 'Rua das Flores, 123 - Centro',
-            phone: '(11) 98765-4321',
-            cnpj: '12.345.678/0001-99'
-        }
-    };
 
-    // Utilitários
-    const Utils = {
-        generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore(); // Get Firestore instance
+const auth = firebase.auth();   // Get Auth instance
+
+// Configurações globais
+const CONFIG = {
+    storageKeys: {
+        lastActivePage: 'sgi_last_active_page',
+        // Collection names in Firestore
+        clients: 'sgi_clients',
+        products: 'sgi_products',
+        sales: 'sgi_sales',
+        cashFlow: 'sgi_cashflow',
+        expenses: 'sgi_expenses',
+        accountsReceivable: 'sgi_accounts_receivable'
+    },
+    company: {
+        name: 'Flor de Maria',
+        address: 'Rua das Flores, 123 - Centro',
+        phone: '(11) 98765-4321',
+        cnpj: '12.345.678/0001-99'
+    }
+};
+
+// Utilitários
+const Utils = {
+    generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    },
+    formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value || 0);
+    },
+    formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        const date = new Date(dateStr);
+        // Adjust for timezone issues when creating date from string
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
+    },
+    formatDateTime(date) {
+        if (!date) return 'N/A';
+        return new Intl.DateTimeFormat('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(new Date(date));
+    },
+    async loadFromStorage(collectionName) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = [];
+            snapshot.forEach(doc => {
+                data.push(doc.data());
             });
-        },
-        formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        },
-        formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const date = new Date(dateStr);
-            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
-        },
-        formatDateTime(date) {
-            if (!date) return 'N/A';
-            return new Intl.DateTimeFormat('pt-BR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(new Date(date));
-        },
-        async loadFromStorage(collectionName) {
-             try {
-                const snapshot = await db.collection(collectionName).get();
-                const data = [];
-                snapshot.forEach(doc => {
-                    data.push(doc.data());
-                });
-                return data;
-            } catch (error) {
-                console.error(`Erro ao carregar de '${collectionName}':`, error);
-                Notification.error('Erro ao carregar dados. Verifique o console.');
-                return [];
-            }
-        },
-        debounce(func, delay = 300) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    func.apply(this, args);
-                }, delay);
-            };
+            return data;
+        } catch (error) {
+            console.error(`Erro ao carregar de '${collectionName}':`, error);
+            Notification.error('Erro ao carregar dados. Verifique o console.');
+            return [];
         }
-    };
+    },
+    debounce(func, delay = 300) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    },
+    downloadCSV(content, filename) {
+        const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8;' }); // Add BOM for Excel
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        Notification.success('Relatório CSV exportado!');
+    }
+};
 
-    // Sistema de Notificações
-    const Notification = {
-        show(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.className = `notification notification-${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        },
-        success(message) { this.show(message, 'success'); },
-        error(message) { this.show(message, 'error'); },
-        warning(message) { this.show(message, 'warning'); }
-    };
+// Sistema de Notificações
+const Notification = {
+    show(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        notificationText.textContent = message;
+        notification.className = `notification notification-${type}`;
+        notification.classList.add('show');
+        setTimeout(() => notification.classList.remove('show'), 3000);
+    },
+    success(message) { this.show(message, 'success'); },
+    error(message) { this.show(message, 'error'); },
+    warning(message) { this.show(message, 'warning'); }
+};
 
-    // Sistema de Modal
-    const Modal = {
-        show(title, content, actionsHtml = '') {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').innerHTML = content;
-            
-            const existingActions = document.getElementById('modalActions');
-            if (existingActions) existingActions.remove();
-            
-            if (actionsHtml) {
-                const modalContent = document.querySelector('.modal-content');
-                const actionsContainer = document.createElement('div');
-                actionsContainer.id = 'modalActions';
-                actionsContainer.style.marginTop = '24px';
-                actionsContainer.style.paddingTop = '16px';
-                actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
-                actionsContainer.innerHTML = actionsHtml;
-                modalContent.appendChild(actionsContainer);
-            }
-            
-            document.getElementById('modal').classList.add('show');
-        },
-        hide() {
-            document.getElementById('modal').classList.remove('show');
+// Sistema de Modal
+const Modal = {
+    show(title, content, actionsHtml = '') {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalBody').innerHTML = content;
+        const existingActions = document.getElementById('modalActions');
+        if (existingActions) existingActions.remove();
+        if (actionsHtml) {
+            const modalContent = document.querySelector('.modal-content');
+            const actionsContainer = document.createElement('div');
+            actionsContainer.id = 'modalActions';
+            actionsContainer.className = "flex gap-2 mt-3"
+            actionsContainer.style.paddingTop = '16px';
+            actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
+            actionsContainer.innerHTML = actionsHtml;
+            modalContent.appendChild(actionsContainer);
         }
-    };
+        document.getElementById('modal').classList.add('show');
+    },
+    hide() {
+        document.getElementById('modal').classList.remove('show');
+    }
+};
 
-    // Sistema de Navegação
-    const Navigation = {
-        init() {
-            const sidebar = document.getElementById('sidebar');
-
-            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
-                    }
-
-                    const page = link.getAttribute('data-page');
-                    if (page) {
-                        this.navigateTo(page);
-                    }
-                });
-            });
-
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
-
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+// Sistema de Navegação
+const Navigation = {
+    init() {
+        const sidebar = document.getElementById('sidebar');
+        document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
+                const page = link.getAttribute('data-page');
+                if (page) this.navigateTo(page);
             });
-        },
-        async navigateTo(page) {
-            try {
-                if (!document.getElementById(`${page}Page`)) {
-                    console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
-                    page = 'dashboard';
-                }
-                
-                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`${page}Page`).classList.remove('hidden');
-
-                document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
-                document.querySelector(`[data-page="${page}"]`).classList.add('active');
-                
-                localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
-                
-                await this.loadPageData(page);
-            } catch (error) {
-                console.error(`Erro ao navegar para a página ${page}:`, error);
-                Notification.error("Ocorreu um erro ao carregar a página.");
+        });
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                sidebar.classList.remove('active');
             }
-        },
-        async loadPageData(page) {
-            switch (page) {
-                case 'dashboard': await Dashboard.loadData(); break;
-                case 'clients': await Clients.loadClients(); break;
-                case 'products': await Products.loadProducts(); break;
-                case 'sales': await Sales.initPage(); break;
-                case 'receipts': await Receipts.initPage(); break;
-                case 'cashflow': await CashFlow.loadCashFlow(); break;
-                case 'expenses': await Expenses.loadExpenses(); break;
-                case 'receivables': await Receivables.loadReceivables(); break;
-                case 'settings': await Settings.updateBackupStats(); break;
-                case 'reports': await Reports.initPage(); break;
+        });
+    },
+    async navigateTo(page) {
+        try {
+            if (!document.getElementById(`${page}Page`)) {
+                console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
+                page = 'dashboard';
             }
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`${page}Page`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
+            await this.loadPageData(page);
+        } catch (error) {
+            console.error(`Erro ao navegar para a página ${page}:`, error);
+            Notification.error("Ocorreu um erro ao carregar a página.");
         }
-    };
-
-    // Autenticação com Firebase
-    const Auth = {
-        init() {
-            document.getElementById('loginForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.login();
-            });
-            document.getElementById('logoutBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                this.logout();
-            });
-
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    this.showApp();
-                } else {
-                    this.showLogin();
-                }
-            });
-        },
-        async login() {
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                Notification.success('Login realizado com sucesso!');
-            } catch (error) {
-                console.error("Login error:", error);
-                Notification.error('Email ou senha incorretos!');
-            }
-        },
-        async logout() {
-            try {
-                await auth.signOut();
-                localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
-                Notification.success('Logout realizado com sucesso!');
-            } catch (error) {
-                console.error("Logout error:", error);
-                Notification.error('Erro ao sair.');
-            }
-        },
-        showLogin() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appLayout').classList.add('hidden');
-        },
-        showApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appLayout').classList.remove('hidden');
-            const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
-            Navigation.navigateTo(lastPage || 'dashboard');
+    },
+    async loadPageData(page) {
+        switch (page) {
+            case 'dashboard': await Dashboard.loadData(); break;
+            case 'clients': await Clients.loadClients(); break;
+            case 'products': await Products.loadProducts(); break;
+            case 'sales': await Sales.initPage(); break;
+            case 'receipts': await Receipts.initPage(); break;
+            case 'cashflow': await CashFlow.loadCashFlow(); break;
+            case 'expenses': await Expenses.loadExpenses(); break;
+            case 'receivables': await Receivables.loadReceivables(); break;
+            case 'reports': await Reports.initPage(); break;
+            case 'settings': await Settings.updateBackupStats(); break;
         }
-    };
-    
-    // Dashboard
-    const Dashboard = {
-        chart: null,
-        async loadData() {
-            await this.updateStats();
-            await this.updateChart();
-            await this.updateOverdueAccounts();
-        },
-        async updateStats() {
-            const cashFlow = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const accountsReceivable = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
+    }
+};
 
-            const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
-            const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
-            
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            const monthlySales = sales
-                .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
-                .reduce((total, s) => total + s.total, 0);
-            
-            const monthlyExpenses = cashFlow
-                .filter(cf => cf.type === 'saida')
-                .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
-                .reduce((total, cf) => total + cf.value, 0);
-
-            document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
-            document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
-            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
-            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
-        },
-        async updateChart() {
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
-
-            const paymentMethods = {};
-            monthlySales.forEach(sale => {
-                const method = sale.paymentMethod || 'N/A';
-                paymentMethods[method] = (paymentMethods[method] || 0) + sale.total;
-            });
-
-            const ctx = document.getElementById('paymentMethodChart').getContext('2d');
-            if (this.chart) this.chart.destroy();
-            this.chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(paymentMethods),
-                    datasets: [{
-                        label: 'Vendas (R$)',
-                        data: Object.values(paymentMethods),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
-                    }
-                }
-            });
-        },
-        async updateOverdueAccounts() {
-            const accountsReceivable = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
-
-            const container = document.getElementById('overdueAccounts');
-            if (overdueAccounts.length === 0) {
-                container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>';
+// Autenticação com Firebase
+const Auth = {
+    init() {
+        document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); this.login(); });
+        document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); this.logout(); });
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                this.showApp();
             } else {
-                container.innerHTML = overdueAccounts.map(account => {
-                    const client = clients.find(c => c.id === account.clientId);
-                    const daysOverdue = Math.floor((today - new Date(account.dueDate)) / (1000 * 60 * 60 * 24));
-                    return `
-                        <div style="padding: 12px; border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 8px; border-radius: 4px;">
-                            <div class="flex-between" style="flex-direction: row; align-items: center;">
-                                <div>
-                                    <strong>${client ? client.name : 'N/A'}</strong><br>
-                                    <small style="color: var(--text-muted);">${daysOverdue} dia(s) em atraso</small>
-                                </div>
-                                <div class="text-right">
-                                    <strong style="color: var(--danger-color);">${Utils.formatCurrency(account.value)}</strong><br>
-                                    <small style="color: var(--text-muted);">Venc: ${Utils.formatDate(account.dueDate)}</small>
-                                </div>
-                            </div>
-                        </div>`;
-                }).join('');
+                this.showLogin();
             }
+        });
+    },
+    async login() {
+        const email = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            Notification.success('Login realizado com sucesso!');
+        } catch (error) {
+            console.error("Login error:", error);
+            Notification.error('Email ou senha incorretos!');
         }
-    };
-
-    // Módulo de Clientes
-    const Clients = {
-        currentEditId: null,
-        init() {
-            document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
-            document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('clientSearch').addEventListener('input', Utils.debounce(() => this.filterClients(), 300));
-            document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
-        },
-        async saveClient() {
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            if (!name || !phone) return Notification.error('Preencha nome e telefone!');
-
-            try {
-                if (this.currentEditId) {
-                    await db.collection(CONFIG.storageKeys.clients).doc(this.currentEditId).update({
-                        name, phone, updatedAt: new Date().toISOString()
-                    });
-                    Notification.success('Cliente atualizado!');
-                } else {
-                    const newId = Utils.generateUUID();
-                    await db.collection(CONFIG.storageKeys.clients).doc(newId).set({
-                        id: newId, name, phone, createdAt: new Date().toISOString()
-                    });
-                    Notification.success('Cliente cadastrado!');
-                }
-            } catch (error) {
-                Notification.error('Erro ao salvar cliente.');
-                console.error(error);
-            }
-            this.clearForm();
-            await this.loadClients();
-        },
-        async editClient(id) {
-            try {
-                const doc = await db.collection(CONFIG.storageKeys.clients).doc(id).get();
-                if (doc.exists) {
-                    const client = doc.data();
-                    document.getElementById('clientName').value = client.name;
-                    document.getElementById('clientPhone').value = client.phone;
-                    this.currentEditId = id;
-                    document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (error) {
-                Notification.error("Erro ao buscar cliente para edição.");
-            }
-        },
-        async deleteClient(id) {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                try {
-                    await db.collection(CONFIG.storageKeys.clients).doc(id).delete();
-                    await this.loadClients();
-                    Notification.success('Cliente excluído!');
-                } catch (error) {
-                    Notification.error('Erro ao excluir cliente.');
-                }
-            }
-        },
-        async viewHistory(id) {
-            const client = (await db.collection(CONFIG.storageKeys.clients).doc(id).get()).data();
-            if (!client) return;
-
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const receivables = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            
-            const clientSales = sales.filter(s => s.clientId === id);
-            const clientReceivables = receivables.filter(r => r.clientId === id);
-            
-            const totalSpent = clientSales.reduce((sum, sale) => sum + sale.total, 0);
-            const totalDebt = clientReceivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
-
-            let historyHtml = `
-                <h4>Histórico de Compras - ${client.name}</h4>
-                <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${clientSales.length} compra(s).</p>
-                <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px;">
-                ${clientSales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
-                    <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
-                    ${clientSales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
-                    </tbody></table>
-                `}
-                </div>
-                <h4 class="mt-3">Contas (Crediário)</h4>
-                <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
-                <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px;">
-                ${clientReceivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
-                    <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-                    ${clientReceivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
-                    </tbody></table>
-                `}
-                </div>
-            `;
-            Modal.show('Histórico do Cliente', historyHtml);
-        },
-        clearForm() {
-            document.getElementById('clientForm').reset();
-            this.currentEditId = null;
-        },
-        async filterClients() {
-            const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm) || c.phone.includes(searchTerm));
-            await this.renderClients(filtered);
-        },
-        async loadClients() {
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            await this.renderClients(clients);
-            document.getElementById('clientCount').textContent = `${clients.length} clientes`;
-        },
-        async renderClients(clients) {
-            const tbody = document.getElementById('clientsTableBody');
-            if (clients.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado</td></tr>`;
-                return;
-            }
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
-                const purchaseCount = sales.filter(s => s.clientId === client.id).length;
-                return `
-                    <tr>
-                        <td>${client.name}</td>
-                        <td>${client.phone}</td>
-                        <td>${Utils.formatDate(client.createdAt)}</td>
-                        <td>${purchaseCount} compra(s)</td>
-                        <td>
-                            <div class="flex gap-1">
-                                <button class="btn btn-secondary btn-sm" onclick="Clients.editClient('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-primary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="Clients.deleteClient('${client.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            }).join('');
-        },
-        async exportToCSV() {
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            if (clients.length === 0) return Notification.warning('Nenhum cliente para exportar!');
-
-            const headers = ['Nome', 'Telefone', 'Data de Cadastro'];
-            const csvContent = [
-                headers.join(','),
-                ...clients.map(c => [`"${c.name}"`, `"${c.phone}"`, `"${Utils.formatDate(c.createdAt)}"`].join(','))
-            ].join('\n');
-            this.downloadCSV(csvContent, 'clientes');
-        },
-        downloadCSV(content, filename) {
-            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            Notification.success('Relatório CSV exportado!');
+    },
+    async logout() {
+        try {
+            await auth.signOut();
+            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
+            Notification.success('Logout realizado com sucesso!');
+        } catch (error) {
+            console.error("Logout error:", error);
+            Notification.error('Erro ao sair.');
         }
-    };
-    
-    // Módulo de Produtos (Implementação completa omitida para brevidade, mas segue o mesmo padrão do `Clients`)
-    const Products = {
-        currentEditId: null,
-        init() {
-            document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
-            document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('productSearch').addEventListener('input', Utils.debounce(() => this.filterProducts(), 300));
-            document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
-        },
-        async saveProduct() {
-            const refCode = document.getElementById('productRefCode').value.trim();
-            const name = document.getElementById('productName').value.trim();
-            const quantity = parseInt(document.getElementById('productQuantity').value) || 0;
-            const costPrice = parseFloat(document.getElementById('productCostPrice').value) || 0;
-            const salePrice = parseFloat(document.getElementById('productSalePrice').value) || 0;
+    },
+    showLogin() {
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('appLayout').classList.add('hidden');
+    },
+    showApp() {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appLayout').classList.remove('hidden');
+        const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
+        Navigation.navigateTo(lastPage || 'dashboard');
+    }
+};
 
-            if (!refCode || !name) return Notification.error('Preencha código e nome!');
-            if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return;
+// Dashboard
+const Dashboard = {
+    chart: null,
+    async loadData() {
+        await this.updateStats();
+        await this.updateChart();
+        await this.updateOverdueAccounts();
+    },
+    async updateStats() {
+        const [cashFlow, accountsReceivable, sales] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.cashFlow),
+            Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable),
+            Utils.loadFromStorage(CONFIG.storageKeys.sales)
+        ]);
 
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            if (!this.currentEditId && products.some(p => p.refCode.toLowerCase() === refCode.toLowerCase())) {
-                return Notification.error('Código de referência já existe!');
-            }
+        const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
+        const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
+        
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
 
-            try {
-                if (this.currentEditId) {
-                    await db.collection(CONFIG.storageKeys.products).doc(this.currentEditId).update({
-                        refCode, name, quantity, costPrice, salePrice, updatedAt: new Date().toISOString()
-                    });
-                    Notification.success('Produto atualizado!');
-                } else {
-                    const newId = Utils.generateUUID();
-                    const newProduct = { id: newId, refCode, name, quantity, costPrice, salePrice, createdAt: new Date().toISOString() };
-                    await db.collection(CONFIG.storageKeys.products).doc(newId).set(newProduct);
-                    Notification.success('Produto cadastrado!');
-                }
-            } catch(error) {
-                 Notification.error("Erro ao salvar produto.");
-                 console.error(error);
-            }
-            this.clearForm();
-            await this.loadProducts();
-        },
-        async editProduct(id) {
-            const doc = await db.collection(CONFIG.storageKeys.products).doc(id).get();
-            if (doc.exists) {
-                const product = doc.data();
-                document.getElementById('productRefCode').value = product.refCode;
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productQuantity').value = product.quantity;
-                document.getElementById('productCostPrice').value = product.costPrice;
-                document.getElementById('productSalePrice').value = product.salePrice;
-                this.currentEditId = id;
-                document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
-            }
-        },
-        async deleteProduct(id) {
-            if (confirm('Tem certeza que deseja excluir este produto?')) {
-                await db.collection(CONFIG.storageKeys.products).doc(id).delete();
-                await this.loadProducts();
-                Notification.success('Produto excluído!');
-            }
-        },
-        clearForm() {
-            document.getElementById('productForm').reset();
-            this.currentEditId = null;
-        },
-        async filterProducts() {
-            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm) || p.refCode.toLowerCase().includes(searchTerm));
-            this.renderProducts(filtered);
-        },
-        async loadProducts() {
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            this.renderProducts(products);
-            this.updateStats(products);
-        },
-        updateStats(products) {
-            document.getElementById('totalProducts').textContent = products.length;
-            document.getElementById('outOfStockProducts').textContent = products.filter(p => p.quantity <= 0).length;
-        },
-        renderProducts(products) {
-            const tbody = document.getElementById('productsTableBody');
-            if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
-                const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
-                const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
-                const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
-                return `
-                    <tr>
-                        <td>${product.refCode}</td>
-                        <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${Utils.formatCurrency(product.costPrice)}</td>
-                        <td>${Utils.formatCurrency(product.salePrice)}</td>
-                        <td>${margin.toFixed(1)}%</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="flex gap-1">
-                                <button class="btn btn-secondary btn-sm" onclick="Products.editProduct('${product.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="Products.deleteProduct('${product.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            }).join('');
-        },
-        async exportToCSV() {
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            if (products.length === 0) return Notification.warning('Nenhum produto para exportar!');
-            Clients.downloadCSV(
-                ['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda', 'Margem %'].join(',') + '\n' +
-                products.map(p => {
-                    const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0;
-                    return [`"${p.refCode}"`, `"${p.name}"`, p.quantity, p.costPrice.toFixed(2), p.salePrice.toFixed(2), margin.toFixed(1)].join(',');
-                }).join('\n'), 'estoque'
-            );
-        }
-    };
+        const monthlySales = sales
+            .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+            .reduce((total, s) => total + s.total, 0);
+        
+        const monthlyExpenses = cashFlow
+            .filter(cf => cf.type === 'saida')
+            .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
+            .reduce((total, cf) => total + cf.value, 0);
 
-    // Módulos Sales, Receipts, CashFlow, etc. (Omitidos para brevidade, mas seguem o mesmo padrão)
-    // ... Implementação completa de todos os outros módulos, convertendo para async/await e usando db.collection()...
-    // É um trabalho repetitivo mas crucial. O padrão é sempre:
-    // 1. Marcar a função como `async`.
-    // 2. Substituir `Utils.loadFromStorage` por `await Utils.loadFromStorage`.
-    // 3. Substituir `Utils.saveToStorage` com as chamadas diretas ao Firestore:
-    //    `await db.collection(...).doc(id).set(data)` para criar/sobrescrever.
-    //    `await db.collection(...).doc(id).update(data)` para atualizar campos.
-    //    `await db.collection(...).doc(id).delete()` para remover.
-    
-    // Inicialização do Sistema
-    document.addEventListener('DOMContentLoaded', () => {
-        Auth.init();
-        Navigation.init();
-        Clients.init();
-        Products.init();
-        // Sales.init();
-        // Receipts.init();
-        // CashFlow.init();
-        // Expenses.init();
-        // Receivables.init();
-        // Reports.init();
-        // Settings.init();
+        document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
+        document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
+        document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
+        document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
+    },
+    async updateChart() {
+        const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
 
-        document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') Modal.hide();
+        const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+
+        const paymentMethods = {};
+        monthlySales.forEach(sale => {
+            const method = sale.paymentMethod || 'N/A';
+            paymentMethods[method] = (paymentMethods[method] || 0) + sale.total;
         });
 
-        console.log('SGI - Flor de Maria v3.0 (Firebase) iniciado!');
+        const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+        if (this.chart) this.chart.destroy();
+        this.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(paymentMethods),
+                datasets: [{
+                    label: 'Vendas (R$)',
+                    data: Object.values(paymentMethods),
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#F1F5F9' } } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
+                    x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
+                }
+            }
+        });
+    },
+    async updateOverdueAccounts() {
+        const accountsReceivable = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
+
+        const container = document.getElementById('overdueAccounts');
+        if (overdueAccounts.length === 0) {
+            container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>';
+        } else {
+            container.innerHTML = overdueAccounts.map(account => {
+                const client = clients.find(c => c.id === account.clientId);
+                const daysOverdue = Math.floor((today - new Date(account.dueDate)) / (1000 * 60 * 60 * 24));
+                return `
+                    <div style="padding: 12px; border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 8px; border-radius: 4px;">
+                        <div class="flex-between" style="flex-direction: row; align-items: center;">
+                            <div>
+                                <strong>${client ? client.name : 'N/A'}</strong><br>
+                                <small style="color: var(--text-muted);">${daysOverdue} dia(s) em atraso</small>
+                            </div>
+                            <div class="text-right">
+                                <strong style="color: var(--danger-color);">${Utils.formatCurrency(account.value)}</strong><br>
+                                <small style="color: var(--text-muted);">Venc: ${Utils.formatDate(account.dueDate)}</small>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+    }
+};
+
+// Módulo de Clientes
+const Clients = {
+    currentEditId: null,
+    init() {
+        document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
+        document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('clientSearch').addEventListener('input', Utils.debounce(() => this.filterClients(), 300));
+        document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
+    },
+    async saveClient() {
+        const name = document.getElementById('clientName').value.trim();
+        const phone = document.getElementById('clientPhone').value.trim();
+        if (!name || !phone) return Notification.error('Preencha nome e telefone!');
+
+        try {
+            if (this.currentEditId) {
+                await db.collection(CONFIG.storageKeys.clients).doc(this.currentEditId).update({
+                    name, phone, updatedAt: new Date().toISOString()
+                });
+                Notification.success('Cliente atualizado!');
+            } else {
+                const newId = Utils.generateUUID();
+                await db.collection(CONFIG.storageKeys.clients).doc(newId).set({
+                    id: newId, name, phone, createdAt: new Date().toISOString()
+                });
+                Notification.success('Cliente cadastrado!');
+            }
+        } catch (error) {
+            Notification.error('Erro ao salvar cliente.');
+            console.error(error);
+        }
+        this.clearForm();
+        await this.loadClients();
+    },
+    async editClient(id) {
+        try {
+            const doc = await db.collection(CONFIG.storageKeys.clients).doc(id).get();
+            if (doc.exists) {
+                const client = doc.data();
+                document.getElementById('clientName').value = client.name;
+                document.getElementById('clientPhone').value = client.phone;
+                this.currentEditId = id;
+                document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (error) {
+            Notification.error("Erro ao buscar cliente para edição.");
+        }
+    },
+    async deleteClient(id) {
+        if (confirm('Tem certeza que deseja excluir este cliente?')) {
+            try {
+                await db.collection(CONFIG.storageKeys.clients).doc(id).delete();
+                await this.loadClients();
+                Notification.success('Cliente excluído!');
+            } catch (error) {
+                Notification.error('Erro ao excluir cliente.');
+            }
+        }
+    },
+    async viewHistory(id) {
+        const clientDoc = await db.collection(CONFIG.storageKeys.clients).doc(id).get();
+        if (!clientDoc.exists) return;
+        const client = clientDoc.data();
+
+        const [sales, receivables] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.sales),
+            Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable)
+        ]);
+        
+        const clientSales = sales.filter(s => s.clientId === id);
+        const clientReceivables = receivables.filter(r => r.clientId === id);
+        
+        const totalSpent = clientSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalDebt = clientReceivables.filter(r => r.status !== 'Pago').reduce((sum, r) => sum + r.value, 0);
+
+        let historyHtml = `
+            <h4>Histórico de Compras - ${client.name}</h4>
+            <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${clientSales.length} compra(s).</p>
+            <hr style="margin: 16px 0;">
+            <div class="table-responsive" style="max-height: 150px;">
+            ${clientSales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
+                <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
+                ${clientSales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
+                </tbody></table>
+            `}
+            </div>
+            <h4 class="mt-3">Contas (Crediário)</h4>
+            <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
+            <hr style="margin: 16px 0;">
+            <div class="table-responsive" style="max-height: 150px;">
+            ${clientReceivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
+                <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
+                ${clientReceivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
+                </tbody></table>
+            `}
+            </div>
+        `;
+        Modal.show('Histórico do Cliente', historyHtml);
+    },
+    clearForm() {
+        document.getElementById('clientForm').reset();
+        this.currentEditId = null;
+    },
+    async filterClients() {
+        const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm) || c.phone.includes(searchTerm));
+        await this.renderClients(filtered);
+    },
+    async loadClients() {
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        await this.renderClients(clients);
+        document.getElementById('clientCount').textContent = `${clients.length} clientes`;
+    },
+    async renderClients(clients) {
+        const tbody = document.getElementById('clientsTableBody');
+        if (clients.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado</td></tr>`;
+            return;
+        }
+        const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
+        tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
+            const purchaseCount = sales.filter(s => s.clientId === client.id).length;
+            return `
+                <tr>
+                    <td>${client.name}</td>
+                    <td>${client.phone}</td>
+                    <td>${Utils.formatDate(client.createdAt)}</td>
+                    <td>${purchaseCount} compra(s)</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="Clients.editClient('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-primary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Clients.deleteClient('${client.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        }).join('');
+    },
+    async exportToCSV() {
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        if (clients.length === 0) return Notification.warning('Nenhum cliente para exportar!');
+        const headers = ['Nome', 'Telefone', 'Data de Cadastro'];
+        const csvContent = [
+            headers.join(','),
+            ...clients.map(c => [`"${c.name}"`, `"${c.phone}"`, `"${Utils.formatDate(c.createdAt)}"`].join(','))
+        ].join('\n');
+        Utils.downloadCSV(csvContent, 'clientes');
+    }
+};
+
+// Módulo de Produtos
+const Products = {
+    currentEditId: null,
+    init() {
+        document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
+        document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('productSearch').addEventListener('input', Utils.debounce(() => this.filterProducts(), 300));
+        document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
+    },
+    async saveProduct() {
+        const refCode = document.getElementById('productRefCode').value.trim();
+        const name = document.getElementById('productName').value.trim();
+        const quantity = parseInt(document.getElementById('productQuantity').value) || 0;
+        const costPrice = parseFloat(document.getElementById('productCostPrice').value) || 0;
+        const salePrice = parseFloat(document.getElementById('productSalePrice').value) || 0;
+
+        if (!refCode || !name) return Notification.error('Preencha código e nome!');
+        if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return;
+
+        const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
+        if (!this.currentEditId && products.some(p => p.refCode.toLowerCase() === refCode.toLowerCase())) {
+            return Notification.error('Código de referência já existe!');
+        }
+
+        try {
+            if (this.currentEditId) {
+                await db.collection(CONFIG.storageKeys.products).doc(this.currentEditId).update({
+                    refCode, name, quantity, costPrice, salePrice, updatedAt: new Date().toISOString()
+                });
+                Notification.success('Produto atualizado!');
+            } else {
+                const newId = Utils.generateUUID();
+                const newProduct = { id: newId, refCode, name, quantity, costPrice, salePrice, createdAt: new Date().toISOString() };
+                await db.collection(CONFIG.storageKeys.products).doc(newId).set(newProduct);
+                Notification.success('Produto cadastrado!');
+            }
+        } catch(error) {
+             Notification.error("Erro ao salvar produto.");
+             console.error(error);
+        }
+        this.clearForm();
+        await this.loadProducts();
+    },
+    async editProduct(id) {
+        const doc = await db.collection(CONFIG.storageKeys.products).doc(id).get();
+        if (doc.exists) {
+            const product = doc.data();
+            document.getElementById('productRefCode').value = product.refCode;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productQuantity').value = product.quantity;
+            document.getElementById('productCostPrice').value = product.costPrice;
+            document.getElementById('productSalePrice').value = product.salePrice;
+            this.currentEditId = id;
+            document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+        }
+    },
+    async deleteProduct(id) {
+        if (confirm('Tem certeza que deseja excluir este produto?')) {
+            await db.collection(CONFIG.storageKeys.products).doc(id).delete();
+            await this.loadProducts();
+            Notification.success('Produto excluído!');
+        }
+    },
+    clearForm() {
+        document.getElementById('productForm').reset();
+        this.currentEditId = null;
+    },
+    async filterProducts() {
+        const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+        const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
+        const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm) || p.refCode.toLowerCase().includes(searchTerm));
+        this.renderProducts(filtered);
+    },
+    async loadProducts() {
+        const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
+        this.renderProducts(products);
+        this.updateStats(products);
+    },
+    updateStats(products) {
+        document.getElementById('totalProducts').textContent = products.length;
+        document.getElementById('outOfStockProducts').textContent = products.filter(p => p.quantity <= 0).length;
+    },
+    renderProducts(products) {
+        const tbody = document.getElementById('productsTableBody');
+        if (products.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
+            const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
+            const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
+            const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
+            return `
+                <tr>
+                    <td>${product.refCode}</td>
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>${Utils.formatCurrency(product.costPrice)}</td>
+                    <td>${Utils.formatCurrency(product.salePrice)}</td>
+                    <td>${margin.toFixed(1)}%</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="Products.editProduct('${product.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="Products.deleteProduct('${product.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        }).join('');
+    },
+    async exportToCSV() {
+        const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
+        if (products.length === 0) return Notification.warning('Nenhum produto para exportar!');
+        Utils.downloadCSV(
+            ['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda', 'Margem %'].join(',') + '\n' +
+            products.map(p => {
+                const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0;
+                return [`"${p.refCode}"`, `"${p.name}"`, p.quantity, p.costPrice.toFixed(2), p.salePrice.toFixed(2), margin.toFixed(1)].join(',');
+            }).join('\n'), 'estoque'
+        );
+    }
+};
+
+// Módulo de Vendas (PDV)
+const Sales = {
+    cart: [],
+    products: [], // Cache products for search
+    init() {
+        document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(() => this.searchProductsPDV(), 200));
+        document.getElementById('salePaymentMethod').addEventListener('change', () => this.toggleInstallments());
+        document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
+        document.getElementById('finalizeSale').addEventListener('click', () => this.finalizeSale());
+    },
+    async initPage() {
+        [this.products] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.products),
+            this.loadClientsForSale(),
+        ]);
+        this.clearCart();
+    },
+    async loadClientsForSale() {
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        const select = document.getElementById('saleClient');
+        select.innerHTML = '<option value="">Selecione um cliente (opcional)</option>';
+        clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(client => {
+            select.innerHTML += `<option value="${client.id}">${client.name}</option>`;
+        });
+    },
+    searchProductsPDV() {
+        const searchTerm = document.getElementById('productSearchPDV').value.toLowerCase();
+        const suggestionsContainer = document.getElementById('productSuggestions');
+        if (!searchTerm) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+        const filtered = this.products
+            .filter(p => p.quantity > 0 && (p.name.toLowerCase().includes(searchTerm) || p.refCode.toLowerCase().includes(searchTerm)))
+            .slice(0, 5); // Limit suggestions
+
+        if (filtered.length > 0) {
+            suggestionsContainer.innerHTML = filtered.map(p => `
+                <div onclick="Sales.addToCart('${p.id}')" style="padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border-color);" class="suggestion-item">
+                    <strong>${p.name}</strong> (${p.refCode}) - ${Utils.formatCurrency(p.salePrice)} | Estoque: ${p.quantity}
+                </div>
+            `).join('');
+            suggestionsContainer.classList.remove('hidden');
+        } else {
+            suggestionsContainer.classList.add('hidden');
+        }
+    },
+    addToCart(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+
+        const existingItem = this.cart.find(item => item.id === productId);
+        if (existingItem) {
+            if (existingItem.quantity < product.quantity) {
+                existingItem.quantity++;
+            } else {
+                Notification.warning('Quantidade máxima em estoque atingida.');
+            }
+        } else {
+            this.cart.push({ ...product, quantity: 1 });
+        }
+        this.updateCart();
+        document.getElementById('productSearchPDV').value = '';
+        document.getElementById('productSuggestions').classList.add('hidden');
+    },
+    updateCart() {
+        const tbody = document.getElementById('cartTableBody');
+        let total = 0;
+        if (this.cart.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>`;
+        } else {
+            tbody.innerHTML = this.cart.map(item => {
+                const subtotal = item.salePrice * item.quantity;
+                total += subtotal;
+                return `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${Utils.formatCurrency(item.salePrice)}</td>
+                        <td>
+                            <input type="number" class="form-input" value="${item.quantity}" min="1" max="${item.quantity}" onchange="Sales.updateItemQuantity('${item.id}', this.value)">
+                        </td>
+                        <td>${Utils.formatCurrency(subtotal)}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.id}')"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        document.getElementById('cartTotal').textContent = Utils.formatCurrency(total);
+        document.getElementById('finalizeSale').disabled = this.cart.length === 0;
+    },
+    updateItemQuantity(productId, newQuantity) {
+        const item = this.cart.find(i => i.id === productId);
+        const product = this.products.find(p => p.id === productId);
+        const quantity = parseInt(newQuantity);
+        if (item && quantity > 0) {
+            if (quantity > product.quantity) {
+                Notification.warning('Quantidade maior que o estoque!');
+                item.quantity = product.quantity;
+            } else {
+                item.quantity = quantity;
+            }
+        }
+        this.updateCart();
+    },
+    removeFromCart(productId) {
+        this.cart = this.cart.filter(item => item.id !== productId);
+        this.updateCart();
+    },
+    clearCart() {
+        this.cart = [];
+        this.updateCart();
+        document.getElementById('saleClient').value = '';
+        document.getElementById('salePaymentMethod').value = 'Dinheiro';
+        document.getElementById('saleInstallments').value = '1';
+        this.toggleInstallments();
+    },
+    toggleInstallments() {
+        const method = document.getElementById('salePaymentMethod').value;
+        const group = document.getElementById('installmentsGroup');
+        group.classList.toggle('hidden', method !== 'Crediário');
+    },
+    async finalizeSale() {
+        const clientId = document.getElementById('saleClient').value;
+        const paymentMethod = document.getElementById('salePaymentMethod').value;
+        const installments = parseInt(document.getElementById('saleInstallments').value) || 1;
+        const total = this.cart.reduce((sum, item) => sum + item.salePrice * item.quantity, 0);
+
+        if (paymentMethod === 'Crediário' && !clientId) {
+            return Notification.error('Selecione um cliente para vendas em crediário.');
+        }
+
+        const saleId = Utils.generateUUID();
+        const sale = {
+            id: saleId,
+            date: new Date().toISOString(),
+            clientId,
+            paymentMethod,
+            items: this.cart.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.salePrice })),
+            total
+        };
+
+        try {
+            // Firestore batch write to ensure all operations succeed or fail together
+            const batch = db.batch();
+
+            // 1. Save the sale
+            const saleRef = db.collection(CONFIG.storageKeys.sales).doc(saleId);
+            batch.set(saleRef, sale);
+
+            // 2. Update product stock
+            for (const item of this.cart) {
+                const productRef = db.collection(CONFIG.storageKeys.products).doc(item.id);
+                const newQuantity = item.quantity - item.quantity;
+                batch.update(productRef, { quantity: firebase.firestore.FieldValue.increment(-item.quantity) });
+            }
+
+            // 3. Add to cash flow or receivables
+            if (paymentMethod === 'Crediário') {
+                const installmentValue = total / installments;
+                for (let i = 1; i <= installments; i++) {
+                    const receivableId = Utils.generateUUID();
+                    const dueDate = new Date();
+                    dueDate.setMonth(dueDate.getMonth() + i);
+                    const receivable = {
+                        id: receivableId,
+                        saleId,
+                        clientId,
+                        value: installmentValue,
+                        description: `Parcela ${i}/${installments} da venda ${saleId.substring(0, 4)}`,
+                        dueDate: dueDate.toISOString(),
+                        status: 'Pendente',
+                        createdAt: new Date().toISOString()
+                    };
+                    const receivableRef = db.collection(CONFIG.storageKeys.accountsReceivable).doc(receivableId);
+                    batch.set(receivableRef, receivable);
+                }
+            } else {
+                const cashFlowId = Utils.generateUUID();
+                const cashFlowEntry = {
+                    id: cashFlowId,
+                    type: 'entrada',
+                    description: `Venda #${saleId.substring(0, 8)}`,
+                    value: total,
+                    date: new Date().toISOString(),
+                    source: 'venda',
+                    sourceId: saleId
+                };
+                const cashFlowRef = db.collection(CONFIG.storageKeys.cashFlow).doc(cashFlowId);
+                batch.set(cashFlowRef, cashFlowEntry);
+            }
+
+            // Commit the batch
+            await batch.commit();
+
+            Notification.success('Venda finalizada com sucesso!');
+            await Receipts.viewReceipt(saleId); // Show receipt after sale
+            await this.initPage(); // Reset PDV for next sale
+
+        } catch (error) {
+            console.error('Erro ao finalizar venda:', error);
+            Notification.error('Ocorreu um erro. A venda não foi concluída.');
+        }
+    }
+};
+
+// Módulo de Recibos
+const Receipts = {
+    sales: [],
+    clients: [],
+    init() {
+        document.getElementById('receiptClientFilter').addEventListener('change', () => this.renderReceipts());
+        document.getElementById('receiptDateFilter').addEventListener('change', () => this.renderReceipts());
+    },
+    async initPage() {
+        [this.sales, this.clients] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.sales),
+            Utils.loadFromStorage(CONFIG.storageKeys.clients)
+        ]);
+        this.populateClientFilter();
+        this.renderReceipts();
+    },
+    populateClientFilter() {
+        const select = document.getElementById('receiptClientFilter');
+        select.innerHTML = '<option value="">Todos os Clientes</option>';
+        this.clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(client => {
+            select.innerHTML += `<option value="${client.id}">${client.name}</option>`;
+        });
+    },
+    renderReceipts() {
+        const clientId = document.getElementById('receiptClientFilter').value;
+        const date = document.getElementById('receiptDateFilter').value;
+
+        let filteredSales = this.sales;
+        if (clientId) {
+            filteredSales = filteredSales.filter(s => s.clientId === clientId);
+        }
+        if (date) {
+            filteredSales = filteredSales.filter(s => s.date.startsWith(date));
+        }
+        
+        const tbody = document.getElementById('receiptsTableBody');
+        if (filteredSales.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum recibo encontrado</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = filteredSales.sort((a, b) => new Date(b.date) - new Date(a.date)).map(sale => {
+            const client = this.clients.find(c => c.id === sale.clientId);
+            return `
+                <tr>
+                    <td>#${sale.id.substring(0, 8)}</td>
+                    <td>${Utils.formatDateTime(sale.date)}</td>
+                    <td>${client ? client.name : 'Consumidor Final'}</td>
+                    <td>${Utils.formatCurrency(sale.total)}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="Receipts.viewReceipt('${sale.id}')"><i class="fas fa-eye"></i> Visualizar</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+    async viewReceipt(saleId) {
+        const sale = this.sales.find(s => s.id === saleId) || (await db.collection(CONFIG.storageKeys.sales).doc(saleId).get()).data();
+        if (!sale) return Notification.error('Venda não encontrada.');
+
+        const client = sale.clientId ? (this.clients.find(c => c.id === sale.clientId) || (await db.collection(CONFIG.storageKeys.clients).doc(sale.clientId).get()).data()) : null;
+
+        const receiptHtml = `
+            <div class="receipt-professional-container" id="receiptToPrint">
+                <div class="receipt-professional-header">
+                    <div class="receipt-logo-container"><i class="fas fa-store"></i></div>
+                    <div class="receipt-company-details">
+                        <h3>${CONFIG.company.name}</h3>
+                        <p>${CONFIG.company.address}</p>
+                        <p>Tel: ${CONFIG.company.phone} | CNPJ: ${CONFIG.company.cnpj}</p>
+                    </div>
+                </div>
+                <div class="receipt-sale-info">
+                    <div class="receipt-info-block">
+                        <p><span class="label">RECIBO Nº:</span> #${sale.id.substring(0, 8)}</p>
+                        <p><span class="label">DATA:</span> ${Utils.formatDateTime(sale.date)}</p>
+                    </div>
+                    <div class="receipt-info-block text-right">
+                        <p><span class="label">CLIENTE:</span></p>
+                        <p><strong>${client ? client.name : 'Consumidor Final'}</strong></p>
+                        <p>${client ? `Tel: ${client.phone}` : ''}</p>
+                    </div>
+                </div>
+                <table class="receipt-items-table">
+                    <thead><tr><th>Descrição</th><th class="text-center">Qtd</th><th class="text-right">Preço Unit.</th><th class="text-right">Subtotal</th></tr></thead>
+                    <tbody>
+                        ${sale.items.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td class="text-center">${item.quantity}</td>
+                                <td class="text-right">${Utils.formatCurrency(item.price)}</td>
+                                <td class="text-right">${Utils.formatCurrency(item.price * item.quantity)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="receipt-summary">
+                    <table>
+                        <tr>
+                            <td class="total-label">Subtotal</td>
+                            <td class="text-right">${Utils.formatCurrency(sale.total)}</td>
+                        </tr>
+                         <tr>
+                            <td class="total-label">Pagamento</td>
+                            <td class="text-right">${sale.paymentMethod}</td>
+                        </tr>
+                        <tr>
+                            <td class="total-label">Total</td>
+                            <td class="total-value text-right">${Utils.formatCurrency(sale.total)}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="receipt-footer">
+                    <p>Obrigado pela sua preferência!</p>
+                </div>
+            </div>
+        `;
+        const actionsHtml = `
+            <button class="btn btn-primary" onclick="Receipts.printReceipt()"><i class="fas fa-print"></i> Imprimir</button>
+            <button class="btn btn-secondary" onclick="Modal.hide()">Fechar</button>
+        `;
+        Modal.show('Recibo de Venda', receiptHtml, actionsHtml);
+    },
+    printReceipt() {
+        const printContent = document.getElementById('receiptToPrint').innerHTML;
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Imprimir Recibo</title>');
+        // Link to Font Awesome for the icon
+        printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">');
+        // Inject styles directly
+        printWindow.document.write('<style>' + document.querySelector('style').innerHTML + '</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(printContent);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        setTimeout(() => { // Timeout to ensure styles are loaded
+            printWindow.print();
+        }, 500);
+    }
+};
+
+// Módulo Fluxo de Caixa
+const CashFlow = {
+    currentEditId: null,
+    init() {
+        document.getElementById('cashFlowForm').addEventListener('submit', e => { e.preventDefault(); this.saveEntry(); });
+        document.getElementById('clearCashFlowForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce(() => this.filterEntries(), 300));
+        document.getElementById('exportCashFlow').addEventListener('click', () => this.exportToCSV());
+        document.getElementById('cashFlowDate').valueAsDate = new Date();
+    },
+    async saveEntry() {
+        const type = document.getElementById('cashFlowType').value;
+        const description = document.getElementById('cashFlowDescription').value.trim();
+        const value = parseFloat(document.getElementById('cashFlowValue').value);
+        const date = document.getElementById('cashFlowDate').value;
+        if (!description || !value || !date) return Notification.error('Preencha todos os campos.');
+
+        try {
+            if (this.currentEditId) {
+                await db.collection(CONFIG.storageKeys.cashFlow).doc(this.currentEditId).update({ type, description, value, date });
+                Notification.success('Lançamento atualizado!');
+            } else {
+                const newId = Utils.generateUUID();
+                const newEntry = { id: newId, type, description, value, date, source: 'manual' };
+                await db.collection(CONFIG.storageKeys.cashFlow).doc(newId).set(newEntry);
+                Notification.success('Lançamento salvo!');
+            }
+        } catch (error) {
+            console.error("Erro ao salvar lançamento: ", error);
+            Notification.error('Erro ao salvar lançamento.');
+        }
+        this.clearForm();
+        await this.loadCashFlow();
+    },
+    async deleteEntry(id) {
+        const entry = (await db.collection(CONFIG.storageKeys.cashFlow).doc(id).get()).data();
+        if (entry.source !== 'manual' && !confirm('Este lançamento foi gerado automaticamente. Excluí-lo pode causar inconsistências. Deseja continuar?')) {
+            return;
+        }
+        if (confirm('Tem certeza que deseja excluir este lançamento?')) {
+            await db.collection(CONFIG.storageKeys.cashFlow).doc(id).delete();
+            await this.loadCashFlow();
+            Notification.success('Lançamento excluído!');
+        }
+    },
+    async editEntry(id) {
+        const entry = (await db.collection(CONFIG.storageKeys.cashFlow).doc(id).get()).data();
+        if (entry.source !== 'manual') return Notification.warning('Lançamentos automáticos não podem ser editados.');
+        document.getElementById('cashFlowType').value = entry.type;
+        document.getElementById('cashFlowDescription').value = entry.description;
+        document.getElementById('cashFlowValue').value = entry.value;
+        document.getElementById('cashFlowDate').value = entry.date;
+        this.currentEditId = id;
+        document.getElementById('cashFlowForm').scrollIntoView({ behavior: 'smooth' });
+    },
+    clearForm() {
+        document.getElementById('cashFlowForm').reset();
+        document.getElementById('cashFlowDate').valueAsDate = new Date();
+        this.currentEditId = null;
+    },
+    async filterEntries() {
+        const searchTerm = document.getElementById('cashFlowSearch').value.toLowerCase();
+        const entries = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+        const filtered = entries.filter(e => e.description.toLowerCase().includes(searchTerm));
+        this.renderEntries(filtered);
+    },
+    async loadCashFlow() {
+        const entries = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+        this.renderEntries(entries);
+        this.updateSummary(entries);
+    },
+    updateSummary(entries) {
+        const totalEntradas = entries.filter(e => e.type === 'entrada').reduce((sum, e) => sum + e.value, 0);
+        const totalSaidas = entries.filter(e => e.type === 'saida').reduce((sum, e) => sum + e.value, 0);
+        const saldoAtual = totalEntradas - totalSaidas;
+
+        document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
+        document.getElementById('totalSaidas').textContent = Utils.formatCurrency(totalSaidas);
+        document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
+    },
+    renderEntries(entries) {
+        const tbody = document.getElementById('cashFlowTableBody');
+        tbody.innerHTML = entries.sort((a,b) => new Date(b.date) - new Date(a.date)).map(entry => `
+            <tr>
+                <td>${Utils.formatDate(entry.date)}</td>
+                <td><span class="badge ${entry.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${entry.type}</span></td>
+                <td>${entry.description}</td>
+                <td style="color: ${entry.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'};">${Utils.formatCurrency(entry.value)}</td>
+                <td>
+                    <div class="flex gap-1">
+                        <button class="btn btn-secondary btn-sm" onclick="CashFlow.editEntry('${entry.id}')" ${entry.source !== 'manual' ? 'disabled title="Não é possível editar lançamentos automáticos"' : 'title="Editar"'}><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="CashFlow.deleteEntry('${entry.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    },
+    async exportToCSV() {
+        const entries = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+        if (entries.length === 0) return Notification.warning('Nenhum lançamento para exportar!');
+        const headers = ['Data', 'Tipo', 'Descrição', 'Valor', 'Origem'];
+        const csvContent = [
+            headers.join(','),
+            ...entries.map(e => [Utils.formatDate(e.date), e.type, `"${e.description}"`, e.value.toFixed(2), e.source || 'manual'].join(','))
+        ].join('\n');
+        Utils.downloadCSV(csvContent, 'fluxo_caixa');
+    }
+};
+
+// Módulo de Despesas
+const Expenses = {
+    currentEditId: null,
+    init() {
+        document.getElementById('expenseForm').addEventListener('submit', e => { e.preventDefault(); this.saveExpense(); });
+        document.getElementById('clearExpenseForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.filterExpenses(), 300));
+        document.getElementById('expenseFilterCategory').addEventListener('change', () => this.filterExpenses());
+        document.getElementById('exportExpenses').addEventListener('click', () => this.exportToCSV());
+        document.getElementById('expenseDate').valueAsDate = new Date();
+    },
+    async saveExpense() {
+        const description = document.getElementById('expenseDescription').value.trim();
+        const category = document.getElementById('expenseCategory').value;
+        const value = parseFloat(document.getElementById('expenseValue').value);
+        const date = document.getElementById('expenseDate').value;
+        if (!description || !category || !value || !date) return Notification.error('Preencha todos os campos!');
+        
+        const expenseId = this.currentEditId || Utils.generateUUID();
+        const expenseData = { id: expenseId, description, category, value, date, updatedAt: new Date().toISOString() };
+        
+        try {
+            const batch = db.batch();
+            const expenseRef = db.collection(CONFIG.storageKeys.expenses).doc(expenseId);
+            
+            if (this.currentEditId) {
+                const oldExpense = (await expenseRef.get()).data();
+                batch.update(expenseRef, expenseData);
+                // Update corresponding cash flow entry
+                const cashFlowRef = db.collection(CONFIG.storageKeys.cashFlow).doc(oldExpense.cashFlowId);
+                batch.update(cashFlowRef, { description: `Despesa: ${description}`, value, date });
+                Notification.success('Despesa atualizada!');
+            } else {
+                const cashFlowId = Utils.generateUUID();
+                expenseData.createdAt = new Date().toISOString();
+                expenseData.cashFlowId = cashFlowId;
+                batch.set(expenseRef, expenseData);
+                // Create corresponding cash flow entry
+                const cashFlowRef = db.collection(CONFIG.storageKeys.cashFlow).doc(cashFlowId);
+                const cashFlowEntry = {
+                    id: cashFlowId,
+                    type: 'saida',
+                    description: `Despesa: ${description}`,
+                    value,
+                    date,
+                    source: 'despesa',
+                    sourceId: expenseId
+                };
+                batch.set(cashFlowRef, cashFlowEntry);
+                Notification.success('Despesa salva!');
+            }
+            await batch.commit();
+        } catch (error) {
+            console.error("Erro ao salvar despesa: ", error);
+            Notification.error('Erro ao salvar despesa.');
+        }
+
+        this.clearForm();
+        await this.loadExpenses();
+    },
+    async deleteExpense(id) {
+        if (!confirm('Tem certeza que deseja excluir esta despesa? Isso também removerá o lançamento do fluxo de caixa.')) return;
+        try {
+            const batch = db.batch();
+            const expenseRef = db.collection(CONFIG.storageKeys.expenses).doc(id);
+            const expense = (await expenseRef.get()).data();
+            
+            // Delete expense
+            batch.delete(expenseRef);
+            
+            // Delete linked cash flow entry
+            if (expense.cashFlowId) {
+                const cashFlowRef = db.collection(CONFIG.storageKeys.cashFlow).doc(expense.cashFlowId);
+                batch.delete(cashFlowRef);
+            }
+            
+            await batch.commit();
+            await this.loadExpenses();
+            Notification.success('Despesa excluída!');
+        } catch (error) {
+            console.error("Erro ao excluir despesa: ", error);
+            Notification.error('Erro ao excluir despesa.');
+        }
+    },
+    async editExpense(id) {
+        const expense = (await db.collection(CONFIG.storageKeys.expenses).doc(id).get()).data();
+        document.getElementById('expenseDescription').value = expense.description;
+        document.getElementById('expenseCategory').value = expense.category;
+        document.getElementById('expenseValue').value = expense.value;
+        document.getElementById('expenseDate').value = expense.date;
+        this.currentEditId = id;
+        document.getElementById('expenseForm').scrollIntoView({ behavior: 'smooth' });
+    },
+    clearForm() {
+        document.getElementById('expenseForm').reset();
+        document.getElementById('expenseDate').valueAsDate = new Date();
+        this.currentEditId = null;
+    },
+    async filterExpenses() {
+        const searchTerm = document.getElementById('expenseSearch').value.toLowerCase();
+        const category = document.getElementById('expenseFilterCategory').value;
+        let expenses = await Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+        if (searchTerm) expenses = expenses.filter(e => e.description.toLowerCase().includes(searchTerm));
+        if (category) expenses = expenses.filter(e => e.category === category);
+        this.renderExpenses(expenses);
+    },
+    async loadExpenses() {
+        const expenses = await Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+        this.renderExpenses(expenses);
+        this.updateSummary(expenses);
+    },
+    updateSummary(expenses) {
+        const now = new Date();
+        const month = now.getMonth();
+        const year = now.getFullYear();
+        const totalMonth = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === month && d.getFullYear() === year; }).reduce((sum, e) => sum + e.value, 0);
+        const totalYear = expenses.filter(e => new Date(e.date).getFullYear() === year).reduce((sum, e) => sum + e.value, 0);
+        document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(totalMonth);
+        document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(totalYear);
+    },
+    renderExpenses(expenses) {
+        const tbody = document.getElementById('expensesTableBody');
+        tbody.innerHTML = expenses.sort((a, b) => new Date(b.date) - new Date(a.date)).map(e => `
+            <tr>
+                <td>${Utils.formatDate(e.date)}</td>
+                <td>${e.description}</td>
+                <td>${e.category}</td>
+                <td>${Utils.formatCurrency(e.value)}</td>
+                <td>
+                    <div class="flex gap-1">
+                        <button class="btn btn-secondary btn-sm" onclick="Expenses.editExpense('${e.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="Expenses.deleteExpense('${e.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    },
+    async exportToCSV() {
+        const entries = await Utils.loadFromStorage(CONFIG.storageKeys.expenses);
+        if (entries.length === 0) return Notification.warning('Nenhuma despesa para exportar!');
+        const headers = ['Data', 'Descrição', 'Categoria', 'Valor'];
+        const csvContent = [
+            headers.join(','),
+            ...entries.map(e => [Utils.formatDate(e.date), `"${e.description}"`, e.category, e.value.toFixed(2)].join(','))
+        ].join('\n');
+        Utils.downloadCSV(csvContent, 'despesas');
+    }
+};
+
+// Módulo Contas a Receber
+const Receivables = {
+    currentEditId: null,
+    init() {
+        document.getElementById('receivableForm').addEventListener('submit', e => { e.preventDefault(); this.saveReceivable(); });
+        document.getElementById('clearReceivableForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.filterReceivables(), 300));
+        document.getElementById('receivableFilterStatus').addEventListener('change', () => this.filterReceivables());
+        document.getElementById('exportReceivables').addEventListener('click', () => this.exportToCSV());
+        document.getElementById('receivableDueDate').valueAsDate = new Date();
+    },
+    async initPage() {
+        await this.loadReceivables();
+        await this.loadClientsForSelect();
+    },
+    async loadClientsForSelect() {
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        const select = document.getElementById('receivableClient');
+        select.innerHTML = '<option value="">Selecione um cliente</option>';
+        clients.sort((a,b) => a.name.localeCompare(b.name)).forEach(client => {
+            select.innerHTML += `<option value="${client.id}">${client.name}</option>`;
+        });
+    },
+    async saveReceivable() {
+        const clientId = document.getElementById('receivableClient').value;
+        const description = document.getElementById('receivableDescription').value.trim();
+        const value = parseFloat(document.getElementById('receivableValue').value);
+        const dueDate = document.getElementById('receivableDueDate').value;
+        if (!clientId || !description || !value || !dueDate) return Notification.error('Preencha todos os campos.');
+        
+        try {
+            if (this.currentEditId) {
+                await db.collection(CONFIG.storageKeys.accountsReceivable).doc(this.currentEditId).update({ clientId, description, value, dueDate, updatedAt: new Date().toISOString() });
+                Notification.success('Conta atualizada!');
+            } else {
+                const newId = Utils.generateUUID();
+                const newReceivable = { id: newId, clientId, description, value, dueDate, status: 'Pendente', source: 'manual', createdAt: new Date().toISOString() };
+                await db.collection(CONFIG.storageKeys.accountsReceivable).doc(newId).set(newReceivable);
+                Notification.success('Conta salva!');
+            }
+        } catch(error) {
+            console.error(error);
+            Notification.error("Erro ao salvar conta.");
+        }
+        this.clearForm();
+        await this.loadReceivables();
+    },
+    async markAsPaid(id) {
+        if (!confirm('Deseja marcar esta conta como paga? Um lançamento de entrada será criado no fluxo de caixa.')) return;
+        try {
+            const batch = db.batch();
+            const receivableRef = db.collection(CONFIG.storageKeys.accountsReceivable).doc(id);
+            const receivable = (await receivableRef.get()).data();
+            
+            // Update receivable status
+            batch.update(receivableRef, { status: 'Pago', paidAt: new Date().toISOString() });
+            
+            // Add to cash flow
+            const client = (await db.collection(CONFIG.storageKeys.clients).doc(receivable.clientId).get()).data();
+            const cashFlowId = Utils.generateUUID();
+            const cashFlowRef = db.collection(CONFIG.storageKeys.cashFlow).doc(cashFlowId);
+            batch.set(cashFlowRef, {
+                id: cashFlowId,
+                type: 'entrada',
+                description: `Recebimento de ${client.name} - ${receivable.description}`,
+                value: receivable.value,
+                date: new Date().toISOString(),
+                source: 'recebimento',
+                sourceId: id
+            });
+            
+            await batch.commit();
+            await this.loadReceivables();
+            Notification.success('Conta marcada como paga!');
+        } catch(error) {
+            console.error(error);
+            Notification.error("Erro ao marcar como pago.");
+        }
+    },
+    async deleteReceivable(id) {
+        if (confirm('Tem certeza que deseja excluir esta conta?')) {
+            const receivable = (await db.collection(CONFIG.storageKeys.accountsReceivable).doc(id).get()).data();
+            if (receivable.status === 'Pago' && !confirm('Esta conta já foi paga. Excluí-la não removerá o valor do fluxo de caixa. Deseja continuar?')) return;
+            await db.collection(CONFIG.storageKeys.accountsReceivable).doc(id).delete();
+            await this.loadReceivables();
+            Notification.success('Conta excluída!');
+        }
+    },
+    clearForm() {
+        document.getElementById('receivableForm').reset();
+        document.getElementById('receivableDueDate').valueAsDate = new Date();
+        this.currentEditId = null;
+    },
+    async filterReceivables() {
+        const searchTerm = document.getElementById('receivableSearch').value.toLowerCase();
+        const status = document.getElementById('receivableFilterStatus').value;
+        let receivables = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+
+        if (searchTerm) {
+            receivables = receivables.filter(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                return r.description.toLowerCase().includes(searchTerm) || (client && client.name.toLowerCase().includes(searchTerm));
+            });
+        }
+        if (status) {
+            if (status === 'Vencido') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                receivables = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) < today);
+            } else {
+                 receivables = receivables.filter(r => r.status === status);
+            }
+        }
+        await this.renderReceivables(receivables, clients);
+    },
+    async loadReceivables() {
+        const [receivables, clients] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable),
+            Utils.loadFromStorage(CONFIG.storageKeys.clients)
+        ]);
+        await this.renderReceivables(receivables, clients);
+        this.updateSummary(receivables);
+    },
+    updateSummary(receivables) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const pending = receivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
+        const overdue = receivables.filter(r => r.status === 'Pendente' && new Date(r.dueDate) < today).reduce((sum, r) => sum + r.value, 0);
+        const paid = receivables.filter(r => r.status === 'Pago').reduce((sum, r) => sum + r.value, 0);
+        document.getElementById('totalReceivablesPending').textContent = Utils.formatCurrency(pending);
+        document.getElementById('totalReceivablesOverdue').textContent = Utils.formatCurrency(overdue);
+        document.getElementById('totalReceivablesPaid').textContent = Utils.formatCurrency(paid);
+    },
+    async renderReceivables(receivables, clients) {
+        const tbody = document.getElementById('receivablesTableBody');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        tbody.innerHTML = receivables.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).map(r => {
+            const client = clients.find(c => c.id === r.clientId);
+            let status = r.status;
+            let statusClass = r.status === 'Pago' ? 'badge-success' : 'badge-warning';
+            if (r.status === 'Pendente' && new Date(r.dueDate) < today) {
+                status = 'Vencido';
+                statusClass = 'badge-danger';
+            }
+            return `
+                <tr>
+                    <td>${client ? client.name : 'N/A'}</td>
+                    <td>${r.description}</td>
+                    <td>${Utils.formatCurrency(r.value)}</td>
+                    <td>${Utils.formatDate(r.dueDate)}</td>
+                    <td><span class="badge ${statusClass}">${status}</span></td>
+                    <td>
+                        <div class="flex gap-1">
+                            ${r.status === 'Pendente' ? `<button class="btn btn-success btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i></button>` : ''}
+                            <button class="btn btn-danger btn-sm" onclick="Receivables.deleteReceivable('${r.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+    async exportToCSV() {
+        const [receivables, clients] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable),
+            Utils.loadFromStorage(CONFIG.storageKeys.clients)
+        ]);
+        if (receivables.length === 0) return Notification.warning('Nenhuma conta para exportar!');
+        
+        const headers = ['Cliente', 'Descrição', 'Valor', 'Vencimento', 'Status'];
+        const csvContent = [
+            headers.join(','),
+            ...receivables.map(r => {
+                const client = clients.find(c => c.id === r.clientId);
+                return [`"${client ? client.name : 'N/A'}"`, `"${r.description}"`, r.value.toFixed(2), Utils.formatDate(r.dueDate), r.status].join(',');
+            })
+        ].join('\n');
+        Utils.downloadCSV(csvContent, 'contas_a_receber');
+    }
+};
+
+// Módulo de Relatórios
+const Reports = {
+    chart: null,
+    reportData: [],
+    init() {
+        document.getElementById('generateReport').addEventListener('click', () => this.generateReport());
+        document.getElementById('reportType').addEventListener('change', () => this.toggleReportFilters());
+        document.getElementById('exportReportPDF').addEventListener('click', () => this.exportToPDF());
+        document.getElementById('exportReportCSV').addEventListener('click', () => this.exportToCSV());
+    },
+    async initPage() {
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        document.getElementById('reportStartDate').value = firstDayOfMonth;
+        document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
+        
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        const select = document.getElementById('reportReceivableClient');
+        select.innerHTML = '<option value="">Todos os Clientes</option>';
+        clients.forEach(c => select.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+
+        this.toggleReportFilters();
+        await this.generateReport();
+    },
+    toggleReportFilters() {
+        const reportType = document.getElementById('reportType').value;
+        const clientFilter = document.getElementById('reportClientFilterContainer');
+        const statusFilter = document.getElementById('reportStatusFilterContainer');
+        const showFilters = reportType === 'contas_a_receber' || reportType === 'clientes';
+        clientFilter.classList.toggle('hidden', !showFilters);
+        statusFilter.classList.toggle('hidden', reportType !== 'contas_a_receber');
+    },
+    async generateReport() {
+        const startDate = document.getElementById('reportStartDate').value;
+        const endDate = document.getElementById('reportEndDate').value;
+        const type = document.getElementById('reportType').value;
+        if (!startDate || !endDate) return Notification.error('Selecione as datas de início e fim.');
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        
+        let reportFunction;
+        switch (type) {
+            case 'vendas': reportFunction = this.generateSalesReport; break;
+            case 'financeiro': reportFunction = this.generateFinancialReport; break;
+            case 'produtos': reportFunction = this.generateProductsReport; break;
+            case 'clientes': reportFunction = this.generateClientsReport; break;
+            case 'contas_a_receber': reportFunction = this.generateReceivablesReport; break;
+        }
+
+        if (reportFunction) {
+            Notification.show("Gerando relatório...", "warning");
+            await reportFunction.call(this, start, end);
+            Notification.success("Relatório gerado!");
+        }
+    },
+    async generateSalesReport(start, end) {
+        const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
+        const filtered = sales.filter(s => new Date(s.date) >= start && new Date(s.date) <= end);
+
+        const totalSales = filtered.reduce((sum, s) => sum + s.total, 0);
+        document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalSales);
+        document.getElementById('reportTotalExpenses').textContent = "N/A";
+        document.getElementById('reportProfit').textContent = "N/A";
+        document.getElementById('reportSalesCount').textContent = filtered.length;
+
+        const salesByDay = {};
+        filtered.forEach(s => {
+            const day = new Date(s.date).toLocaleDateString('pt-BR');
+            salesByDay[day] = (salesByDay[day] || 0) + s.total;
+        });
+
+        this.updateChart('Vendas por Dia', Object.keys(salesByDay), Object.values(salesByDay));
+        this.updateTopLists('produtos', sales);
+        
+        const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
+        this.reportData = filtered.map(s => ({
+            'ID Venda': s.id.substring(0,8),
+            'Data': Utils.formatDateTime(s.date),
+            'Cliente': (clients.find(c => c.id === s.clientId) || {name: 'Consumidor Final'}).name,
+            'Pagamento': s.paymentMethod,
+            'Total': Utils.formatCurrency(s.total)
+        }));
+        this.renderDetailTable(this.reportData);
+    },
+    async generateFinancialReport(start, end) {
+        const cashFlow = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
+        const filtered = cashFlow.filter(cf => new Date(cf.date) >= start && new Date(cf.date) <= end);
+        
+        const totalIncome = filtered.filter(cf => cf.type === 'entrada').reduce((sum, cf) => sum + cf.value, 0);
+        const totalOutcome = filtered.filter(cf => cf.type === 'saida').reduce((sum, cf) => sum + cf.value, 0);
+        
+        document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalIncome);
+        document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(totalOutcome);
+        document.getElementById('reportProfit').textContent = Utils.formatCurrency(totalIncome - totalOutcome);
+        document.getElementById('reportSalesCount').textContent = "N/A";
+
+        const balanceByDay = {};
+        filtered.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(cf => {
+            const day = new Date(cf.date).toLocaleDateString('pt-BR');
+            balanceByDay[day] = (balanceByDay[day] || 0) + (cf.type === 'entrada' ? cf.value : -cf.value);
+        });
+
+        this.updateChart('Balanço Diário (Entradas - Saídas)', Object.keys(balanceByDay), Object.values(balanceByDay));
+        this.updateTopLists('despesas', cashFlow);
+
+        this.reportData = filtered.map(cf => ({
+            'Data': Utils.formatDate(cf.date),
+            'Tipo': cf.type,
+            'Descrição': cf.description,
+            'Valor': Utils.formatCurrency(cf.value)
+        }));
+        this.renderDetailTable(this.reportData);
+    },
+    async generateProductsReport(start, end) {
+        const [sales, products] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.sales),
+            Utils.loadFromStorage(CONFIG.storageKeys.products),
+        ]);
+        const filteredSales = sales.filter(s => new Date(s.date) >= start && new Date(s.date) <= end);
+
+        const productSales = {};
+        filteredSales.forEach(sale => {
+            sale.items.forEach(item => {
+                if (!productSales[item.id]) {
+                    productSales[item.id] = { name: item.name, quantity: 0, revenue: 0 };
+                }
+                productSales[item.id].quantity += item.quantity;
+                productSales[item.id].revenue += item.quantity * item.price;
+            });
+        });
+        
+        const sortedProducts = Object.values(productSales).sort((a, b) => b.revenue - a.revenue);
+        this.updateChart('Top 10 Produtos (Receita)', sortedProducts.slice(0,10).map(p=>p.name), sortedProducts.slice(0,10).map(p=>p.revenue));
+        this.updateTopLists('produtos_report', sortedProducts);
+
+        const totalRevenue = sortedProducts.reduce((sum, p) => sum + p.revenue, 0);
+        document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(totalRevenue);
+        document.getElementById('reportTotalExpenses').textContent = "N/A";
+        document.getElementById('reportProfit').textContent = "N/A";
+        document.getElementById('reportSalesCount').textContent = filteredSales.length;
+
+        this.reportData = sortedProducts.map(p => ({
+            'Produto': p.name,
+            'Quantidade Vendida': p.quantity,
+            'Receita Gerada': Utils.formatCurrency(p.revenue)
+        }));
+        this.renderDetailTable(this.reportData);
+    },
+    async generateClientsReport(start, end) {
+        const [sales, clients] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.sales),
+            Utils.loadFromStorage(CONFIG.storageKeys.clients),
+        ]);
+        const filteredSales = sales.filter(s => new Date(s.date) >= start && new Date(s.date) <= end);
+        
+        const clientSpending = {};
+        filteredSales.forEach(sale => {
+            if (sale.clientId) {
+                if (!clientSpending[sale.clientId]) {
+                    clientSpending[sale.clientId] = { purchases: 0, total: 0 };
+                }
+                clientSpending[sale.clientId].purchases++;
+                clientSpending[sale.clientId].total += sale.total;
+            }
+        });
+
+        const sortedClients = Object.keys(clientSpending).map(id => ({
+            id,
+            name: (clients.find(c => c.id === id) || {name: 'Cliente Removido'}).name,
+            ...clientSpending[id]
+        })).sort((a,b) => b.total - a.total);
+        
+        this.updateTopLists('clientes_report', sortedClients);
+        this.updateChart('Top 10 Clientes (Gastos)', sortedClients.slice(0,10).map(c=>c.name), sortedClients.slice(0,10).map(c=>c.total));
+
+        this.reportData = sortedClients;
+        this.renderDetailTable(sortedClients.map(c => ({
+            'Cliente': c.name,
+            'Total Gasto': Utils.formatCurrency(c.total),
+            'Nº de Compras': c.purchases
+        })));
+    },
+    async generateReceivablesReport(start, end) {
+        const [receivables, clients] = await Promise.all([
+            Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable),
+            Utils.loadFromStorage(CONFIG.storageKeys.clients),
+        ]);
+        
+        const clientId = document.getElementById('reportReceivableClient').value;
+        const status = document.getElementById('reportReceivableStatus').value;
+        
+        let filtered = receivables.filter(r => new Date(r.createdAt) >= start && new Date(r.createdAt) <= end);
+        if (clientId) filtered = filtered.filter(r => r.clientId === clientId);
+        if (status) filtered = filtered.filter(r => r.status === status);
+        
+        const clientDebt = {};
+        filtered.forEach(r => {
+            if(r.status !== 'Pago') {
+                clientDebt[r.clientId] = (clientDebt[r.clientId] || 0) + r.value;
+            }
+        });
+        const sortedDebtors = Object.keys(clientDebt).map(id => ({
+            id,
+            name: (clients.find(c=>c.id === id) || {name: 'Cliente Removido'}).name,
+            debt: clientDebt[id]
+        })).sort((a,b) => b.debt - a.debt);
+
+        this.updateTopLists('devedores_report', sortedDebtors);
+        this.updateChart('Top 10 Devedores', sortedDebtors.slice(0,10).map(c=>c.name), sortedDebtors.slice(0,10).map(c=>c.debt));
+        
+        this.reportData = filtered.map(r => {
+            const client = clients.find(c => c.id === r.clientId);
+            return {
+                'Cliente': client ? client.name : 'N/A',
+                'Vencimento': Utils.formatDate(r.dueDate),
+                'Valor': Utils.formatCurrency(r.value),
+                'Status': r.status,
+            };
+        });
+        this.renderDetailTable(this.reportData);
+    },
+    updateChart(label, labels, data) {
+        const ctx = document.getElementById('reportChart').getContext('2d');
+        if (this.chart) this.chart.destroy();
+        this.chart = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{ label, data, borderColor: '#3B82F6', tension: 0.1 }] },
+            options: { ...Dashboard.chart.options } // Reuse dashboard chart options
+        });
+    },
+    updateTopLists(type, data) {
+        const container = document.getElementById('topProductsList');
+        let content = '';
+        switch(type) {
+            case 'produtos':
+                 const productSales = {};
+                 data.forEach(sale => sale.items.forEach(item => {
+                    productSales[item.id] = (productSales[item.id] || 0) + item.quantity;
+                 }));
+                 const topProducts = Object.keys(productSales).sort((a,b) => productSales[b] - productSales[a]).slice(0,5);
+                 content = `<h6>Top 5 Produtos Mais Vendidos</h6><ol>${topProducts.map(id => `<li>${(data.flatMap(s=>s.items).find(i=>i.id===id)).name} (${productSales[id]} un)</li>`).join('')}</ol>`;
+                break;
+            case 'produtos_report':
+                 content = `<h6>Top 5 Produtos (Receita)</h6><ol>${data.slice(0,5).map(p => `<li>${p.name} (${Utils.formatCurrency(p.revenue)})</li>`).join('')}</ol>`;
+                break;
+             case 'clientes_report':
+                 content = `<h6>Top 5 Clientes (Gastos)</h6><ol>${data.slice(0,5).map(p => `<li>${p.name} (${Utils.formatCurrency(p.total)})</li>`).join('')}</ol>`;
+                break;
+             case 'devedores_report':
+                 content = `<h6>Top 5 Devedores</h6><ol>${data.slice(0,5).map(p => `<li>${p.name} (${Utils.formatCurrency(p.debt)})</li>`).join('')}</ol>`;
+                break;
+            case 'despesas':
+                const expenseCats = {};
+                data.filter(i => i.type === 'saida').forEach(i => {
+                    const desc = i.description.split(':')[0]; // e.g., "Despesa"
+                    expenseCats[desc] = (expenseCats[desc] || 0) + i.value;
+                });
+                const topCats = Object.keys(expenseCats).sort((a,b) => expenseCats[b] - expenseCats[a]).slice(0,5);
+                content = `<h6>Top 5 Categorias de Despesa</h6><ol>${topCats.map(cat => `<li>${cat} (${Utils.formatCurrency(expenseCats[cat])})</li>`).join('')}</ol>`;
+                break;
+        }
+        container.innerHTML = content || '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Sem dados para exibir.</p>';
+    },
+    renderDetailTable(data) {
+        const thead = document.getElementById('reportTableHead');
+        const tbody = document.getElementById('reportTableBody');
+        if (data.length === 0) {
+            thead.innerHTML = '';
+            tbody.innerHTML = `<tr><td class="text-center" style="padding: 40px;">Nenhum dado para este relatório.</td></tr>`;
+            return;
+        }
+        const headers = Object.keys(data[0]);
+        thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        tbody.innerHTML = data.map(row => `<tr>${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>`).join('');
+    },
+    exportToPDF() {
+        if (this.reportData.length === 0) return Notification.warning('Gere um relatório primeiro.');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text(`Relatório - ${document.getElementById('reportType').value}`, 14, 16);
+        doc.autoTable({
+            head: [Object.keys(this.reportData[0])],
+            body: this.reportData.map(row => Object.values(row)),
+            startY: 20,
+        });
+        doc.save(`relatorio_${new Date().toISOString().split('T')[0]}.pdf`);
+    },
+    exportToCSV() {
+        if (this.reportData.length === 0) return Notification.warning('Gere um relatório primeiro.');
+        const headers = Object.keys(this.reportData[0]);
+        const csvContent = [
+            headers.join(','),
+            ...this.reportData.map(row => headers.map(h => `"${row[h]}"`).join(','))
+        ].join('\n');
+        Utils.downloadCSV(csvContent, `relatorio_${document.getElementById('reportType').value}`);
+    }
+};
+
+// Módulo de Configurações
+const Settings = {
+    init() {
+        document.getElementById('downloadBackup').addEventListener('click', () => this.downloadBackup());
+        document.getElementById('restoreFile').addEventListener('change', (e) => {
+            document.getElementById('restoreBackup').disabled = !e.target.files.length;
+        });
+        document.getElementById('restoreBackup').addEventListener('click', () => this.restoreBackup());
+        document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
+    },
+    async updateBackupStats() {
+        const counts = await Promise.all([
+            db.collection(CONFIG.storageKeys.clients).get().then(snap => snap.size),
+            db.collection(CONFIG.storageKeys.products).get().then(snap => snap.size),
+            db.collection(CONFIG.storageKeys.sales).get().then(snap => snap.size),
+            db.collection(CONFIG.storageKeys.accountsReceivable).get().then(snap => snap.size),
+        ]);
+        document.getElementById('backupClientsCount').textContent = counts[0];
+        document.getElementById('backupProductsCount').textContent = counts[1];
+        document.getElementById('backupSalesCount').textContent = counts[2];
+        document.getElementById('backupReceivablesCount').textContent = counts[3];
+    },
+    async downloadBackup() {
+        Notification.show("Iniciando backup completo...", "warning");
+        const backupData = {};
+        for (const key in CONFIG.storageKeys) {
+            if(key === 'lastActivePage') continue;
+            const collectionName = CONFIG.storageKeys[key];
+            backupData[collectionName] = await Utils.loadFromStorage(collectionName);
+        }
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `backup_sgi_${new Date().toISOString()}.json`;
+        link.click();
+        Notification.success("Backup baixado com sucesso!");
+    },
+    async restoreBackup() {
+        const file = document.getElementById('restoreFile').files[0];
+        if (!file) return Notification.error('Selecione um arquivo de backup.');
+        if (!confirm('ATENÇÃO! Restaurar um backup substituirá TODOS os dados atuais. Esta ação é IRREVERSÍVEL. Deseja continuar?')) return;
+
+        Notification.show("Restaurando backup... Por favor, aguarde.", "warning");
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const backupData = JSON.parse(e.target.result);
+                // First, clear all existing data
+                await this.clearAllData(false); // false to skip confirmation
+                
+                // Then, restore from backup file
+                const promises = [];
+                for (const collectionName in backupData) {
+                    const collectionData = backupData[collectionName];
+                    if(Array.isArray(collectionData)) {
+                        const batch = db.batch();
+                        collectionData.forEach(item => {
+                            if(item.id) {
+                                const docRef = db.collection(collectionName).doc(item.id);
+                                batch.set(docRef, item);
+                            }
+                        });
+                        promises.push(batch.commit());
+                    }
+                }
+                await Promise.all(promises);
+                Notification.success("Backup restaurado com sucesso! A página será recarregada.");
+                setTimeout(() => window.location.reload(), 2000);
+            } catch (error) {
+                console.error("Erro ao restaurar backup:", error);
+                Notification.error("Erro no arquivo de backup ou ao restaurar os dados.");
+            }
+        };
+        reader.readAsText(file);
+    },
+    async clearAllData(confirmFirst = true) {
+        if (confirmFirst && !confirm('PERIGO! Esta ação apagará TODOS os dados do sistema (clientes, produtos, vendas, etc.). É IRREVERSÍVEL. Tem certeza ABSOLUTA?')) return;
+
+        Notification.show("Limpando todos os dados...", "warning");
+        try {
+            const promises = [];
+            for (const key in CONFIG.storageKeys) {
+                if (key === 'lastActivePage') continue;
+                const collectionName = CONFIG.storageKeys[key];
+                const promise = db.collection(collectionName).get().then(snapshot => {
+                    const batch = db.batch();
+                    snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                    return batch.commit();
+                });
+                promises.push(promise);
+            }
+            await Promise.all(promises);
+            Notification.success("Todos os dados foram limpos com sucesso.");
+            await this.updateBackupStats();
+        } catch (error) {
+            console.error("Erro ao limpar dados:", error);
+            Notification.error("Ocorreu um erro ao limpar os dados.");
+        }
+    }
+};
+
+// Inicialização do Sistema
+document.addEventListener('DOMContentLoaded', () => {
+    Auth.init();
+    Navigation.init();
+    Clients.init();
+    Products.init();
+    Sales.init();
+    Receipts.init();
+    CashFlow.init();
+    Expenses.init();
+    Receivables.init();
+    Reports.init();
+    Settings.init();
+
+    document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
+    document.getElementById('modal').addEventListener('click', (e) => {
+        if (e.target.id === 'modal') Modal.hide();
     });
-    </script>
+
+    console.log('SGI - Flor de Maria v3.0 (Firebase) iniciado!');
+});
 </body>
 </html>
