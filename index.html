@@ -65,7 +65,7 @@
 
         <main class="main-content">
             
-            <div id="dashboardPage" class="page">
+            <div id="dashboardPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Visão geral do seu negócio</p>
@@ -229,71 +229,71 @@
                 </div>
             </div>
 
-             <div id="salesPage" class="page hidden">
-                <div class="page-header">
-                    <h1 class="page-title">Ponto de Venda</h1>
-                    <p class="page-subtitle">Registre suas vendas</p>
-                </div>
-                <div class="grid grid-layout-pdv">
-                    <div class="pdv-main">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Adicionar Produto</h3></div>
-                            <div class="form-group">
-                                <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
-                            </div>
-                            <div id="productSuggestions" class="hidden custom-scrollbar" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;"></div>
-                        </div>
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho de Compras</h3>
-                                <button class="btn btn-danger btn-sm" id="clearCart"><i class="fas fa-trash"></i> Limpar Carrinho</button>
-                            </div>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y:auto;">
-                                <table class="table">
-                                    <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Qtd.</th><th>Subtotal</th><th>Ações</th></tr></thead>
-                                    <tbody id="cartTableBody">
-                                        <tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="pdv-sidebar">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title"><i class="fas fa-user-check"></i> Finalizar Venda</h3></div>
-                            <div class="form-group">
-                                <label class="form-label" for="saleClient">Cliente (obrigatório para crediário)</label>
-                                <select id="saleClient" class="form-select"><option value="">Selecione um cliente</option></select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
-                                <select id="salePaymentMethod" class="form-select" required>
-                                    <option value="Dinheiro">Dinheiro</option>
-                                    <option value="PIX">PIX</option>
-                                    <option value="Cartão de Débito">Cartão de Débito</option>
-                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                    <option value="Crediário">Crediário</option>
-                                </select>
-                            </div>
-                            <div class="form-group hidden" id="installmentsGroup">
-                                <label class="form-label" for="saleInstallments">Número de Parcelas</label>
-                                <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
-                            </div>
-                             <div class="sale-summary">
-                                <div class="flex-between">
-                                    <span>Subtotal</span>
-                                    <span id="cartSubtotal">R$ 0,00</span>
-                                </div>
-                                <div class="flex-between total-line">
-                                    <strong>Total</strong>
-                                    <strong id="cartTotal" style="font-size: 24px; color: var(--primary-color);">R$ 0,00</strong>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-lg mt-3" id="finalizeSale" disabled style="width: 100%;"><i class="fas fa-check"></i> Finalizar Venda</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                 <div id="salesPage" class="page hidden">
+                     <div class="page-header">
+                         <h1 class="page-title">Ponto de Venda</h1>
+                         <p class="page-subtitle">Registre suas vendas</p>
+                     </div>
+                     <div class="grid grid-layout-pdv">
+                         <div class="pdv-main">
+                             <div class="card">
+                                 <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Adicionar Produto</h3></div>
+                                 <div class="form-group">
+                                     <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
+                                 </div>
+                                 <div id="productSuggestions" class="hidden custom-scrollbar" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;"></div>
+                             </div>
+                             <div class="card mt-4">
+                                 <div class="card-header">
+                                     <h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho de Compras</h3>
+                                     <button class="btn btn-danger btn-sm" id="clearCart"><i class="fas fa-trash"></i> Limpar Carrinho</button>
+                                 </div>
+                                 <div class="table-responsive" style="max-height: 400px; overflow-y:auto;">
+                                     <table class="table" id="pdvCartTable">
+                                         <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Qtd.</th><th>Subtotal</th><th>Ações</th></tr></thead>
+                                         <tbody id="cartTableBody">
+                                             <tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>
+                                         </tbody>
+                                     </table>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="pdv-sidebar">
+                             <div class="card">
+                                 <div class="card-header"><h3 class="card-title"><i class="fas fa-user-check"></i> Finalizar Venda</h3></div>
+                                 <div class="form-group">
+                                     <label class="form-label" for="saleClient">Cliente (obrigatório para crediário)</label>
+                                     <select id="saleClient" class="form-select"><option value="">Selecione um cliente</option></select>
+                                 </div>
+                                 <div class="form-group">
+                                     <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
+                                     <select id="salePaymentMethod" class="form-select" required>
+                                         <option value="Dinheiro">Dinheiro</option>
+                                         <option value="PIX">PIX</option>
+                                         <option value="Cartão de Débito">Cartão de Débito</option>
+                                         <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                         <option value="Crediário">Crediário</option>
+                                     </select>
+                                 </div>
+                                 <div class="form-group hidden" id="installmentsGroup">
+                                     <label class="form-label" for="saleInstallments">Número de Parcelas</label>
+                                     <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
+                                 </div>
+                                  <div class="sale-summary">
+                                     <div class="flex-between">
+                                         <span>Subtotal</span>
+                                         <span id="cartSubtotal">R$ 0,00</span>
+                                     </div>
+                                     <div class="flex-between total-line">
+                                         <strong>Total</strong>
+                                         <strong id="cartTotal" style="font-size: 24px; color: var(--primary-color);">R$ 0,00</strong>
+                                     </div>
+                                 </div>
+                                 <button class="btn btn-primary btn-lg mt-3" id="finalizeSale" disabled style="width: 100%;"><i class="fas fa-check"></i> Finalizar Venda</button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
 
             <div id="receiptsPage" class="page hidden">
                 <div class="page-header">
@@ -314,7 +314,7 @@
                          <div class="form-group">
                             <label class="form-label">&nbsp;</label>
                              <button id="clearReceiptFilters" class="btn btn-secondary" style="width:100%"><i class="fas fa-times"></i> Limpar Filtros</button>
-                        </div>
+                         </div>
                     </div>
                 </div>
                 <div class="card mt-4">
@@ -560,64 +560,64 @@
                 <div class="card">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Gerar Relatório</h3></div>
                      <div class="grid grid-4 align-items-end">
-                        <div class="form-group">
-                            <label class="form-label" for="reportType">Tipo de Relatório</label>
-                            <select id="reportType" class="form-select">
-                                <option value="vendas">Vendas</option>
-                                <option value="financeiro">Financeiro (DRE)</option>
-                                <option value="produtos">Produtos</option>
-                                <option value="clientes">Clientes</option>
-                                <option value="contas_a_receber">Contas a Receber</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="reportStartDate">Data Inicial</label>
-                            <input type="date" id="reportStartDate" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="reportEndDate">Data Final</label>
-                            <input type="date" id="reportEndDate" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-primary" id="generateReport" style="width: 100%;"><i class="fas fa-sync-alt"></i> Gerar</button>
-                        </div>
-                    </div>
-                    <div id="reportFiltersContainer" class="grid grid-2 mt-3" style="border-top: 1px solid var(--border-color); padding-top: 24px;">
-                        </div>
+                         <div class="form-group">
+                             <label class="form-label" for="reportType">Tipo de Relatório</label>
+                             <select id="reportType" class="form-select">
+                                 <option value="vendas">Vendas</option>
+                                 <option value="financeiro">Financeiro (DRE)</option>
+                                 <option value="produtos">Produtos</option>
+                                 <option value="clientes">Clientes</option>
+                                 <option value="contas_a_receber">Contas a Receber</option>
+                             </select>
+                         </div>
+                         <div class="form-group">
+                             <label class="form-label" for="reportStartDate">Data Inicial</label>
+                             <input type="date" id="reportStartDate" class="form-input">
+                         </div>
+                         <div class="form-group">
+                             <label class="form-label" for="reportEndDate">Data Final</label>
+                             <input type="date" id="reportEndDate" class="form-input">
+                         </div>
+                         <div class="form-group">
+                             <button class="btn btn-primary" id="generateReport" style="width: 100%;"><i class="fas fa-sync-alt"></i> Gerar</button>
+                         </div>
+                     </div>
+                     <div id="reportFiltersContainer" class="grid grid-2 mt-3" style="border-top: 1px solid var(--border-color); padding-top: 24px;">
+                         </div>
                 </div>
 
                 <div id="reportResultContainer" class="hidden">
-                    <div class="grid grid-2 mt-4">
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title" id="reportSummaryTitle"><i class="fas fa-chart-pie"></i> Resumo do Período</h3></div>
-                            <div id="reportSummaryContent" class="grid grid-2">
-                                </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title" id="reportHighlightsTitle"><i class="fas fa-trophy"></i> Destaques</h3></div>
-                            <div id="topItemsList" class="custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
-                                </div>
-                        </div>
-                    </div>
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-chart-line"></i> Gráfico do Relatório</h3>
-                             <div class="flex gap-2">
-                                <button class="btn btn-secondary btn-sm" id="exportReportPDF"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-                                <button class="btn btn-secondary btn-sm" id="exportReportCSV"><i class="fas fa-file-csv"></i> Exportar CSV</button>
-                            </div>
-                        </div>
-                        <div class="chart-container" style="height: 400px;"><canvas id="reportChart"></canvas></div>
-                    </div>
-                    <div class="card mt-4">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-table"></i> Detalhes do Relatório</h3></div>
-                        <div class="table-responsive">
-                            <table class="table" id="reportDetailTable">
-                                <thead id="reportTableHead"></thead>
-                                <tbody id="reportTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                     <div class="grid grid-2 mt-4">
+                         <div class="card">
+                             <div class="card-header"><h3 class="card-title" id="reportSummaryTitle"><i class="fas fa-chart-pie"></i> Resumo do Período</h3></div>
+                             <div id="reportSummaryContent" class="grid grid-2">
+                                 </div>
+                         </div>
+                         <div class="card">
+                             <div class="card-header"><h3 class="card-title" id="reportHighlightsTitle"><i class="fas fa-trophy"></i> Destaques</h3></div>
+                             <div id="topItemsList" class="custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
+                                 </div>
+                         </div>
+                     </div>
+                     <div class="card mt-4">
+                         <div class="card-header">
+                             <h3 class="card-title"><i class="fas fa-chart-line"></i> Gráfico do Relatório</h3>
+                              <div class="flex gap-2">
+                                 <button class="btn btn-secondary btn-sm" id="exportReportPDF"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                                 <button class="btn btn-secondary btn-sm" id="exportReportCSV"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                             </div>
+                         </div>
+                         <div class="chart-container" style="height: 400px;"><canvas id="reportChart"></canvas></div>
+                     </div>
+                     <div class="card mt-4">
+                         <div class="card-header"><h3 class="card-title"><i class="fas fa-table"></i> Detalhes do Relatório</h3></div>
+                         <div class="table-responsive">
+                             <table class="table" id="reportDetailTable">
+                                 <thead id="reportTableHead"></thead>
+                                 <tbody id="reportTableBody"></tbody>
+                             </table>
+                         </div>
+                     </div>
                 </div>
             </div>
 
