@@ -3,12 +3,12 @@
 // 1. Initialize Firebase
 // TODO: Replace this with your own Firebase project configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
+  authDomain: "sistema-flor-de-maria.firebaseapp.com",
+  projectId: "sistema-flor-de-maria",
+  storageBucket: "sistema-flor-de-maria.firebasestorage.app",
+  messagingSenderId: "148120762956",
+  appId: "1:148120762956:web:253cb554ded28a13bcd2e9"
 };
 
 // Initialize Firebase
