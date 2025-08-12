@@ -42,6 +42,7 @@
 
     <div id="appLayout" class="app-layout hidden">
         <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -96,7 +97,7 @@
                 <div class="grid grid-2">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Método de Pagamento (Mês Atual)</h3>
+                            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Mês Atual)</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="paymentMethodChart"></canvas>
@@ -107,7 +108,7 @@
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3>
                         </div>
-                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
+                        <div id="overdueAccounts" class="custom-scrollbar" style="max-height: 350px; overflow-y: auto;">
                             <p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>
                         </div>
                     </div>
@@ -179,7 +180,7 @@
                                 <label class="form-label" for="productName">Nome do Produto</label>
                                 <input type="text" id="productName" class="form-input" placeholder="Digite o nome do produto" required>
                             </div>
-                            <div class="grid grid-2">
+                            <div class="grid grid-3-col">
                                 <div class="form-group">
                                     <label class="form-label" for="productQuantity">Quantidade</label>
                                     <input type="number" id="productQuantity" class="form-input" min="0" placeholder="0" required>
@@ -188,10 +189,10 @@
                                     <label class="form-label" for="productCostPrice">Preço de Custo</label>
                                     <input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="productSalePrice">Preço de Venda</label>
-                                <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                <div class="form-group">
+                                    <label class="form-label" for="productSalePrice">Preço de Venda</label>
+                                    <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Produto</button>
@@ -221,65 +222,74 @@
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Código</th><th>Nome</th><th>Quantidade</th><th>Preço Custo</th><th>Preço Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="productsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div id="salesPage" class="page hidden">
+             <div id="salesPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Ponto de Venda</h1>
                     <p class="page-subtitle">Registre suas vendas</p>
                 </div>
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Produto</h3></div>
-                        <div class="form-group">
-                            <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
+                <div class="grid grid-layout-pdv">
+                    <div class="pdv-main">
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Adicionar Produto</h3></div>
+                            <div class="form-group">
+                                <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
+                            </div>
+                            <div id="productSuggestions" class="hidden custom-scrollbar" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;"></div>
                         </div>
-                        <div id="productSuggestions" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;"></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user"></i> Cliente e Pagamento</h3></div>
-                        <div class="form-group">
-                            <label class="form-label" for="saleClient">Cliente</label>
-                            <select id="saleClient" class="form-select"><option value="">Selecione um cliente (opcional)</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
-                            <select id="salePaymentMethod" class="form-select" required>
-                                <option value="Dinheiro">Dinheiro</option>
-                                <option value="PIX">PIX</option>
-                                <option value="Cartão de Débito">Cartão de Débito</option>
-                                <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                <option value="Crediário">Crediário</option>
-                            </select>
-                        </div>
-                        <div class="form-group hidden" id="installmentsGroup">
-                            <label class="form-label" for="saleInstallments">Número de Parcelas</label>
-                            <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho de Compras</h3>
+                                <button class="btn btn-danger btn-sm" id="clearCart"><i class="fas fa-trash"></i> Limpar Carrinho</button>
+                            </div>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y:auto;">
+                                <table class="table">
+                                    <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Qtd.</th><th>Subtotal</th><th>Ações</th></tr></thead>
+                                    <tbody id="cartTableBody">
+                                        <tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho de Compras</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-danger btn-sm" id="clearCart"><i class="fas fa-trash"></i> Limpar Carrinho</button>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Quantidade</th><th>Subtotal</th><th>Ações</th></tr></thead>
-                            <tbody id="cartTableBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                        <div><strong style="font-size: 24px; color: var(--primary-color);">Total: <span id="cartTotal">R$ 0,00</span></strong></div>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary" id="finalizeSale" disabled><i class="fas fa-check"></i> Finalizar Venda</button>
+                    <div class="pdv-sidebar">
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title"><i class="fas fa-user-check"></i> Finalizar Venda</h3></div>
+                            <div class="form-group">
+                                <label class="form-label" for="saleClient">Cliente (obrigatório para crediário)</label>
+                                <select id="saleClient" class="form-select"><option value="">Selecione um cliente</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
+                                <select id="salePaymentMethod" class="form-select" required>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                    <option value="PIX">PIX</option>
+                                    <option value="Cartão de Débito">Cartão de Débito</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                    <option value="Crediário">Crediário</option>
+                                </select>
+                            </div>
+                            <div class="form-group hidden" id="installmentsGroup">
+                                <label class="form-label" for="saleInstallments">Número de Parcelas</label>
+                                <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
+                            </div>
+                             <div class="sale-summary">
+                                <div class="flex-between">
+                                    <span>Subtotal</span>
+                                    <span id="cartSubtotal">R$ 0,00</span>
+                                </div>
+                                <div class="flex-between total-line">
+                                    <strong>Total</strong>
+                                    <strong id="cartTotal" style="font-size: 24px; color: var(--primary-color);">R$ 0,00</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-lg mt-3" id="finalizeSale" disabled style="width: 100%;"><i class="fas fa-check"></i> Finalizar Venda</button>
                         </div>
                     </div>
                 </div>
@@ -292,7 +302,7 @@
                 </div>
                 <div class="card">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Filtrar Recibos</h3></div>
-                    <div class="grid grid-2">
+                    <div class="grid grid-3">
                         <div class="form-group">
                             <label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label>
                             <select id="receiptClientFilter" class="form-select"><option value="">Todos os Clientes</option></select>
@@ -301,13 +311,17 @@
                             <label class="form-label" for="receiptDateFilter">Filtrar por Data</label>
                             <input type="date" id="receiptDateFilter" class="form-input">
                         </div>
+                         <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                             <button id="clearReceiptFilters" class="btn btn-secondary" style="width:100%"><i class="fas fa-times"></i> Limpar Filtros</button>
+                        </div>
                     </div>
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Vendas</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
                             <tbody id="receiptsTableBody"></tbody>
                         </table>
                     </div>
@@ -334,13 +348,15 @@
                                 <label class="form-label" for="cashFlowDescription">Descrição</label>
                                 <input type="text" id="cashFlowDescription" class="form-input" placeholder="Descrição do lançamento" required>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowValue">Valor</label>
-                                <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowDate">Data</label>
-                                <input type="date" id="cashFlowDate" class="form-input" required>
+                            <div class="grid grid-2-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="cashFlowValue">Valor</label>
+                                    <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="cashFlowDate">Data</label>
+                                    <input type="date" id="cashFlowDate" class="form-input" required>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Lançamento</button>
@@ -365,7 +381,7 @@
                             <div class="stat-label">Saldo Atual</div>
                         </div>
                         <div class="form-group mt-3">
-                            <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento">
+                            <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento por descrição">
                         </div>
                         <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;"><i class="fas fa-download"></i> Exportar Fluxo de Caixa</button>
                     </div>
@@ -406,19 +422,21 @@
                                     <option value="Fornecedores">Fornecedores</option>
                                     <option value="Marketing">Marketing</option>
                                     <option value="Transporte">Transporte</option>
-                                    <option value="Alimentação">Alimentação</option>
+                                    <option value="Salários">Salários</option>
                                     <option value="Material de Escritório">Material de Escritório</option>
                                     <option value="Impostos">Impostos</option>
                                     <option value="Outros">Outros</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="expenseValue">Valor</label>
-                                <input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="expenseDate">Data</label>
-                                <input type="date" id="expenseDate" class="form-input" required>
+                            <div class="grid grid-2-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseValue">Valor</label>
+                                    <input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseDate">Data</label>
+                                    <input type="date" id="expenseDate" class="form-input" required>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Despesa</button>
@@ -439,24 +457,12 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa">
+                            <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa por descrição">
                         </div>
                         <div class="flex gap-2">
                             <select id="expenseFilterCategory" class="form-select">
                                 <option value="">Todas as categorias</option>
-                                <option value="Aluguel">Aluguel</option>
-                                <option value="Energia Elétrica">Energia Elétrica</option>
-                                <option value="Água">Água</option>
-                                <option value="Internet">Internet</option>
-                                <option value="Telefone">Telefone</option>
-                                <option value="Fornecedores">Fornecedores</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Alimentação">Alimentação</option>
-                                <option value="Material de Escritório">Material de Escritório</option>
-                                <option value="Impostos">Impostos</option>
-                                <option value="Outros">Outros</option>
-                            </select>
+                                </select>
                             <button class="btn btn-secondary btn-sm" id="exportExpenses"><i class="fas fa-download"></i> Exportar</button>
                         </div>
                     </div>
@@ -479,7 +485,7 @@
                 </div>
                 <div class="grid grid-2">
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-plus"></i> Nova Conta a Receber (Manual)</h3></div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-plus"></i> Nova Conta (Manual)</h3></div>
                         <form id="receivableForm">
                             <div class="form-group">
                                 <label class="form-label" for="receivableClient">Cliente</label>
@@ -489,13 +495,15 @@
                                 <label class="form-label" for="receivableDescription">Descrição</label>
                                 <input type="text" id="receivableDescription" class="form-input" placeholder="Descrição da conta" required>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="receivableValue">Valor</label>
-                                <input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
-                                <input type="date" id="receivableDueDate" class="form-input" required>
+                            <div class="grid grid-2-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="receivableValue">Valor</label>
+                                    <input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
+                                    <input type="date" id="receivableDueDate" class="form-input" required>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Conta</button>
@@ -504,22 +512,22 @@
                         </form>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line"></i> Resumo de Recebimentos</h3></div>
-                        <div class="grid grid-2 mb-3">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line"></i> Resumo</h3></div>
+                        <div class="grid grid-3 mb-3">
                             <div class="text-center">
-                                <div class="stat-value" id="totalReceivablesPending" style="color: var(--warning-color);">R$ 0,00</div>
-                                <div class="stat-label">Pendentes</div>
+                                <div class="stat-value" id="totalReceivablesPending" style="color: var(--accent-color);">R$ 0,00</div>
+                                <div class="stat-label">Abertas</div>
                             </div>
                             <div class="text-center">
                                 <div class="stat-value" id="totalReceivablesOverdue" style="color: var(--danger-color);">R$ 0,00</div>
                                 <div class="stat-label">Vencidas</div>
                             </div>
+                             <div class="text-center">
+                                <div class="stat-value" id="totalReceivablesPaid" style="color: var(--primary-color);">R$ 0,00</div>
+                                <div class="stat-label">Pagas (Mês)</div>
+                            </div>
                         </div>
-                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$ 0,00</div>
-                            <div class="stat-label">Recebidas</div>
-                        </div>
-                        <div class="form-group mt-3">
+                        <div class="form-group">
                             <input type="text" id="receivableSearch" class="form-input" placeholder="Buscar por cliente ou descrição">
                         </div>
                         <div class="flex gap-2">
@@ -547,11 +555,21 @@
             <div id="reportsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Relatórios</h1>
-                    <p class="page-subtitle">Análise e relatórios</p>
+                    <p class="page-subtitle">Análise e insights do seu negócio</p>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Filtros de Relatório</h3></div>
-                    <div class="grid grid-4">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Gerar Relatório</h3></div>
+                     <div class="grid grid-4 align-items-end">
+                        <div class="form-group">
+                            <label class="form-label" for="reportType">Tipo de Relatório</label>
+                            <select id="reportType" class="form-select">
+                                <option value="vendas">Vendas</option>
+                                <option value="financeiro">Financeiro (DRE)</option>
+                                <option value="produtos">Produtos</option>
+                                <option value="clientes">Clientes</option>
+                                <option value="contas_a_receber">Contas a Receber</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label class="form-label" for="reportStartDate">Data Inicial</label>
                             <input type="date" id="reportStartDate" class="form-input">
@@ -561,80 +579,44 @@
                             <input type="date" id="reportEndDate" class="form-input">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="reportType">Tipo de Relatório</label>
-                            <select id="reportType" class="form-select">
-                                <option value="vendas">Vendas</option>
-                                <option value="financeiro">Financeiro</option>
-                                <option value="produtos">Produtos</option>
-                                <option value="clientes">Clientes</option>
-                                <option value="contas_a_receber">Contas a Receber</option>
-                            </select>
-                        </div>
-                        <div class="form-group hidden" id="reportClientFilterContainer">
-                            <label class="form-label" for="reportReceivableClient">Cliente</label>
-                            <select id="reportReceivableClient" class="form-select"><option value="">Todos os Clientes</option></select>
-                        </div>
-                        <div class="form-group hidden" id="reportStatusFilterContainer">
-                            <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
-                            <select id="reportReceivableStatus" class="form-select">
-                                <option value="">Todos</option>
-                                <option value="Pendente">Pendentes</option>
-                                <option value="Pago">Pagas</option>
-                                <option value="Vencido">Vencidas</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-primary" id="generateReport" style="width: 100%;"><i class="fas fa-sync-alt"></i> Atualizar Relatório</button>
+                            <button class="btn btn-primary" id="generateReport" style="width: 100%;"><i class="fas fa-sync-alt"></i> Gerar</button>
                         </div>
                     </div>
+                    <div id="reportFiltersContainer" class="grid grid-2 mt-3" style="border-top: 1px solid var(--border-color); padding-top: 24px;">
+                        </div>
                 </div>
-                <div class="grid grid-2 mt-4">
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Resumo Geral</h3></div>
-                        <div class="grid grid-2">
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$ 0,00</div>
-                                <div class="stat-label">Total de Vendas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalExpenses" style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Total de Despesas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportProfit" style="color: var(--primary-color);">R$ 0,00</div>
-                                <div class="stat-label">Lucro Líquido</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportSalesCount">0</div>
-                                <div class="stat-label">Número de Vendas</div>
-                            </div>
+
+                <div id="reportResultContainer" class="hidden">
+                    <div class="grid grid-2 mt-4">
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title" id="reportSummaryTitle"><i class="fas fa-chart-pie"></i> Resumo do Período</h3></div>
+                            <div id="reportSummaryContent" class="grid grid-2">
+                                </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title" id="reportHighlightsTitle"><i class="fas fa-trophy"></i> Destaques</h3></div>
+                            <div id="topItemsList" class="custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
+                                </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-trophy"></i> Top 5 (Produtos/Clientes/Devedores)</h3></div>
-                        <div id="topProductsList">
-                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">Gere um relatório para ver os destaques.</p>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-line"></i> Gráfico do Relatório</h3>
+                             <div class="flex gap-2">
+                                <button class="btn btn-secondary btn-sm" id="exportReportPDF"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                                <button class="btn btn-secondary btn-sm" id="exportReportCSV"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                            </div>
                         </div>
+                        <div class="chart-container" style="height: 400px;"><canvas id="reportChart"></canvas></div>
                     </div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-chart-line"></i> Gráfico do Relatório</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary btn-sm" id="exportReportPDF"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-                            <button class="btn btn-secondary btn-sm" id="exportReportCSV"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    <div class="card mt-4">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-table"></i> Detalhes do Relatório</h3></div>
+                        <div class="table-responsive">
+                            <table class="table" id="reportDetailTable">
+                                <thead id="reportTableHead"></thead>
+                                <tbody id="reportTableBody"></tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div class="chart-container"><canvas id="reportChart"></canvas></div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header"><h3 class="card-title"><i class="fas fa-table"></i> Detalhes do Relatório</h3></div>
-                    <div class="table-responsive">
-                        <table class="table" id="reportDetailTable">
-                            <thead id="reportTableHead"></thead>
-                            <tbody id="reportTableBody"></tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -642,43 +624,33 @@
             <div id="settingsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Configurações</h1>
-                    <p class="page-subtitle">Backup e restauração dos dados</p>
+                    <p class="page-subtitle">Gerencie os dados e as preferências do sistema</p>
                 </div>
                 <div class="grid grid-2">
                     <div class="card">
                         <div class="card-header"><h3 class="card-title"><i class="fas fa-download"></i> Backup dos Dados</h3></div>
                         <p style="color: var(--text-muted); margin-bottom: 20px;">Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.</p>
                         <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="backupClientsCount">0</div>
-                                <div class="stat-label">Clientes</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="backupProductsCount">0</div>
-                                <div class="stat-label">Produtos</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="backupSalesCount">0</div>
-                                <div class="stat-label">Vendas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="backupReceivablesCount">0</div>
-                                <div class="stat-label">Contas a Receber</div>
-                            </div>
+                            <div class="text-center"><div class="stat-value" id="backupClientsCount">0</div><div class="stat-label">Clientes</div></div>
+                            <div class="text-center"><div class="stat-value" id="backupProductsCount">0</div><div class="stat-label">Produtos</div></div>
+                            <div class="text-center"><div class="stat-value" id="backupSalesCount">0</div><div class="stat-label">Vendas</div></div>
+                            <div class="text-center"><div class="stat-value" id="backupCashFlowCount">0</div><div class="stat-label">Fluxo de Caixa</div></div>
+                            <div class="text-center"><div class="stat-value" id="backupExpensesCount">0</div><div class="stat-label">Despesas</div></div>
+                            <div class="text-center"><div class="stat-value" id="backupReceivablesCount">0</div><div class="stat-label">Contas a Receber</div></div>
                         </div>
                         <button class="btn btn-primary" id="downloadBackup" style="width: 100%;"><i class="fas fa-download"></i> Baixar Backup Completo</button>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-upload"></i> Restaurar Dados</h3></div>
-                        <p style="color: var(--text-muted); margin-bottom: 20px;">Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.</p>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-upload"></i> Restaurar e Limpar</h3></div>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">Restaure dados a partir de um arquivo. <strong>Atenção:</strong> Isso substituirá os dados atuais.</p>
                         <div class="form-group">
                             <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
                             <input type="file" id="restoreFile" class="form-input" accept=".json">
                         </div>
-                        <div class="flex gap-2">
-                            <button class="btn btn-warning" id="restoreBackup" disabled><i class="fas fa-upload"></i> Restaurar Backup</button>
-                            <button class="btn btn-danger" id="clearAllData"><i class="fas fa-trash"></i> Limpar Todos os Dados</button>
-                        </div>
+                        <button class="btn btn-warning" id="restoreBackup" disabled style="width:100%"><i class="fas fa-upload"></i> Restaurar Backup</button>
+                        <hr style="border-color: var(--border-color); margin: 24px 0;">
+                        <p style="color: var(--text-muted); margin-bottom: 16px;"><strong>Ação Irreversível:</strong> Limpa todos os dados do sistema.</p>
+                        <button class="btn btn-danger" id="clearAllData" style="width:100%"><i class="fas fa-trash"></i> Limpar Todos os Dados</button>
                     </div>
                 </div>
             </div>
@@ -693,7 +665,7 @@
                 <h3 class="modal-title" id="modalTitle">Modal</h3>
                 <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
             </div>
-            <div id="modalBody"></div>
+            <div id="modalBody" class="custom-scrollbar"></div>
         </div>
     </div>
 
