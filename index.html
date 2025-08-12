@@ -2576,7 +2576,7 @@
                 return;
             }
             const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
+            tbody.innerHTML = clients.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(client => {
                 const purchaseCount = sales.filter(s => s.clientId === client.id).length;
                 return `
                     <tr>
