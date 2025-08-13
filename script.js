@@ -1,4 +1,4 @@
-// ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.4 (Completo e Sincronizado) =====
+// ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.5 (Sincronização Completa) =====
 
 // 1. Initialize Firebase
 const firebaseConfig = {
@@ -88,7 +88,6 @@ const Utils = {
             }
         });
     },
-    // Função para gerar PDF (simulada, pois a biblioteca não está no código)
     generatePDF: (content, filename) => {
         console.log(`Gerando PDF com o nome: ${filename}`);
         console.log("Conteúdo do PDF:\n", content);
@@ -263,7 +262,7 @@ const App = {
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v3.4 (Firebase) iniciado!');
+        console.log('SGI - Flor de Maria v3.5 (Firebase) iniciado!');
     }
 };
 
@@ -411,6 +410,9 @@ const Clients = {
         const phone = document.getElementById('clientPhone').value.trim();
         if (!name || !phone) return Notification.error('Nome e telefone são obrigatórios.');
 
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
         try {
             if (state.currentEditId) {
                 const clientRef = db.collection(CONFIG.collections.clients).doc(state.currentEditId);
@@ -425,6 +427,8 @@ const Clients = {
         } catch (error) {
             Notification.error('Erro ao salvar cliente.');
             console.error(error);
+        } finally {
+            submitButton.disabled = false;
         }
 
         Clients.clearForm();
@@ -523,6 +527,9 @@ const Products = {
 
         if (!newProduct.refCode || !newProduct.name) return Notification.error('Código e Nome são obrigatórios.');
 
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
         try {
             if (state.currentEditId) {
                 await db.collection(CONFIG.collections.products).doc(state.currentEditId).update({ ...newProduct, updatedAt: new Date().toISOString() });
@@ -533,7 +540,10 @@ const Products = {
                 Notification.success('Produto cadastrado!');
             }
         } catch (error) {
-            Notification.error('Erro ao salvar produto.'); console.error(error);
+            Notification.error('Erro ao salvar produto.');
+            console.error(error);
+        } finally {
+            submitButton.disabled = false;
         }
 
         Products.clearForm();
@@ -560,7 +570,8 @@ const Products = {
             await App.loadAllData();
             await Products.load();
         } catch (error) {
-            Notification.error('Erro ao excluir produto.'); console.error(error);
+            Notification.error('Erro ao excluir produto.');
+            console.error(error);
         }
     },
     clearForm() {
@@ -733,7 +744,6 @@ const Sales = {
         };
 
         const batch = db.batch();
-
         batch.set(db.collection(CONFIG.collections.sales).doc(saleId), saleData);
 
         for (const item of state.cart) {
@@ -776,10 +786,10 @@ const Sales = {
         }
 
         try {
-            await batch.commit();
+            await batch.commit(); // Espera a transação ser concluída
             Notification.success('Venda finalizada com sucesso!');
             Sales.clearCart();
-            await App.loadAllData();
+            await App.loadAllData(); // Recarrega os dados após a transação
             await Sales.load();
         } catch (error) {
             Notification.error('Erro ao finalizar a venda.');
@@ -948,6 +958,9 @@ const Expenses = {
         const value = parseFloat(document.getElementById('expenseValue').value);
         if (!description || !value) return Notification.error('Descrição e valor são obrigatórios.');
 
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
         try {
             const expenseId = Utils.generateUUID();
             const newExpense = {
@@ -979,6 +992,8 @@ const Expenses = {
         } catch (error) {
             Notification.error('Erro ao registrar despesa.');
             console.error(error);
+        } finally {
+            submitButton.disabled = false;
         }
     },
     remove: async (id) => {
@@ -1120,6 +1135,9 @@ const Receivables = {
             return Notification.error('Todos os campos são obrigatórios para uma conta manual.');
         }
 
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
         try {
             const receivableId = Utils.generateUUID();
             const newReceivable = {
@@ -1139,6 +1157,8 @@ const Receivables = {
         } catch (error) {
             Notification.error('Erro ao cadastrar conta a receber.');
             console.error(error);
+        } finally {
+            submitButton.disabled = false;
         }
     },
     clearForm: () => {
@@ -1154,7 +1174,6 @@ const Reports = {
         this.updateStats();
     },
     updateStats() {
-        // Exibe as mesmas estatísticas do dashboard para o módulo de relatórios
         document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(state.sales.reduce((acc, s) => acc + s.total, 0));
         document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(state.expenses.reduce((acc, e) => acc + e.value, 0));
         const totalProfit = state.sales.reduce((acc, s) => acc + s.total, 0) - state.expenses.reduce((acc, e) => acc + e.value, 0);
@@ -1162,7 +1181,6 @@ const Reports = {
         document.getElementById('reportTotalClients').textContent = state.clients.length;
     },
     generateReports() {
-        // Exemplo de como gerar um relatório mais detalhado
         let reportContent = `
             <h2>Relatório Completo - ${CONFIG.company.name}</h2>
             <p><strong>Data de Geração:</strong> ${Utils.formatDate(new Date().toISOString())}</p>
