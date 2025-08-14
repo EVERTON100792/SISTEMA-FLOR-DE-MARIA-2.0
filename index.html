@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v8.0 - RECIBO PROFISSIONAL E AJUSTES FINAIS */
+        /* SGI - FLOR DE MARIA v8.1 - CORREÇÃO DE BOTÕES RESPONSIVOS */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -127,6 +127,14 @@
         #modalBody { overflow-y: auto; padding-right: 10px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        
+        /* NOVA CLASSE PARA OS BOTÕES DO MODAL */
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* Padrão para telas grandes */
+        }
 
         .grid { display: grid; gap: 24px; }
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -164,6 +172,15 @@
 
         @media (max-width: 900px) {
             #pdv-product-card { height: auto; max-height: 40vh; }
+
+            /* NOVA REGRA: Empilha os botões do modal em telas pequenas */
+            .modal-actions {
+                flex-direction: column;
+            }
+            .modal-actions .btn {
+                width: 100%;
+            }
+
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 80px 15px 20px; }
@@ -561,7 +578,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v8.0 - RECIBO PROFISSIONAL E AJUSTES FINAIS =====
+    // ===== SGI - FLOR DE MARIA v8.1 - CORREÇÃO DE BOTÕES RESPONSIVOS =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -591,7 +608,6 @@
         formatCurrency: v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v) || 0),
         formatDate: d => d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A',
         formatInputDate: d => d ? new Date(d).toISOString().split('T')[0] : '',
-        // NOVA FUNÇÃO: Cria um ID curto e profissional para exibição
         formatShortId: id => id ? id.toString().slice(-6).toUpperCase() : 'N/A',
         debounce: (func, delay = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; },
         populateSelect: (id, data, valF, textF, defTxt) => {
@@ -680,7 +696,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v8.0 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v8.1 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -1137,6 +1153,7 @@
                 ? `https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, ${client?.name}! Segue em anexo o recibo da sua compra.`)}`
                 : '#';
 
+            // ATUALIZAÇÃO: Novo layout do recibo e botões com classe
             const modalContent = `
                 <div id="receipt-content" style="background: var(--primary-bg); color: var(--text-primary); padding: 25px; border-radius: 8px; font-family: 'Segoe UI', sans-serif;">
                     <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
@@ -1181,7 +1198,7 @@
                         Obrigado pela sua compra!
                     </div>
                 </div>
-                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                <div class="modal-actions">
                      <button id="newSaleBtn" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> Nova Venda</button>
                      <button id="downloadReceiptPdfBtn" class="btn btn-primary"><i class="fas fa-download"></i> Baixar PDF</button>
                      <a href="${whatsappLink}" target="_blank" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn" style="background-color: #25D366;">
