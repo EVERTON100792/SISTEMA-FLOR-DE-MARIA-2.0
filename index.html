@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v7.3 - ZONA DE PERIGO */
+        /* SGI - FLOR DE MARIA v7.4 - CORREÇÃO DE BUGS */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -137,12 +137,10 @@
         .mb-2 { margin-bottom: 16px; }
         .text-center { text-align: center; }
 
-        /* Estilos de Scrollbar customizado */
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: var(--secondary-bg); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--hover-bg); border-radius: 10px; border: 2px solid var(--secondary-bg); }
 
-        /* Estilos Específicos do PDV */
         .product-list-pdv { max-height: 400px; overflow-y: scroll; padding-right: 10px; }
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
         .product-item-pdv:hover { background-color: var(--hover-bg); }
@@ -150,7 +148,6 @@
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
 
-        /* Media queries para responsividade */
         @media (max-width: 1200px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -524,14 +521,14 @@
                          <div class="mb-2" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
                             <div>
                                 <strong>Limpar Base de Clientes</strong>
-                                <p class="text-muted" style="font-size: 14px;">Apaga permanentemente todos os clientes cadastrados.</p>
+                                <p class="text-muted" style="font-size: 14px;">Apaga permanentemente todos os clientes cadastrados e seus respectivos históricos de vendas.</p>
                             </div>
                             <button id="clearClientsBtn" class="btn btn-danger"><i class="fas fa-users-slash"></i> Limpar Clientes</button>
                         </div>
                          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
                             <div>
                                 <strong>Limpar Estoque de Produtos</strong>
-                                <p class="text-muted" style="font-size: 14px;">Apaga permanentemente todos os produtos do estoque.</p>
+                                <p class="text-muted" style="font-size: 14px;">Apaga permanentemente todos os produtos do estoque. Isso pode afetar o histórico de vendas.</p>
                             </div>
                             <button id="clearProductsBtn" class="btn btn-danger"><i class="fas fa-boxes"></i> Limpar Produtos</button>
                         </div>
@@ -554,9 +551,8 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v7.3 (Com Zona de Perigo) =====
+    // ===== SGI - FLOR DE MARIA v7.4 (Com Correção de Bugs de Exclusão) =====
     
-    // 1. INICIALIZAÇÃO E CONFIGURAÇÕES
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
     
@@ -581,7 +577,6 @@
         cart: [], currentEditId: null, chartInstances: {}
     };
     
-    // 2. MÓDULOS DE UTILIDADES
     const Utils = {
         formatCurrency: v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v) || 0),
         formatDate: d => d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A',
@@ -642,7 +637,7 @@
             if(el && textEl) {
                 textEl.textContent = msg;
                 el.className = `notification notification-${type} show`;
-                setTimeout(() => el.classList.remove('show'), 3500);
+                setTimeout(() => el.classList.remove('show'), 4000);
             }
         },
         success: m => Notification.show(m, 'success'),
@@ -659,7 +654,6 @@
         hide: () => document.getElementById('modal').classList.remove('show')
     };
     
-    // 3. ESTRUTURA PRINCIPAL DA APLICAÇÃO
     const App = {
         modules: {},
         async init() {
@@ -674,10 +668,10 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v7.3 (Com Zona de Perigo) Iniciado.');
+            console.log('SGI - Flor de Maria v7.4 (Bug Fixes) Iniciado.');
         },
-        async loadAllData() {
-            document.body.className = 'state-loading';
+        async loadAllData(showLoading = true) {
+            if(showLoading) document.body.className = 'state-loading';
             const tables = [
                 'clients', 'products', 'sales', 
                 'cash_flow', 'expenses', 'receivables'
@@ -698,11 +692,10 @@
                 }
             });
             App.modules.Settings.loadCompanyInfo();
-            document.body.className = 'state-app';
+            if(showLoading) document.body.className = 'state-app';
         }
     };
     
-    // 4. MÓDULOS DA APLICAÇÃO
     const Auth = {
         init() {
             document.getElementById('loginForm').addEventListener('submit', this.handleLogin);
@@ -732,7 +725,7 @@
         async showApp() {
             await App.loadAllData();
             const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage) || 'dashboard';
-            await Navigation.navigateTo(lastPage);
+            await Navigation.navigateTo(lastPage, false);
         }
     };
     App.modules.Auth = Auth;
@@ -754,7 +747,9 @@
             document.getElementById('mobileMenuToggle').addEventListener('click', toggle);
             overlay.addEventListener('click', toggle);
         },
-        async navigateTo(page) {
+        async navigateTo(page, reloadData = true) {
+            if(reloadData) await App.loadAllData();
+
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             const targetPage = document.getElementById(`${page}Page`);
             if (targetPage) targetPage.classList.remove('hidden');
@@ -886,18 +881,14 @@
                 ).select().single();
                 if (error) throw error;
                 
-                if (state.currentEditId) {
-                    state[config.stateKey] = state[config.stateKey].map(i => i.id === state.currentEditId ? data : i);
-                } else {
-                    state[config.stateKey].unshift(data);
-                }
+                await App.loadAllData(false);
                 
                 Notification.success(`${config.name} ${state.currentEditId ? 'atualizado' : 'salvo'}!`);
                 this.clearForm();
                 this.render();
                 if(config.onSave) config.onSave(data);
 
-            } catch (error) { Notification.error(error.message); }
+            } catch (error) { Notification.error(`Erro ao salvar: ${error.message}`); }
             finally { btn.disabled = false; }
         },
         edit(id) {
@@ -913,11 +904,18 @@
             try {
                 const { error } = await db.from(config.tableName).delete().eq('id', id);
                 if (error) throw error;
+                
                 state[config.stateKey] = state[config.stateKey].filter(i => i.id !== id);
+                Notification.success(`${config.name} excluído.`);
+                
+                await App.loadAllData(false);
                 this.render();
                 if(config.onRemove) config.onRemove();
-                Notification.success(`${config.name} excluído.`);
-            } catch (error) { Notification.error(`Erro ao excluir ${config.name}.`); }
+
+            } catch (error) { 
+                console.error(`Erro detalhado ao excluir ${config.name}:`, error);
+                Notification.error(`Erro ao excluir: ${error.message}`);
+            }
         },
         clearForm() {
             state.currentEditId = null;
@@ -1135,12 +1133,10 @@
                 
                 Notification.success('Venda finalizada com sucesso!');
                 this.clearSale();
-                await App.loadAllData();
                 await Navigation.navigateTo('dashboard');
-                this.renderProductList(); 
 
             } catch (error) {
-                Notification.error('Erro ao finalizar a venda: ' + error.message);
+                Notification.error(`Erro ao finalizar a venda: ${error.message}`);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check"></i> Finalizar Venda';
@@ -1315,7 +1311,6 @@
 
                 Notification.success('Despesa registrada com sucesso!');
                 e.target.reset();
-                await App.loadAllData();
                 await Navigation.navigateTo('expenses');
 
             } catch(error) {
@@ -1330,9 +1325,9 @@
                 const { error } = await db.from('expenses').delete().eq('id', id);
                 if (error) throw error;
                 Notification.success('Despesa excluída.');
-                await App.loadAllData();
                 await Navigation.navigateTo('expenses');
             } catch(error) {
+                console.error('Erro ao excluir despesa:', error);
                 Notification.error('Erro ao excluir despesa: ' + error.message);
             }
         }
@@ -1386,9 +1381,7 @@
                 });
                 
                 Notification.success('Conta marcada como paga!');
-                await App.loadAllData();
-                this.render();
-                App.modules.Dashboard.load();
+                await Navigation.navigateTo('receivables');
             } catch(error) {
                 Notification.error('Erro ao processar pagamento: ' + error.message);
             }
@@ -1626,16 +1619,18 @@
                 return Notification.warning('Ação cancelada.');
             }
             try {
+                document.body.className = 'state-loading';
                 const tablesToClear = ['sales', 'cash_flow', 'expenses', 'receivables'];
-                const promises = tablesToClear.map(tableName => db.from(tableName).delete().neq('id', 0));
+                const promises = tablesToClear.map(tableName => db.from(tableName).delete().neq('id', '00000000-0000-0000-0000-000000000000'));
                 await Promise.all(promises);
                 
                 Notification.success('Todos os dados financeiros foram zerados com sucesso!');
-                await App.loadAllData();
                 await Navigation.navigateTo('dashboard');
 
             } catch (error) {
+                console.error('Erro ao zerar dados financeiros:', error);
                 Notification.error('Ocorreu um erro ao zerar os dados: ' + error.message);
+                document.body.className = 'state-app';
             }
         },
         async handleClearTable(tableName, displayName, confirmationKeyword) {
@@ -1644,17 +1639,18 @@
                 return Notification.warning('Ação cancelada.');
             }
             try {
-                await db.from(tableName).delete().neq('id', 0);
+                document.body.className = 'state-loading';
+                await db.from(tableName).delete().neq('id', '00000000-0000-0000-0000-000000000000');
                 Notification.success(`Todos os ${displayName} foram excluídos.`);
-                await App.loadAllData();
                 await Navigation.navigateTo('dashboard');
             } catch (error) {
+                console.error(`Erro ao limpar ${displayName}:`, error);
                 Notification.error(`Ocorreu um erro ao limpar os ${displayName}: ` + error.message);
+                document.body.className = 'state-app';
             }
         }
     };
 
-    // INICIALIZAÇÃO FINAL
     document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
