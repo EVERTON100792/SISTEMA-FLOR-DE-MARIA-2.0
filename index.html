@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v7.1 - ESTILOS FINAIS E CORRIGIDOS */
+        /* SGI - FLOR DE MARIA v7.2 - ESTILOS FINAIS E CORRIGIDOS */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -140,12 +140,18 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--hover-bg); border-radius: 10px; border: 2px solid var(--secondary-bg); }
 
         /* Estilos Específicos do PDV */
-        .product-list-pdv { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .product-list-pdv { max-height: 400px; overflow-y: scroll; padding-right: 10px; } /* MUDADO para 'scroll' */
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
         .product-item-pdv:hover { background-color: var(--hover-bg); }
         .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
+
+        /* Media queries para responsividade */
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
 
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); }
@@ -157,9 +163,9 @@
             .stats-grid, .grid, .grid-2, .grid-3, .grid-4, .grid-layout-pdv { grid-template-columns: 1fr !important; }
             .table thead { display: none; }
             .table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
-            .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); text-align: right; }
+            .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); text-align: right; white-space: normal; /* ADICIONADO para quebra de linha */ }
             .table tr td:last-child { border-bottom: none; }
-            .table td::before { content: attr(data-label); font-weight: bold; text-align: left; padding-right: 1rem; color: var(--text-secondary);}
+            .table td::before { content: attr(data-label); font-weight: bold; text-align: left; padding-right: 1rem; color: var(--text-secondary); white-space: nowrap; }
         }
     </style>
 </head>
@@ -518,7 +524,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v7.1 (Versão com Novas Features e Melhorias) =====
+    // ===== SGI - FLOR DE MARIA v7.2 (Versão com Ajustes de Responsividade) =====
     
     // 1. INICIALIZAÇÃO E CONFIGURAÇÕES
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
@@ -638,7 +644,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v7.1 (Com Novas Features) Iniciado.');
+            console.log('SGI - Flor de Maria v7.2 (Com Ajustes) Iniciado.');
         },
         async loadAllData() {
             const tables = [
@@ -772,7 +778,7 @@
             const labels = Object.keys(dataByMethod);
             const data = Object.values(dataByMethod);
 
-            Utils.renderChart('paymentMethodChart', 'bar', { // MUDADO PARA 'bar'
+            Utils.renderChart('paymentMethodChart', 'bar', {
                 labels,
                 datasets: [{
                     label: 'Vendas por Pagamento',
@@ -784,9 +790,9 @@
             }, { 
                 responsive: true, 
                 maintainAspectRatio: false, 
-                indexAxis: 'y', // Deixa as barras na horizontal
+                indexAxis: 'y',
                 plugins: { 
-                    legend: { display: false } // Esconde a legenda, pois os labels já estão no eixo
+                    legend: { display: false }
                 },
                 scales: {
                     x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } },
@@ -1013,8 +1019,10 @@
             newQuantity = parseInt(newQuantity);
             if (item && newQuantity > 0 && newQuantity <= item.stock_quantity) {
                 item.quantity = newQuantity;
+            } else if (item) {
+                // Se a quantidade for inválida, reseta para o valor anterior
+                this.renderCart();
             }
-            this.renderCart();
         },
         renderCart() {
             const cartEl = document.getElementById('pdvCartItems');
@@ -1069,10 +1077,10 @@
                 if (saleError) throw saleError;
                 
                 // 2. Atualizar estoque
-                const stockUpdates = state.cart.map(item => 
-                    db.rpc('decrement_product_quantity', { p_id: item.id, p_quantity: item.quantity })
-                );
-                await Promise.all(stockUpdates);
+                for (const item of state.cart) {
+                    const { error } = await db.rpc('decrement_product_quantity', { p_id: item.id, p_quantity: item.quantity });
+                    if (error) throw new Error(`Erro ao atualizar estoque para ${item.name}: ${error.message}`);
+                }
                 
                 const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito'].includes(paymentMethod) || (paymentMethod === 'Cartão de Crédito' && installments === 1);
                 
@@ -1083,11 +1091,11 @@
                     });
                 } else {
                     // 3b. Adicionar a contas a receber
-                    const installmentValue = total / installments;
+                    const installmentValue = parseFloat((total / installments).toFixed(2));
                     const receivablesToInsert = [];
                     for (let i = 1; i <= installments; i++) {
                         const dueDate = new Date();
-                        dueDate.setMonth(dueDate.getMonth() + i);
+                        dueDate.setMonth(dueDate.getMonth() + (i -1)); // Parcela 1 vence no mês atual, 2 no próximo, etc.
                         receivablesToInsert.push({
                             client_id: clientId,
                             sale_id: newSale.id,
@@ -1296,7 +1304,6 @@
         async remove(id) {
             if(!confirm('Deseja realmente excluir esta despesa? Esta ação é irreversível.')) return;
             try {
-                // Para este sistema, faremos a exclusão direta.
                 const { error } = await db.from('expenses').delete().eq('id', id);
                 if (error) throw error;
                 Notification.success('Despesa excluída.');
@@ -1552,9 +1559,8 @@
             `;
             document.getElementById('reportOutput').innerHTML = html;
             
-            // For PDF, we'll create a single doc with two tables. The utility doesn't support this directly, so we'll just export the unpaid items for now.
             const pdfHead = [['Descrição', 'Vencimento', 'Status', 'Valor']];
-            const pdfBody = unpaid.map(r => [r.description, Utils.formatDate(r.due_date), r.status, Utils.formatCurrency(r.value)]);
+            const pdfBody = unpaid.map(r => [r.description, Utils.formatDate(r.due_date), r.due_date < new Date().toISOString().split('T')[0] ? 'Vencido' : 'Pendente', Utils.formatCurrency(r.value)]);
             this.addPdfButton(reportTitle, pdfHead, pdfBody, [`Total Pago: ${Utils.formatCurrency(totalPaid)}`, `Total a Pagar: ${Utils.formatCurrency(totalOwed)}`]);
         }
     };
