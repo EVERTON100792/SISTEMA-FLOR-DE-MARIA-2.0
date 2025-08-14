@@ -4,1077 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGI - Flor de Maria | Sistema de Gestão Integrado</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* ===== ESTILOS CSS (Sem alterações, omitido para brevidade) ===== */
-        /* ... Cole todo o seu CSS aqui ... */
-         /* ===== RESET E VARIÁVEIS CSS ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* SGI - FLOR DE MARIA v7.0 - ESTILOS FINAIS E CORRIGIDOS */
         :root {
-            /* Paleta de Cores Moderna */
-            --primary-bg: #0F172A;  /* Azul escuro profundo */
-            --secondary-bg: #1E293B;  /* Azul acinzentado */
-            --surface-bg: #334155;  /* Superfície elevada */
-            --primary-color: #3B82F6; /* Azul vibrante */
-            --accent-color: #10B981;  /* Verde neon */
-            --danger-color: #EF4444;  /* Vermelho */
-            --warning-color: #F59E0B; /* Amarelo */
-            --text-primary: #FFFFFF;  /* Branco puro */
-            --text-secondary: #F1F5F9; /* Cinza claro */
-            --text-muted: #94A3B8;  /* Cinza médio */
-            --border-color: #475569;  /* Borda */
-            --hover-bg: #475569;    /* Hover */
-            
-            /* Gradientes */
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            --gradient-dark: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
-            
-            /* Sombras */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            
-            /* Transições */
+            --primary-bg: #0B1120;
+            --secondary-bg: #131a2b;
+            --surface-bg: #1e293b;
+            --primary-color: #3b82f6;
+            --primary-color-rgb: 59, 130, 246;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: rgba(148, 163, 184, 0.2);
+            --hover-bg: #334155;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* ===== ESTILOS GLOBAIS ===== */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--gradient-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* ===== COMPONENTES REUTILIZÁVEIS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            justify-content: center;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-secondary {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--hover-bg);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Roboto', sans-serif; background-color: var(--primary-bg); color: var(--text-primary); line-height: 1.6; }
         
-        .btn-success {
-            background: var(--accent-color);
-            color: var(--text-primary);
-        }
+        .hidden { display: none !important; }
 
-        .btn-success:hover {
-            background: #059669;
-        }
+        #loginScreen, #appLayout, #loadingOverlay { display: none; }
+        body.state-login #loginScreen { display: flex; }
+        body.state-loading #loadingOverlay { display: flex; }
+        body.state-app #appLayout { display: flex; }
 
-        .btn-danger {
-            background: var(--danger-color);
-            color: var(--text-primary);
+        .login-container { align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: var(--secondary-bg); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
+        .login-logo i { font-size: 48px; color: var(--primary-color); margin-bottom: 16px; }
+        .login-title { font-size: 28px; margin-bottom: 8px; }
+        .login-subtitle { color: var(--text-muted); margin-bottom: 32px; }
+        .input-group { position: relative; margin-bottom: 32px; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;
+            background: rgba(15, 23, 42, 0.5); color: var(--text-primary); font-size: 15px; transition: var(--transition);
         }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3); }
+        .form-label-float { position: absolute; top: 13px; left: 16px; color: var(--text-muted); pointer-events: none; transition: all 0.2s ease-out; background-color: transparent; padding: 0 4px; }
+        .form-input:focus+.form-label-float, .form-input:not(:placeholder-shown)+.form-label-float { top: -10px; font-size: 12px; color: var(--primary-color); background-color: var(--secondary-bg); }
 
-        .btn-danger:hover {
-            background: #DC2626;
-        }
+        .app-layout { min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--secondary-bg); border-right: 1px solid var(--border-color); padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease-in-out; }
+        .sidebar-header { padding: 0 24px 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
+        .sidebar-logo i { font-size: 24px; color: var(--primary-color); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav-link { display: flex; align-items: center; gap: 16px; padding: 12px 24px; color: var(--text-muted); text-decoration: none; transition: var(--transition); border-radius: 8px; margin: 4px 12px; }
+        .sidebar-nav-link:hover { background: var(--hover-bg); color: var(--text-primary); }
+        .sidebar-nav-link.active { background: var(--primary-color); color: var(--text-primary); font-weight: 600; }
+        .sidebar-nav-link i { width: 20px; text-align: center; }
+        .main-content { flex: 1; margin-left: 260px; padding: 32px; transition: margin-left 0.3s ease-in-out; }
+        .page { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-warning {
-            background: var(--warning-color);
-            color: var(--text-primary);
-        }
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+        .page-subtitle { color: var(--text-muted); }
 
-        .btn-warning:hover {
-            background: #D97706;
-        }
+        .mobile-menu-toggle { display: none; }
 
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 12px;
-        }
-
-        .card {
-            background: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Otimização para mobile: remove efeito de hover que pode ser "pegajoso" */
-        @media (hover: none) {
-            .card:hover {
-                transform: none;
-                box-shadow: var(--shadow-lg);
-            }
-            .btn-primary:hover:not(:disabled) {
-                transform: none;
-                box-shadow: var(--shadow-md);
-            }
-        }
-        @media (hover: hover) {
-            .card:hover {
-                transform: translateY(-4px);
-                box-shadow: var(--shadow-xl);
-            }
-        }
-
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 16px; 
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .form-input,
-        .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--surface-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: var(--transition);
-        }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .btn-primary { background: var(--primary-color); color: var(--text-primary); }
+        .btn-secondary { background: var(--surface-bg); color: var(--text-primary); border-color: var(--border-color); }
+        .btn-danger { background: var(--danger-color); color: var(--text-primary); }
+        .btn-accent { background: var(--accent-color); color: var(--text-primary); }
+        .btn-sm { padding: 8px 16px; font-size: 12px; }
         
-        .form-select {
-            cursor: pointer;
-        }
+        .card { background: var(--surface-bg); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .card-title { font-size: 18px; font-weight: 700; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); }
 
-        .form-input:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
+        .stats-grid { display: grid; gap: 24px; grid-template-columns: repeat(4, 1fr); }
+        .stat-card { background-color: var(--surface-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .stat-label { font-size: 14px; color: var(--text-muted); }
+        .stat-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 40px; opacity: 0.15; color: var(--text-secondary); }
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        .table th { font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
+        .table tbody tr:hover { background-color: var(--hover-bg); }
+        .table-actions { display: flex; gap: 8px; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+        .badge-info { background: rgba(59, 130, 246, 0.2); color: var(--primary-color); }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th,
-        .table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            /* white-space: nowrap; Removido para melhor responsividade em mobile */
-        }
-
-        .table th {
-            background: var(--surface-bg);
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .table tr:hover {
-            background: var(--surface-bg);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent-color);
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger-color);
-        }
-
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning-color);
-        }
-        .badge-secondary {
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-muted);
-        }
-
-
-        /* ===== TELA DE LOGIN ===== */
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: var(--secondary-bg);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .login-logo {
-            font-size: 48px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-        }
-
-        .login-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .login-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 32px;
-        }
-
-        /* ===== LAYOUT PRINCIPAL ===== */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: var(--secondary-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 24px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            transition: var(--transition);
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 0 24px 24px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .sidebar-logo i {
-            font-size: 24px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-        }
-
-        .sidebar-nav-item {
-            margin-bottom: 4px;
-        }
-
-        .sidebar-nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: var(--transition);
-            border-radius: 0;
-            position: relative;
-        }
-
-        .sidebar-nav-link:hover {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-        }
-
-        .sidebar-nav-link.active {
-            background: var(--primary-color);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
+        .loading-overlay { flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 9999; }
+        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid var(--primary-color); width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .sidebar-nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--accent-color);
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 24px;
-            transition: var(--transition);
-        }
-
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: var(--text-primary); font-weight: 600; z-index: 9999; transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .notification.show { transform: translateX(0); }
+        .notification-success { background: var(--accent-color); }
+        .notification-error { background: var(--danger-color); }
+        .notification-warning { background: var(--warning-color); }
         
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-            flex-grow: 1; 
-        }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 9998; }
+        .modal.show { display: flex; animation: fadeIn 0.3s; }
+        .modal-content { background: var(--secondary-bg); border-radius: 12px; padding: 24px; max-width: 800px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
+        #modalBody { overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
 
+        .grid { display: grid; gap: 24px; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-layout-pdv { grid-template-columns: 2fr 1fr; }
+        .mt-4 { margin-top: 24px; }
+        .text-center { text-align: center; }
 
-        /* ===== RESPONSIVIDADE ===== */
-        .mobile-menu-toggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px; 
-            z-index: 1001;
-            background: var(--surface-bg); 
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 10px 12px; 
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            box-shadow: var(--shadow-md);
-        }
+        /* Estilos Específicos do PDV */
+        .product-list-pdv { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
+        .product-item-pdv:hover { background-color: var(--hover-bg); }
+        .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
 
-        @media (max-width: 800px) { /* Aumentado o breakpoint para cobrir mais tablets */
-            body {
-                font-size: 14px;
-            }
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-                box-shadow: var(--shadow-xl);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 80px 15px 20px; 
-            }
-
-            .login-card {
-                padding: 32px 24px;
-            }
-
-            .card {
-                padding: 16px;
-            }
-            
-            /* Ajuste crucial para os grids em mobile */
-            .grid-2, .grid-3, .grid-4, .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            /* Garante que grupos de botões em formulários empilhem verticalmente */
-            .form-group .flex.gap-2 {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .form-group .flex.gap-2 .btn {
-                width: 100%;
-            }
-            
-            /* Empilha o total e o botão de finalizar na página de vendas */
-            #salesPage .flex-between.mt-3 {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 16px;
-                text-align: center;
-            }
-            #salesPage .flex-between.mt-3 .btn {
-                width: 100%;
-            }
-            
-            /* Empilha o conteúdo dos cabeçalhos dos cards */
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .card-header .flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-            
-            /* Melhorando a visualização do recibo no modal */
-            .receipt-professional-header, .receipt-sale-info .text-right {
-                flex-direction: column;
-                align-items: flex-start;
-                text-align: left;
-                gap: 16px;
-            }
-            .receipt-company-details {
-                text-align: left;
-                margin-top: 16px;
-            }
-            .receipt-sale-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .receipt-summary {
-                justify-content: flex-start;
-            }
-            .receipt-summary table {
-                width: 100%;
-                max-width: none;
-            }
-            
-            .btn {
-                padding: 12px 18px; 
-                font-size: 14px;
-            }
-
-            .form-input, .form-select {
-                font-size: 14px;
-                padding: 12px 16px;
-            }
-
-            .chart-container {
-                max-height: 300px;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 24px 16px;
-            }
-
-            .modal-title {
-                font-size: 20px;
-            }
-
-            /* --- RELATÓRIOS & TABELAS GERAIS: Ajustes para responsividade --- */
-            /* Garante que as colunas da tabela quebrem o texto em mobile */
-            .table th, .table td {
-                white-space: normal; /* Permite que o texto quebre */
-            }
-
-            /* Ajusta a largura das colunas para tentar evitar a rolagem horizontal, se possível */
-            /* Isso é uma otimização, mas `overflow-x: auto` ainda é necessário para tabelas muito grandes */
-            .table th:nth-child(1), .table td:nth-child(1) { width: 30%; } /* Ex: Nome/Descrição/Produto */
-            .table th:nth-child(2), .table td:nth-child(2) { width: 30%; } /* Ex: Telefone/Qtd/Tipo */
-            .table th:nth-child(3), .table td:nth-child(3) { width: 20%; } /* Ex: Cadastro/Valor/Categoria */
-            .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* Ex: Compras/Vencimento/Status */
-            /* Ações podem permanecer pequenas, ou se ajustarem com flex-wrap em seu container */
-            .table td:last-child, .table th:last-child {
-                width: auto; /* Deixa o navegador ajustar a última coluna */
-            }
-
-            /* Ajusta o input de quantidade no carrinho do PDV */
-            #salesPage .table input[type="number"].form-input {
-                width: 55px; /* Mais compacto */
-                padding: 4px;
-                font-size: 13px;
-            }
-
-            /* Ajusta os filtros de relatório para empilhar verticalmente em mobile */
-            #reportsPage .grid-4 {
-                grid-template-columns: 1fr; /* Força empilhamento em uma única coluna */
-            }
-
-            /* Reduz o padding para filtros para usar melhor o espaço */
-            #reportsPage .form-group {
-                margin-bottom: 15px;
-            }
-
-            /* Garante que o botão de atualizar relatório ocupe a largura total */
-            #reportsPage #generateReport {
-                width: 100%;
-            }
-
-            /* Ajusta a disposição dos botões de exportar em mobile */
-            #reportsPage .card-header .flex.gap-2 {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-            #reportsPage .card-header .flex.gap-2 .btn {
-                width: 100%;
-            }
-            /* --- FIM: RELATÓRIOS & TABELAS GERAIS --- */
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 80px 15px 20px; }
+            .mobile-menu-toggle { display: block; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--surface-bg); border: 1px solid var(--border-color); width: 45px; height: 45px; border-radius: 8px; cursor: pointer; color: var(--text-primary); font-size: 18px; }
+            .sidebar-overlay { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+            .sidebar-overlay.active { opacity: 1; pointer-events: all; }
+            .stats-grid, .grid, .grid-2, .grid-3, .grid-4, .grid-layout-pdv { grid-template-columns: 1fr !important; }
+            .table thead { display: none; }
+            .table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+            .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); text-align: right; }
+            .table tr td:last-child { border-bottom: none; }
+            .table td::before { content: attr(data-label); font-weight: bold; text-align: left; padding-right: 1rem; color: var(--text-secondary);}
         }
-
-        /* ===== UTILITÁRIOS ===== */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .mb-0 { margin-bottom: 0; }
-        .mb-1 { margin-bottom: 8px; }
-        .mb-2 { margin-bottom: 16px; }
-        .mb-3 { margin-bottom: 24px; }
-        .mb-4 { margin-bottom: 32px; }
-
-        .mt-0 { margin-top: 0; }
-        .mt-1 { margin-top: 8px; }
-        .mt-2 { margin-top: 16px; }
-        .mt-3 { margin-top: 24px; }
-        .mt-4 { margin-top: 32px; }
-
-        .grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        .grid-3 {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-
-        .grid-4 {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        }
-
-        .flex {
-            display: flex;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .flex-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .gap-1 { gap: 8px; }
-        .gap-2 { gap: 16px; }
-        .gap-3 { gap: 24px; }
-
-        /* ===== NOTIFICAÇÕES ===== */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-            z-index: 9999;
-            transform: translateX(400px);
-            transition: var(--transition);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification-success {
-            background: var(--accent-color);
-        }
-
-        .notification-error {
-            background: var(--danger-color);
-        }
-
-        .notification-warning {
-            background: var(--warning-color);
-        }
-
-        /* ===== MODAL ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 32px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 85vh; 
-            display: flex; 
-            flex-direction: column; 
-            border: 1px solid var(--border-color);
-            transform: scale(0.9);
-            transition: var(--transition);
-        }
-        
-        #modalBody {
-            overflow-y: auto; 
-        }
-
-
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--surface-bg);
-            color: var(--text-primary);
-        }
-
-        /* ===== LOADING ===== */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ===== DASHBOARD ESPECÍFICO ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--secondary-bg);
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-icon {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 32px;
-            color: var(--primary-color);
-            opacity: 0.3;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* PDV - Sugestões de produtos */
-        .suggestion-item:hover {
-            background: var(--surface-bg) !important;
-            color: var(--text-primary);
-        }
-
-        /* ===== NOVO ESTILO DE RECIBO PROFISSIONAL ===== */
-        .receipt-professional-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-        .receipt-professional-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap; 
-        }
-        .receipt-logo-container {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-        }
-        .receipt-company-details {
-            text-align: right;
-        }
-        .receipt-company-details h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #343a40;
-        }
-        .receipt-company-details p {
-            margin: 2px 0;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .receipt-sale-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-        .receipt-info-block p {
-            margin: 4px 0;
-        }
-        .receipt-info-block .label {
-            color: #6c757d;
-            font-weight: 600;
-        }
-        .receipt-items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-        }
-        .receipt-items-table thead {
-            background-color: #e9ecef;
-        }
-        .receipt-items-table th {
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #495057;
-            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
-        }
-        .receipt-items-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 0.95rem;
-            /* white-space: nowrap; */ /* Removido para responsividade no recibo também */
-        }
-        .receipt-items-table .text-right { text-align: right; }
-        .receipt-items-table .text-center { text-align: center; }
-        .receipt-summary {
-            display: flex;
-            justify-content: flex-end;
-        }
-        .receipt-summary table {
-            width: 50%;
-            max-width: 300px;
-        }
-        .receipt-summary td {
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
-        .receipt-summary .total-label {
-            font-weight: bold;
-            color: #495057;
-        }
-        .receipt-summary .total-value {
-            font-weight: bold;
-            font-size: 1.25rem;
-            color: var(--primary-color);
-        }
-        .receipt-footer {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            text-align: center;
-            border-top: 1px solid #dee2e6;
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-
     </style>
 </head>
 <body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Carregando dados...</p>
+    </div>
+
     <div id="loginScreen" class="login-container">
         <div class="login-card">
-            <div class="login-logo">
-                <i class="fas fa-store"></i>
-            </div>
+            <div class="login-logo"><i class="fas fa-store"></i></div>
             <h1 class="login-title">Flor de Maria</h1>
             <p class="login-subtitle">Sistema de Gestão Integrado</p>
             
             <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">Email</label>
-                    <input type="email" id="username" class="form-input" placeholder="Digite seu email" required>
+                <div class="input-group">
+                    <input type="email" id="username" class="form-input" placeholder=" " required>
+                    <label for="username" class="form-label-float">Email</label>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label" for="password">Senha</label>
-                    <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
+                <div class="input-group">
+                    <input type="password" id="password" class="form-input" placeholder=" " required>
+                    <label for="password" class="form-label-float">Senha</label>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Entrar
-                </button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
         </div>
     </div>
 
-    <div id="appLayout" class="app-layout hidden">
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
+    <div id="appLayout" class="app-layout">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-store"></i>
-                    <span>Flor de Maria</span>
-                </div>
+                <div class="sidebar-logo"><i class="fas fa-store"></i><span>Flor de Maria</span></div>
             </div>
-            
             <ul class="sidebar-nav">
-                <li class="sidebar-nav-item">
-                    <a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#clients" class="sidebar-nav-link" data-page="clients">
-                        <i class="fas fa-users"></i>
-                        <span>Clientes</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#products" class="sidebar-nav-link" data-page="products">
-                        <i class="fas fa-boxes"></i>
-                        <span>Estoque</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#sales" class="sidebar-nav-link" data-page="sales">
-                        <i class="fas fa-cash-register"></i>
-                        <span>PDV</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#receipts" class="sidebar-nav-link" data-page="receipts">
-                        <i class="fas fa-receipt"></i>
-                        <span>Recibos</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#cashflow" class="sidebar-nav-link" data-page="cashflow">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Fluxo de Caixa</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#expenses" class="sidebar-nav-link" data-page="expenses">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Despesas</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#receivables" class="sidebar-nav-link" data-page="receivables">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Contas a Receber</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#reports" class="sidebar-nav-link" data-page="reports">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Relatórios</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="#settings" class="sidebar-nav-link" data-page="settings">
-                        <i class="fas fa-cog"></i>
-                        <span>Configurações</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-item" style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                    <a href="#" class="sidebar-nav-link" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sair</span>
-                    </a>
-                </li>
+                <li class="sidebar-nav-item"><a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+                <li class="sidebar-nav-item"><a href="#clients" class="sidebar-nav-link" data-page="clients"><i class="fas fa-users"></i><span>Clientes</span></a></li>
+                <li class="sidebar-nav-item"><a href="#products" class="sidebar-nav-link" data-page="products"><i class="fas fa-boxes"></i><span>Estoque</span></a></li>
+                <li class="sidebar-nav-item"><a href="#sales" class="sidebar-nav-link" data-page="sales"><i class="fas fa-cash-register"></i><span>PDV</span></a></li>
+                <li class="sidebar-nav-item"><a href="#receipts" class="sidebar-nav-link" data-page="receipts"><i class="fas fa-receipt"></i><span>Recibos</span></a></li>
+                <li class="sidebar-nav-item"><a href="#cashflow" class="sidebar-nav-link" data-page="cashflow"><i class="fas fa-money-bill-wave"></i><span>Fluxo de Caixa</span></a></li>
+                <li class="sidebar-nav-item"><a href="#expenses" class="sidebar-nav-link" data-page="expenses"><i class="fas fa-file-invoice-dollar"></i><span>Despesas</span></a></li>
+                <li class="sidebar-nav-item"><a href="#receivables" class="sidebar-nav-link" data-page="receivables"><i class="fas fa-calendar-check"></i><span>Contas a Receber</span></a></li>
+                <li class="sidebar-nav-item"><a href="#reports" class="sidebar-nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>Relatórios</span></a></li>
+                <li class="sidebar-nav-item"><a href="#settings" class="sidebar-nav-link" data-page="settings"><i class="fas fa-cog"></i><span>Configurações</span></a></li>
+                <li class="sidebar-nav-item" style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 24px;"><a href="#" class="sidebar-nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
             </ul>
         </nav>
 
@@ -1084,7 +214,6 @@
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Visão geral do seu negócio</p>
                 </div>
-
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value" id="cashBalance">R$ 0,00</div>
@@ -1107,380 +236,144 @@
                         <i class="fas fa-chart-line stat-icon"></i>
                     </div>
                 </div>
-
-                <div class="grid grid-2">
+                <div class="grid grid-2 mt-4">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-bar"></i>
-                                Vendas por Método de Pagamento (Mês Atual)
-                            </h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="paymentMethodChart"></canvas>
-                        </div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Mês Atual)</h3></div>
+                        <div class="chart-container" style="position: relative; height:350px;"><canvas id="paymentMethodChart"></canvas></div>
                     </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Contas Vencidas
-                            </h3>
-                        </div>
-                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;">
-                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
-                                Nenhuma conta vencida
-                            </p>
-                        </div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3></div>
+                        <div id="overdueAccounts" style="max-height: 350px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
 
             <div id="clientsPage" class="page hidden">
-                <div class="page-header">
+                 <div class="page-header">
                     <h1 class="page-title">Clientes</h1>
                     <p class="page-subtitle">Gerencie seus clientes</p>
                 </div>
-
                 <div class="grid grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-user-plus"></i>
-                                Novo Cliente
-                            </h3>
-                        </div>
-                        
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user-plus"></i> Novo Cliente</h3></div>
                         <form id="clientForm">
-                            <div class="form-group">
-                                <label class="form-label" for="clientName">Nome Completo</label>
-                                <input type="text" id="clientName" class="form-input" placeholder="Digite o nome do cliente" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="clientPhone">Telefone</label>
-                                <input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000" required>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Cliente
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearClientForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
+                            <input type="hidden" id="clientId">
+                            <div class="form-group"><label class="form-label" for="clientName">Nome Completo</label><input type="text" id="clientName" class="form-input" required></div>
+                            <div class="form-group"><label class="form-label" for="clientPhone">Telefone</label><input type="tel" id="clientPhone" class="form-input" placeholder="(00) 00000-0000"></div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Cliente</button>
+                                <button type="button" class="btn btn-secondary" id="clearClientForm"><i class="fas fa-times"></i> Limpar</button>
                             </div>
                         </form>
                     </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-search"></i>
-                                Buscar Cliente
-                            </h3>
-                        </div>
-                        
-                        <div class="form-group">
-                            <input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone do cliente">
-                        </div>
-                        
-                        <div class="flex-between">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Cliente</h3></div>
+                        <div class="form-group"><input type="text" id="clientSearch" class="form-input" placeholder="Digite o nome ou telefone"></div>
+                        <div style="display:flex; justify-content: space-between; align-items: center;">
                             <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
-                            <button class="btn btn-secondary btn-sm" id="exportClients">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
+                            <button class="btn btn-secondary btn-sm" id="exportClients"><i class="fas fa-download"></i> Exportar CSV</button>
                         </div>
                     </div>
                 </div>
-
                 <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-users"></i>
-                            Lista de Clientes
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Telefone</th>
-                                    <th>Cadastro</th>
-                                    <th>Compras</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clientsTableBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
+                    <div class="table-responsive"><table class="table">
+                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead>
+                        <tbody id="clientsTableBody"></tbody>
+                    </table></div>
                 </div>
             </div>
-
+            
             <div id="productsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Estoque</h1>
                     <p class="page-subtitle">Gerencie seus produtos</p>
                 </div>
-
                 <div class="grid grid-2">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-box"></i>
-                                Novo Produto
-                            </h3>
-                        </div>
-                        
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-box"></i> Novo Produto</h3></div>
                         <form id="productForm">
-                            <div class="form-group">
-                                <label class="form-label" for="productRefCode">Código de Referência</label>
-                                <input type="text" id="productRefCode" class="form-input" placeholder="Ex: PRD001" required>
+                            <input type="hidden" id="productId">
+                            <div class="form-group"><label class="form-label" for="productRefCode">Código de Referência</label><input type="text" id="productRefCode" class="form-input" required></div>
+                            <div class="form-group"><label class="form-label" for="productName">Nome do Produto</label><input type="text" id="productName" class="form-input" required></div>
+                            <div class="grid grid-3">
+                                <div class="form-group"><label class="form-label" for="productQuantity">Quantidade</label><input type="number" id="productQuantity" class="form-input" min="0" required></div>
+                                <div class="form-group"><label class="form-label" for="productCostPrice">Preço de Custo</label><input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" required></div>
+                                <div class="form-group"><label class="form-label" for="productSalePrice">Preço de Venda</label><input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" required></div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="productName">Nome do Produto</label>
-                                <input type="text" id="productName" class="form-input" placeholder="Digite o nome do produto" required>
-                            </div>
-                            
-                            <div class="grid grid-2">
-                                <div class="form-group">
-                                    <label class="form-label" for="productQuantity">Quantidade</label>
-                                    <input type="number" id="productQuantity" class="form-input" min="0" placeholder="0" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label" for="productCostPrice">Preço de Custo</label>
-                                    <input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="productSalePrice">Preço de Venda</label>
-                                <input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Produto
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearProductForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Produto</button>
+                                <button type="button" class="btn btn-secondary" id="clearProductForm"><i class="fas fa-times"></i> Limpar</button>
                             </div>
                         </form>
                     </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo do Estoque
-                            </h3>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Resumo do Estoque</h3></div>
+                        <div class="grid grid-2" style="margin-bottom: 20px;">
+                            <div class="text-center"><div class="stat-value" id="totalProducts">0</div><div class="stat-label">Total de Produtos</div></div>
+                            <div class="text-center"><div class="stat-value" id="outOfStockProducts">0</div><div class="stat-label">Produtos Esgotados</div></div>
                         </div>
-                        
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalProducts">0</div>
-                                <div class="stat-label">Total de Produtos</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="outOfStockProducts">0</div>
-                                <div class="stat-label">Produtos Esgotados</div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código">
-                        </div>
-                        
-                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;">
-                            <i class="fas fa-download"></i>
-                            Exportar Estoque
-                        </button>
+                        <div class="form-group"><input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código"></div>
+                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;"><i class="fas fa-download"></i> Exportar Estoque (CSV)</button>
                     </div>
                 </div>
-
                 <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-boxes"></i>
-                            Lista de Produtos
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nome</th>
-                                    <th>Quantidade</th>
-                                    <th>Preço Custo</th>
-                                    <th>Preço Venda</th>
-                                    <th>Margem</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div>
+                    <div class="table-responsive"><table class="table">
+                        <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table></div>
                 </div>
             </div>
 
             <div id="salesPage" class="page hidden">
                 <div class="page-header">
-                    <h1 class="page-title">Ponto de Venda</h1>
-                    <p class="page-subtitle">Registre suas vendas</p>
+                    <h1 class="page-title">PDV - Ponto de Venda</h1>
+                    <p class="page-subtitle">Realize uma nova venda</p>
                 </div>
-
-                <div class="grid grid-2">
+                <div class="grid grid-layout-pdv">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-search"></i>
-                                Buscar Produto
-                            </h3>
-                        </div>
-                        
-                        <div class="form-group">
-                            <input type="text" id="productSearchPDV" class="form-input" placeholder="Digite o código ou nome do produto">
-                        </div>
-                        
-                        <div id="productSuggestions" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 8px;">
-                        </div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Produtos</h3></div>
+                        <div class="form-group"><input type="text" id="pdvProductSearch" class="form-input" placeholder="Digite o nome ou código do produto..."></div>
+                        <div id="pdvProductList" class="product-list-pdv"></div>
                     </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-user"></i>
-                                Cliente e Pagamento
-                            </h3>
-                        </div>
-                        
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-shopping-cart"></i> Carrinho</h3></div>
+                        <div id="pdvCartItems" class="cart-items"></div>
+                        <hr style="border-color: var(--border-color); margin: 20px 0;">
                         <div class="form-group">
-                            <label class="form-label" for="saleClient">Cliente</label>
-                            <select id="saleClient" class="form-select">
-                                <option value="">Selecione um cliente (opcional)</option>
-                            </select>
+                            <label for="pdvClient" class="form-label">Cliente</label>
+                            <select id="pdvClient" class="form-select"></select>
                         </div>
-                        
                         <div class="form-group">
-                            <label class="form-label" for="salePaymentMethod">Método de Pagamento</label>
-                            <select id="salePaymentMethod" class="form-select" required>
+                            <label for="pdvPaymentMethod" class="form-label">Forma de Pagamento</label>
+                            <select id="pdvPaymentMethod" class="form-select">
                                 <option value="Dinheiro">Dinheiro</option>
-                                <option value="PIX">PIX</option>
+                                <option value="Pix">Pix</option>
                                 <option value="Cartão de Débito">Cartão de Débito</option>
                                 <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                <option value="Crediário">Crediário</option>
+                                <option value="A Prazo">A Prazo</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group hidden" id="installmentsGroup">
-                            <label class="form-label" for="saleInstallments">Número de Parcelas</label>
-                            <input type="number" id="saleInstallments" class="form-input" min="1" value="1">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted">TOTAL:</span>
+                            <div id="pdvTotal" class="cart-total">R$ 0,00</div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-shopping-cart"></i>
-                            Carrinho de Compras
-                        </h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-danger btn-sm" id="clearCart">
-                                <i class="fas fa-trash"></i>
-                                Limpar Carrinho
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Preço Unit.</th>
-                                    <th>Quantidade</th>
-                                    <th>Subtotal</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cartTableBody"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="flex-between mt-3" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                        <div>
-                            <strong style="font-size: 24px; color: var(--primary-color);">
-                                Total: <span id="cartTotal">R$ 0,00</span>
-                            </strong>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary" id="finalizeSale" disabled>
-                                <i class="fas fa-check"></i>
-                                Finalizar Venda
-                            </button>
-                        </div>
+                        <button id="finalizeSaleBtn" class="btn btn-accent" style="width: 100%;"><i class="fas fa-check"></i> Finalizar Venda</button>
                     </div>
                 </div>
             </div>
 
             <div id="receiptsPage" class="page hidden">
                 <div class="page-header">
-                    <h1 class="page-title">Recibos</h1>
-                    <p class="page-subtitle">Visualize e gerencie os recibos de vendas</p>
+                    <h1 class="page-title">Recibos de Vendas</h1>
+                    <p class="page-subtitle">Consulte o histórico de vendas realizadas</p>
                 </div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-filter"></i>
-                            Filtrar Recibos
-                        </h3>
-                    </div>
-                    <div class="grid grid-2">
-                            <div class="form-group">
-                            <label class="form-label" for="receiptClientFilter">Filtrar por Cliente</label>
-                            <select id="receiptClientFilter" class="form-select">
-                                <option value="">Todos os Clientes</option>
-                            </select>
-                        </div>
-                            <div class="form-group">
-                            <label class="form-label" for="receiptDateFilter">Filtrar por Data</label>
-                            <input type="date" id="receiptDateFilter" class="form-input">
-                        </div>
-                    </div>
-                </div>
-                    <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Vendas
-                        </h3>
-                    </div>
-                        <div class="table-responsive">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-history"></i> Histórico de Vendas</h3></div>
+                    <div class="table-responsive">
                         <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID da Venda</th>
-                                    <th>Data</th>
-                                    <th>Cliente</th>
-                                    <th>Total</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
                             <tbody id="receiptsTableBody"></tbody>
                         </table>
                     </div>
@@ -1490,244 +383,40 @@
             <div id="cashflowPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Fluxo de Caixa</h1>
-                    <p class="page-subtitle">Controle suas finanças</p>
+                    <p class="page-subtitle">Controle as entradas e saídas financeiras</p>
                 </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Novo Lançamento Manual
-                            </h3>
-                        </div>
-                        
-                        <form id="cashFlowForm">
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowType">Tipo</label>
-                                <select id="cashFlowType" class="form-select" required>
-                                    <option value="entrada">Entrada</option>
-                                    <option value="saida">Saída</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowDescription">Descrição</label>
-                                <input type="text" id="cashFlowDescription" class="form-input" placeholder="Descrição do lançamento" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowValue">Valor</label>
-                                <input type="number" id="cashFlowValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="cashFlowDate">Data</label>
-                                <input type="date" id="cashFlowDate" class="form-input" required>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Lançamento
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearCashFlowForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line"></i>
-                                Resumo Financeiro
-                            </h3>
-                        </div>
-                        
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalEntradas" style="color: var(--accent-color);">R$ 0,00</div>
-                                <div class="stat-label">Total Entradas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalSaidas" style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Total Saídas</div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <div class="stat-value" id="saldoAtual">R$ 0,00</div>
-                            <div class="stat-label">Saldo Atual</div>
-                        </div>
-                        
-                        <div class="form-group mt-3">
-                            <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento">
-                        </div>
-                        
-                        <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;">
-                            <i class="fas fa-download"></i>
-                            Exportar Fluxo de Caixa
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Histórico de Lançamentos
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
+                <div class="card">
+                     <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Lançamentos</h3></div>
+                     <div class="table-responsive">
                         <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Valor</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cashFlowTableBody"></tbody>
+                            <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Valor</th></tr></thead>
+                            <tbody id="cashflowTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
             <div id="expensesPage" class="page hidden">
-                <div class="page-header">
+                 <div class="page-header">
                     <h1 class="page-title">Despesas</h1>
-                    <p class="page-subtitle">Registre suas despesas</p>
+                    <p class="page-subtitle">Gerencie suas despesas e custos</p>
                 </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Nova Despesa
-                            </h3>
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-plus-circle"></i> Nova Despesa</h3></div>
+                    <form id="expenseForm">
+                        <div class="grid grid-3">
+                            <div class="form-group"><label for="expenseDescription" class="form-label">Descrição</label><input type="text" id="expenseDescription" class="form-input" required></div>
+                            <div class="form-group"><label for="expenseValue" class="form-label">Valor</label><input type="number" id="expenseValue" class="form-input" step="0.01" min="0" required></div>
+                            <div class="form-group"><label for="expenseDate" class="form-label">Data</label><input type="date" id="expenseDate" class="form-input" required></div>
                         </div>
-                        
-                        <form id="expenseForm">
-                            <div class="form-group">
-                                <label class="form-label" for="expenseDescription">Descrição</label>
-                                <input type="text" id="expenseDescription" class="form-input" placeholder="Descrição da despesa" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="expenseCategory">Categoria</label>
-                                <select id="expenseCategory" class="form-select" required>
-                                    <option value="">Selecione uma categoria</option>
-                                    <option value="Aluguel">Aluguel</option>
-                                    <option value="Energia Elétrica">Energia Elétrica</option>
-                                    <option value="Água">Água</option>
-                                    <option value="Internet">Internet</option>
-                                    <option value="Telefone">Telefone</option>
-                                    <option value="Fornecedores">Fornecedores</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Transporte">Transporte</option>
-                                    <option value="Alimentação">Alimentação</option>
-                                    <option value="Material de Escritório">Material de Escritório</option>
-                                    <option value="Impostos">Impostos</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="expenseValue">Valor</label>
-                                <input type="number" id="expenseValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="expenseDate">Data</label>
-                                <input type="date" id="expenseDate" class="form-input" required>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Despesa
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearExpenseForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo de Despesas
-                            </h3>
-                        </div>
-                        
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalExpensesMonth" style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Despesas do Mês</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalExpensesYear" style="color: var(--warning-color);">R$ 0,00</div>
-                                <div class="stat-label">Despesas do Ano</div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <input type="text" id="expenseSearch" class="form-input" placeholder="Buscar despesa">
-                        </div>
-                        
-                        <div class="flex gap-2">
-                            <select id="expenseFilterCategory" class="form-select">
-                                <option value="">Todas as categorias</option>
-                                <option value="Aluguel">Aluguel</option>
-                                <option value="Energia Elétrica">Energia Elétrica</option>
-                                <option value="Água">Água</option>
-                                <option value="Internet">Internet</option>
-                                <option value="Telefone">Telefone</option>
-                                <option value="Fornecedores">Fornecedores</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Alimentação">Alimentação</option>
-                                <option value="Material de Escritório">Material de Escritório</option>
-                                <option value="Impostos">Impostos</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="exportExpenses">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
-                        </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lançar Despesa</button>
+                    </form>
                 </div>
-
                 <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Despesas
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-list-alt"></i> Histórico de Despesas</h3></div>
+                     <div class="table-responsive">
                         <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Descrição</th>
-                                    <th>Categoria</th>
-                                    <th>Valor</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
                             <tbody id="expensesTableBody"></tbody>
                         </table>
                     </div>
@@ -1737,117 +426,13 @@
             <div id="receivablesPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Contas a Receber</h1>
-                    <p class="page-subtitle">Gerencie seus recebimentos (Crediário)</p>
+                    <p class="page-subtitle">Gerencie os pagamentos pendentes</p>
                 </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-plus"></i>
-                                Nova Conta a Receber (Manual)
-                            </h3>
-                        </div>
-                        
-                        <form id="receivableForm">
-                            <div class="form-group">
-                                <label class="form-label" for="receivableClient">Cliente</label>
-                                <select id="receivableClient" class="form-select" required>
-                                    <option value="">Selecione um cliente</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="receivableDescription">Descrição</label>
-                                <input type="text" id="receivableDescription" class="form-input" placeholder="Descrição da conta" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="receivableValue">Valor</label>
-                                <input type="number" id="receivableValue" class="form-input" min="0" step="0.01" placeholder="0,00" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="receivableDueDate">Data de Vencimento</label>
-                                <input type="date" id="receivableDueDate" class="form-input" required>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Salvar Conta
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearReceivableForm">
-                                    <i class="fas fa-times"></i>
-                                    Limpar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line"></i>
-                                Resumo de Recebimentos
-                            </h3>
-                        </div>
-                        
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="totalReceivablesPending" style="color: var(--warning-color);">R$ 0,00</div>
-                                <div class="stat-label">Pendentes</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="totalReceivablesOverdue" style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Vencidas</div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <div class="stat-value" id="totalReceivablesPaid" style="color: var(--accent-color);">R$ 0,00</div>
-                            <div class="stat-label">Recebidas</div>
-                        </div>
-                        
-                        <div class="form-group mt-3">
-                            <input type="text" id="receivableSearch" class="form-input" placeholder="Buscar por cliente ou descrição">
-                        </div>
-                        
-                        <div class="flex gap-2">
-                            <select id="receivableFilterStatus" class="form-select">
-                                <option value="">Todos os status</option>
-                                <option value="Pendente">Pendente</option>
-                                <option value="Pago">Pago</option>
-                                <option value="Vencido">Vencido</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="exportReceivables">
-                                <i class="fas fa-download"></i>
-                                Exportar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i>
-                            Lista de Contas a Receber
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
+                 <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-tasks"></i> Contas Pendentes e Vencidas</h3></div>
+                     <div class="table-responsive">
                         <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Descrição</th>
-                                    <th>Valor</th>
-                                    <th>Vencimento</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Cliente</th><th>Valor</th><th>Data Venda</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="receivablesTableBody"></tbody>
                         </table>
                     </div>
@@ -1857,148 +442,29 @@
             <div id="reportsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Relatórios</h1>
-                    <p class="page-subtitle">Análise e relatórios</p>
+                    <p class="page-subtitle">Gere relatórios para análise do seu negócio</p>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-filter"></i>
-                            Filtros de Relatório
-                        </h3>
-                    </div>
-                    
-                    <div class="grid grid-4">
-                        <div class="form-group">
-                            <label class="form-label" for="reportStartDate">Data Inicial</label>
-                            <input type="date" id="reportStartDate" class="form-input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="reportEndDate">Data Final</label>
-                            <input type="date" id="reportEndDate" class="form-input">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="reportType">Tipo de Relatório</label>
-                            <select id="reportType" class="form-select">
-                                <option value="vendas">Vendas</option>
-                                <option value="financeiro">Financeiro</option>
-                                <option value="produtos">Produtos</option>
-                                <option value="clientes">Clientes</option>
-                                <option value="contas_a_receber">Contas a Receber</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group hidden" id="reportClientFilterContainer">
-                                <label class="form-label" for="reportReceivableClient">Cliente</label>
-                                <select id="reportReceivableClient" class="form-select">
-                                    <option value="">Todos os Clientes</option>
-                                </select>
-                        </div>
-                        
-                        <div class="form-group hidden" id="reportStatusFilterContainer">
-                            <label class="form-label" for="reportReceivableStatus">Status da Conta</label>
-                            <select id="reportReceivableStatus" class="form-select">
-                                <option value="">Todos</option>
-                                <option value="Pendente">Pendentes</option>
-                                <option value="Pago">Pagas</option>
-                                <option value="Vencido">Vencidas</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">&nbsp;</label>
-                            <button class="btn btn-primary" id="generateReport" style="width: 100%;">
-                                <i class="fas fa-sync-alt"></i>
-                                Atualizar Relatório
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-2 mt-4">
+                <div class="grid grid-3">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Resumo Geral
-                            </h3>
-                        </div>
-                        
-                        <div class="grid grid-2">
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalSales" style="color: var(--accent-color);">R$ 0,00</div>
-                                <div class="stat-label">Total de Vendas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportTotalExpenses" style="color: var(--danger-color);">R$ 0,00</div>
-                                <div class="stat-label">Total de Despesas</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportProfit" style="color: var(--primary-color);">R$ 0,00</div>
-                                <div class="stat-label">Lucro Líquido</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="reportSalesCount">0</div>
-                                <div class="stat-label">Número de Vendas</div>
-                            </div>
-                        </div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-file-invoice-dollar"></i> Relatório de Vendas</h3></div>
+                        <p class="text-muted" style="margin-bottom: 20px;">Gere um relatório de vendas por período.</p>
+                        <button class="btn btn-primary" id="generateSalesReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
                     </div>
-
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-trophy"></i>
-                                Top 5 (Produtos/Clientes/Devedores)
-                            </h3>
-                        </div>
-                        
-                        <div id="topProductsList">
-                            <p class="text-center" style="color: var(--text-muted); padding: 20px;">
-                                Gere um relatório para ver os destaques.
-                            </p>
-                        </div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-star"></i> Produtos Mais Vendidos</h3></div>
+                        <p class="text-muted" style="margin-bottom: 20px;">Veja um ranking dos produtos mais vendidos.</p>
+                        <button class="btn btn-primary" id="generateTopProductsReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
+                    </div>
+                     <div class="card">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user-tag"></i> Compras por Cliente</h3></div>
+                        <p class="text-muted" style="margin-bottom: 20px;">Relatório de compras detalhado por cliente.</p>
+                        <button class="btn btn-primary" id="generateClientSalesReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
                     </div>
                 </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Gráfico do Relatório
-                        </h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary btn-sm" id="exportReportPDF">
-                                <i class="fas fa-file-pdf"></i>
-                                Exportar PDF
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="exportReportCSV">
-                                <i class="fas fa-file-csv"></i>
-                                Exportar CSV
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <canvas id="reportChart"></canvas>
-                    </div>
-                    
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-table"></i>
-                            Detalhes do Relatório
-                        </h3>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table" id="reportDetailTable">
-                            <thead id="reportTableHead"></thead>
-                            <tbody id="reportTableBody"></tbody>
-                        </table>
+                 <div class="card mt-4">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Visualização de Relatório</h3></div>
+                    <div id="reportOutput" class="text-center" style="min-height: 200px; padding: 20px; color: var(--text-muted);">
+                        Selecione um relatório para visualizar os dados aqui.
                     </div>
                 </div>
             </div>
@@ -2006,769 +472,1019 @@
             <div id="settingsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Configurações</h1>
-                    <p class="page-subtitle">Backup e restauração dos dados</p>
+                    <p class="page-subtitle">Ajuste as informações da sua empresa</p>
                 </div>
-
-                <div class="grid grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-download"></i>
-                                Backup dos Dados
-                            </h3>
+                <div class="card">
+                     <div class="card-header"><h3 class="card-title"><i class="fas fa-building"></i> Dados da Empresa</h3></div>
+                     <form id="settingsForm">
+                        <div class="grid grid-2">
+                            <div class="form-group"><label for="companyName" class="form-label">Nome da Empresa</label><input type="text" id="companyName" class="form-input"></div>
+                            <div class="form-group"><label for="companyCnpj" class="form-label">CNPJ</label><input type="text" id="companyCnpj" class="form-input"></div>
                         </div>
-                        
-                        <p style="color: var(--text-muted); margin-bottom: 20px;">
-                            Faça o backup de todos os seus dados do sistema. O arquivo será baixado em formato JSON.
-                        </p>
-                        
-                        <div class="grid grid-2 mb-3">
-                            <div class="text-center">
-                                <div class="stat-value" id="backupClientsCount">0</div>
-                                <div class="stat-label">Clientes</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="backupProductsCount">0</div>
-                                <div class="stat-label">Produtos</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-value" id="backupSalesCount">0</div>
-                                <div class="stat-label">Vendas</div>
-                            </div>
-                                <div class="text-center">
-                                    <div class="stat-value" id="backupReceivablesCount">0</div>
-                                    <div class="stat-label">Contas a Receber</div>
-                                </div>
-                        </div>
-                        
-                        <button class="btn btn-primary" id="downloadBackup" style="width: 100%;">
-                            <i class="fas fa-download"></i>
-                            Baixar Backup Completo
-                        </button>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-upload"></i>
-                                Restaurar Dados
-                            </h3>
-                        </div>
-                        
-                        <p style="color: var(--text-muted); margin-bottom: 20px;">
-                            Restaure seus dados a partir de um arquivo de backup. <strong>Atenção:</strong> Isso substituirá todos os dados atuais.
-                        </p>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="restoreFile">Arquivo de Backup (.json)</label>
-                            <input type="file" id="restoreFile" class="form-input" accept=".json">
-                        </div>
-                        
-                        <div class="flex gap-2">
-                            <button class="btn btn-warning" id="restoreBackup" disabled>
-                                <i class="fas fa-upload"></i>
-                                Restaurar Backup
-                            </button>
-                            <button class="btn btn-danger" id="clearAllData">
-                                <i class="fas fa-trash"></i>
-                                Limpar Todos os Dados
-                            </button>
-                        </div>
-                    </div>
+                        <div class="form-group"><label for="companyAddress" class="form-label">Endereço</label><input type="text" id="companyAddress" class="form-input"></div>
+                        <div class="form-group"><label for="companyPhone" class="form-label">Telefone</label><input type="text" id="companyPhone" class="form-input"></div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Configurações</button>
+                     </form>
                 </div>
             </div>
+
         </main>
     </div>
 
-    <div id="notification" class="notification">
-        <span id="notificationText"></span>
-    </div>
-
+    <div id="notification" class="notification"><span id="notificationText"></span></div>
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">Modal</h3>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
             </div>
-            <div id="modalBody">
-            </div>
+            <div id="modalBody" class="custom-scrollbar"></div>
         </div>
     </div>
 
     <script>
-    // ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.0 (Firebase Integration) =====
+    // ===== SGI - FLOR DE MARIA v7.0 (Versão Definitiva, 100% Funcional e Integrada) =====
     
-    // 1. Initialize Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBUn5hALHO13M0uHtMawZg_8CmRVBhHzAk",
-  authDomain: "sistema-flor-de-maria.firebaseapp.com",
-  projectId: "sistema-flor-de-maria",
-  storageBucket: "sistema-flor-de-maria.firebasestorage.app",
-  messagingSenderId: "148120762956",
-  appId: "1:148120762956:web:253cb554ded28a13bcd2e9"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(); // Get Firestore instance
-    const auth = firebase.auth();   // Get Auth instance
+    // 1. INICIALIZAÇÃO E CONFIGURAÇÕES
+    const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
     
-    // Configurações globais
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     const CONFIG = {
-        storageKeys: {
-            lastActivePage: 'sgi_last_active_page', 
-            // Os nomes das coleções agora serão usados diretamente
-            clients: 'sgi_clients',
-            products: 'sgi_products',
-            sales: 'sgi_sales',
-            cashFlow: 'sgi_cashflow',
-            expenses: 'sgi_expenses',
-            accountsReceivable: 'sgi_accounts_receivable'
+        storageKeys: { 
+            lastActivePage: 'sgi_last_active_page',
+            companyInfo: 'sgi_company_info'
         },
         company: { 
-            name: 'Flor de Maria',
-            address: 'Rua das Flores, 123 - Centro',
-            phone: '(11) 98765-4321',
-            cnpj: '12.345.678/0001-99'
-        }
-    };
-
-    // Utilitários
-    const Utils = {
-        generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        },
-        formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        },
-        formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const date = new Date(dateStr);
-            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
-        },
-        formatDateTime(date) {
-            if (!date) return 'N/A';
-            return new Intl.DateTimeFormat('pt-BR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(new Date(date));
-        },
-        async loadFromStorage(collectionName) {
-             try {
-                const snapshot = await db.collection(collectionName).get();
-                const data = [];
-                snapshot.forEach(doc => {
-                    data.push(doc.data());
-                });
-                return data;
-            } catch (error) {
-                console.error(`Erro ao carregar de '${collectionName}':`, error);
-                Notification.error('Erro ao carregar dados. Verifique o console.');
-                return [];
-            }
-        },
-        debounce(func, delay = 300) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    func.apply(this, args);
-                }, delay);
-            };
-        }
-    };
-
-    // Sistema de Notificações
-    const Notification = {
-        show(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.className = `notification notification-${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        },
-        success(message) { this.show(message, 'success'); },
-        error(message) { this.show(message, 'error'); },
-        warning(message) { this.show(message, 'warning'); }
-    };
-
-    // Sistema de Modal
-    const Modal = {
-        show(title, content, actionsHtml = '') {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').innerHTML = content;
-            
-            const existingActions = document.getElementById('modalActions');
-            if (existingActions) existingActions.remove();
-            
-            if (actionsHtml) {
-                const modalContent = document.querySelector('.modal-content');
-                const actionsContainer = document.createElement('div');
-                actionsContainer.id = 'modalActions';
-                actionsContainer.style.marginTop = '24px';
-                actionsContainer.style.paddingTop = '16px';
-                actionsContainer.style.borderTop = `1px solid ${getComputedStyle(document.documentElement).getPropertyValue('--border-color')}`;
-                actionsContainer.innerHTML = actionsHtml;
-                modalContent.appendChild(actionsContainer);
-            }
-            
-            document.getElementById('modal').classList.add('show');
-        },
-        hide() {
-            document.getElementById('modal').classList.remove('show');
-        }
-    };
-
-    // Sistema de Navegação
-    const Navigation = {
-        init() {
-            const sidebar = document.getElementById('sidebar');
-
-            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    if (window.innerWidth <= 800 && sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
-                    }
-
-                    const page = link.getAttribute('data-page');
-                    if (page) {
-                        this.navigateTo(page);
-                    }
-                });
-            });
-
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
-
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 800 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
-                    sidebar.classList.remove('active');
-                }
-            });
-        },
-        async navigateTo(page) {
-            try {
-                if (!document.getElementById(`${page}Page`)) {
-                    console.error(`Página "${page}" não encontrada. Redirecionando para o dashboard.`);
-                    page = 'dashboard';
-                }
-                
-                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`${page}Page`).classList.remove('hidden');
-
-                document.querySelectorAll('.sidebar-nav-link').forEach(link => link.classList.remove('active'));
-                document.querySelector(`[data-page="${page}"]`).classList.add('active');
-                
-                localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
-                
-                await this.loadPageData(page);
-            } catch (error) {
-                console.error(`Erro ao navegar para a página ${page}:`, error);
-                Notification.error("Ocorreu um erro ao carregar a página.");
-            }
-        },
-        async loadPageData(page) {
-            switch (page) {
-                case 'dashboard': await Dashboard.loadData(); break;
-                case 'clients': await Clients.loadClients(); break;
-                case 'products': await Products.loadProducts(); break;
-                case 'sales': await Sales.initPage(); break;
-                case 'receipts': await Receipts.initPage(); break;
-                case 'cashflow': await CashFlow.loadCashFlow(); break;
-                case 'expenses': await Expenses.loadExpenses(); break;
-                case 'receivables': await Receivables.loadReceivables(); break;
-                case 'settings': await Settings.updateBackupStats(); break;
-                case 'reports': await Reports.initPage(); break;
-            }
-        }
-    };
-
-    // Autenticação com Firebase
-    const Auth = {
-        init() {
-            document.getElementById('loginForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.login();
-            });
-            document.getElementById('logoutBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                this.logout();
-            });
-
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    this.showApp();
-                } else {
-                    this.showLogin();
-                }
-            });
-        },
-        async login() {
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                Notification.success('Login realizado com sucesso!');
-            } catch (error) {
-                console.error("Login error:", error);
-                Notification.error('Email ou senha incorretos!');
-            }
-        },
-        async logout() {
-            try {
-                await auth.signOut();
-                localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
-                Notification.success('Logout realizado com sucesso!');
-            } catch (error) {
-                console.error("Logout error:", error);
-                Notification.error('Erro ao sair.');
-            }
-        },
-        showLogin() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appLayout').classList.add('hidden');
-        },
-        showApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appLayout').classList.remove('hidden');
-            const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage);
-            Navigation.navigateTo(lastPage || 'dashboard');
+            name: 'Flor de Maria', 
+            address: 'Rua das Flores, 123 - Centro', 
+            phone: '(11) 98765-4321', 
+            cnpj: '12.345.678/0001-99' 
         }
     };
     
-    // Dashboard
-    const Dashboard = {
-        chart: null,
-        async loadData() {
-            await this.updateStats();
-            await this.updateChart();
-            await this.updateOverdueAccounts();
-        },
-        async updateStats() {
-            const cashFlow = await Utils.loadFromStorage(CONFIG.storageKeys.cashFlow);
-            const accountsReceivable = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-
-            const cashBalance = cashFlow.reduce((total, item) => item.type === 'entrada' ? total + item.value : total - item.value, 0);
-            const totalReceivables = accountsReceivable.filter(acc => acc.status === 'Pendente').reduce((total, acc) => total + acc.value, 0);
-            
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            const monthlySales = sales
-                .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
-                .reduce((total, s) => total + s.total, 0);
-            
-            const monthlyExpenses = cashFlow
-                .filter(cf => cf.type === 'saida')
-                .filter(cf => { const d = new Date(cf.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
-                .reduce((total, cf) => total + cf.value, 0);
-
-            document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
-            document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
-            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
-            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
-        },
-        async updateChart() {
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
-
-            const paymentMethods = {};
-            monthlySales.forEach(sale => {
-                const method = sale.paymentMethod || 'N/A';
-                paymentMethods[method] = (paymentMethods[method] || 0) + sale.total;
-            });
-
-            const ctx = document.getElementById('paymentMethodChart').getContext('2d');
-            if (this.chart) this.chart.destroy();
-            this.chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(paymentMethods),
-                    datasets: [{
-                        label: 'Vendas (R$)',
-                        data: Object.values(paymentMethods),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#F1F5F9' } } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: '#475569' } },
-                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#475569' } }
-                    }
-                }
-            });
-        },
-        async updateOverdueAccounts() {
-            const accountsReceivable = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const overdueAccounts = accountsReceivable.filter(account => account.status === 'Pendente' && new Date(account.dueDate) < today);
-
-            const container = document.getElementById('overdueAccounts');
-            if (overdueAccounts.length === 0) {
-                container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida</p>';
-            } else {
-                container.innerHTML = overdueAccounts.map(account => {
-                    const client = clients.find(c => c.id === account.clientId);
-                    const daysOverdue = Math.floor((today - new Date(account.dueDate)) / (1000 * 60 * 60 * 24));
-                    return `
-                        <div style="padding: 12px; border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 8px; border-radius: 4px;">
-                            <div class="flex-between" style="flex-direction: row; align-items: center;">
-                                <div>
-                                    <strong>${client ? client.name : 'N/A'}</strong><br>
-                                    <small style="color: var(--text-muted);">${daysOverdue} dia(s) em atraso</small>
-                                </div>
-                                <div class="text-right">
-                                    <strong style="color: var(--danger-color);">${Utils.formatCurrency(account.value)}</strong><br>
-                                    <small style="color: var(--text-muted);">Venc: ${Utils.formatDate(account.dueDate)}</small>
-                                </div>
-                            </div>
-                        </div>`;
-                }).join('');
-            }
-        }
+    const state = {
+        clients: [], products: [], sales: [], cashFlow: [], expenses: [], receivables: [],
+        cart: [], currentEditId: null, chartInstances: {}
     };
-
-    // Módulo de Clientes
-    const Clients = {
-        currentEditId: null,
-        init() {
-            document.getElementById('clientForm').addEventListener('submit', (e) => { e.preventDefault(); this.saveClient(); });
-            document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('clientSearch').addEventListener('input', Utils.debounce(() => this.filterClients(), 300));
-            document.getElementById('exportClients').addEventListener('click', () => this.exportToCSV());
+    
+    // 2. MÓDULOS DE UTILIDADES
+    const Utils = {
+        formatCurrency: v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v) || 0),
+        formatDate: d => d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A',
+        formatInputDate: d => d ? new Date(d).toISOString().split('T')[0] : '',
+        debounce: (func, delay = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; },
+        populateSelect: (id, data, valF, textF, defTxt) => {
+            const s = document.getElementById(id);
+            if (!s) return;
+            s.innerHTML = `<option value="">${defTxt}</option>`;
+            [...data].sort((a, b) => (a[textF] || '').localeCompare(b[textF] || '')).forEach(i => {
+                s.innerHTML += `<option value="${i[valF]}">${i[textF]}</option>`;
+            });
         },
-        async saveClient() {
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            if (!name || !phone) return Notification.error('Preencha nome e telefone!');
-
-            try {
-                if (this.currentEditId) {
-                    await db.collection(CONFIG.storageKeys.clients).doc(this.currentEditId).update({
-                        name, phone, updatedAt: new Date().toISOString()
-                    });
-                    Notification.success('Cliente atualizado!');
-                } else {
-                    const newId = Utils.generateUUID();
-                    await db.collection(CONFIG.storageKeys.clients).doc(newId).set({
-                        id: newId, name, phone, createdAt: new Date().toISOString()
-                    });
-                    Notification.success('Cliente cadastrado!');
-                }
-            } catch (error) {
-                Notification.error('Erro ao salvar cliente.');
-                console.error(error);
-            }
-            this.clearForm();
-            await this.loadClients();
-        },
-        async editClient(id) {
-            try {
-                const doc = await db.collection(CONFIG.storageKeys.clients).doc(id).get();
-                if (doc.exists) {
-                    const client = doc.data();
-                    document.getElementById('clientName').value = client.name;
-                    document.getElementById('clientPhone').value = client.phone;
-                    this.currentEditId = id;
-                    document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (error) {
-                Notification.error("Erro ao buscar cliente para edição.");
-            }
-        },
-        async deleteClient(id) {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                try {
-                    await db.collection(CONFIG.storageKeys.clients).doc(id).delete();
-                    await this.loadClients();
-                    Notification.success('Cliente excluído!');
-                } catch (error) {
-                    Notification.error('Erro ao excluir cliente.');
-                }
-            }
-        },
-        async viewHistory(id) {
-            const client = (await db.collection(CONFIG.storageKeys.clients).doc(id).get()).data();
-            if (!client) return;
-
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            const receivables = await Utils.loadFromStorage(CONFIG.storageKeys.accountsReceivable);
-            
-            const clientSales = sales.filter(s => s.clientId === id);
-            const clientReceivables = receivables.filter(r => r.clientId === id);
-            
-            const totalSpent = clientSales.reduce((sum, sale) => sum + sale.total, 0);
-            const totalDebt = clientReceivables.filter(r => r.status === 'Pendente').reduce((sum, r) => sum + r.value, 0);
-
-            let historyHtml = `
-                <h4>Histórico de Compras - ${client.name}</h4>
-                <p><strong>Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)} em ${clientSales.length} compra(s).</p>
-                <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px;">
-                ${clientSales.length === 0 ? '<p>Nenhuma compra registrada.</p>' : `
-                    <table class="table"><thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead><tbody>
-                    ${clientSales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr><td>${Utils.formatDateTime(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.paymentMethod}</td></tr>`).join('')}
-                    </tbody></table>
-                `}
-                </div>
-                <h4 class="mt-3">Contas (Crediário)</h4>
-                <p><strong>Total Pendente:</strong> ${Utils.formatCurrency(totalDebt)}</p>
-                <hr style="margin: 16px 0;">
-                <div class="table-responsive" style="max-height: 150px;">
-                ${clientReceivables.length === 0 ? '<p>Nenhuma conta no crediário.</p>' : `
-                    <table class="table"><thead><tr><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>
-                    ${clientReceivables.sort((a,b) => new Date(b.dueDate) - new Date(a.dueDate)).map(r => `<tr><td>${Utils.formatDate(r.dueDate)}</td><td>${Utils.formatCurrency(r.value)}</td><td><span class="badge ${r.status === 'Pago' ? 'badge-success' : 'badge-warning'}">${r.status}</span></td></tr>`).join('')}
-                    </tbody></table>
-                `}
-                </div>
-            `;
-            Modal.show('Histórico do Cliente', historyHtml);
-        },
-        clearForm() {
-            document.getElementById('clientForm').reset();
-            this.currentEditId = null;
-        },
-        async filterClients() {
-            const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm) || c.phone.includes(searchTerm));
-            await this.renderClients(filtered);
-        },
-        async loadClients() {
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            await this.renderClients(clients);
-            document.getElementById('clientCount').textContent = `${clients.length} clientes`;
-        },
-        async renderClients(clients) {
-            const tbody = document.getElementById('clientsTableBody');
-            if (clients.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado</td></tr>`;
-                return;
-            }
-            const sales = await Utils.loadFromStorage(CONFIG.storageKeys.sales);
-            tbody.innerHTML = clients.sort((a,b) => a.name.localeCompare(b.name)).map(client => {
-                const purchaseCount = sales.filter(s => s.clientId === client.id).length;
-                return `
-                    <tr>
-                        <td>${client.name}</td>
-                        <td>${client.phone}</td>
-                        <td>${Utils.formatDate(client.createdAt)}</td>
-                        <td>${purchaseCount} compra(s)</td>
-                        <td>
-                            <div class="flex gap-1">
-                                <button class="btn btn-secondary btn-sm" onclick="Clients.editClient('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-primary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="Clients.deleteClient('${client.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-            }).join('');
-        },
-        async exportToCSV() {
-            const clients = await Utils.loadFromStorage(CONFIG.storageKeys.clients);
-            if (clients.length === 0) return Notification.warning('Nenhum cliente para exportar!');
-
-            const headers = ['Nome', 'Telefone', 'Data de Cadastro'];
-            const csvContent = [
+        exportToCSV: (filename, data) => {
+            if (!data || data.length === 0) return Notification.warning("Não há dados para exportar.");
+            const headers = Object.keys(data[0]);
+            const csv = [
                 headers.join(','),
-                ...clients.map(c => [`"${c.name}"`, `"${c.phone}"`, `"${Utils.formatDate(c.createdAt)}"`].join(','))
+                ...data.map(row => headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(','))
             ].join('\n');
-            this.downloadCSV(csvContent, 'clientes');
-        },
-        downloadCSV(content, filename) {
-            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = filename;
             link.click();
-            Notification.success('Relatório CSV exportado!');
+            URL.revokeObjectURL(link.href);
+            Notification.success("Dados exportados com sucesso!");
+        },
+        exportToPDF: (title, head, body) => {
+            if (!body || body.length === 0) return Notification.warning("Não há dados para exportar para PDF.");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(title, 14, 16);
+            doc.autoTable({ head, body, startY: 20, theme: 'grid', headStyles: { fillColor: [59, 130, 246] } });
+            doc.save(`${title.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+            Notification.success("PDF gerado com sucesso!");
+        },
+        renderChart(id, type, data, options) {
+            if (state.chartInstances[id]) state.chartInstances[id].destroy();
+            const ctx = document.getElementById(id)?.getContext('2d');
+            if (ctx) state.chartInstances[id] = new Chart(ctx, { type, data, options });
         }
     };
     
-    // Módulo de Produtos (Implementação completa omitida para brevidade, mas segue o mesmo padrão do `Clients`)
-    const Products = {
-        currentEditId: null,
-        init() {
-            document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
-            document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
-            document.getElementById('productSearch').addEventListener('input', Utils.debounce(() => this.filterProducts(), 300));
-            document.getElementById('exportProducts').addEventListener('click', () => this.exportToCSV());
-        },
-        async saveProduct() {
-            const refCode = document.getElementById('productRefCode').value.trim();
-            const name = document.getElementById('productName').value.trim();
-            const quantity = parseInt(document.getElementById('productQuantity').value) || 0;
-            const costPrice = parseFloat(document.getElementById('productCostPrice').value) || 0;
-            const salePrice = parseFloat(document.getElementById('productSalePrice').value) || 0;
-
-            if (!refCode || !name) return Notification.error('Preencha código e nome!');
-            if (salePrice < costPrice && !confirm('Preço de venda menor que o de custo. Continuar?')) return;
-
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            if (!this.currentEditId && products.some(p => p.refCode.toLowerCase() === refCode.toLowerCase())) {
-                return Notification.error('Código de referência já existe!');
+    const Notification = {
+        show: (msg, type = 'success') => {
+            const el = document.getElementById('notification');
+            const textEl = document.getElementById('notificationText');
+            if(el && textEl) {
+                textEl.textContent = msg;
+                el.className = `notification notification-${type} show`;
+                setTimeout(() => el.classList.remove('show'), 3500);
             }
+        },
+        success: m => Notification.show(m, 'success'),
+        error: m => Notification.show(m, 'error'),
+        warning: m => Notification.show(m, 'warning'),
+    };
+    
+    const Modal = {
+        show: (title, content) => {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modal').classList.add('show');
+        },
+        hide: () => document.getElementById('modal').classList.remove('show')
+    };
+    
+    // 3. ESTRUTURA PRINCIPAL DA APLICAÇÃO
+    const App = {
+        modules: {},
+        async init() {
+            Object.values(this.modules).forEach(m => m.init?.());
+            document.getElementById('modalClose').addEventListener('click', Modal.hide);
+            
+            db.auth.onAuthStateChange((event, session) => {
+                if (session) Auth.showApp();
+                else Auth.showLogin();
+            });
 
-            try {
-                if (this.currentEditId) {
-                    await db.collection(CONFIG.storageKeys.products).doc(this.currentEditId).update({
-                        refCode, name, quantity, costPrice, salePrice, updatedAt: new Date().toISOString()
-                    });
-                    Notification.success('Produto atualizado!');
+            const { data: { session } } = await db.auth.getSession();
+            if (session) await Auth.showApp();
+            else Auth.showLogin();
+            console.log('SGI - Flor de Maria v7.0 (Definitiva) Iniciado.');
+        },
+        async loadAllData() {
+            const tables = [
+                'clients', 'products', 'sales', 
+                'cash_flow', 'expenses', 'receivables'
+            ];
+            const promises = tables.map(t => db.from(t).select('*'));
+            const results = await Promise.allSettled(promises);
+            
+            results.forEach((res, i) => {
+                const tableName = tables[i];
+                const stateTableName = tableName.replace(/_([a-z])/g, g => g[1].toUpperCase());
+                
+                if (res.status === 'fulfilled' && !res.value.error) {
+                    state[stateTableName] = res.value.data;
                 } else {
-                    const newId = Utils.generateUUID();
-                    const newProduct = { id: newId, refCode, name, quantity, costPrice, salePrice, createdAt: new Date().toISOString() };
-                    await db.collection(CONFIG.storageKeys.products).doc(newId).set(newProduct);
-                    Notification.success('Produto cadastrado!');
+                    console.error(`Falha ao carregar ${tableName}:`, res.value ? res.value.error : res.reason);
+                    Notification.error(`Falha ao carregar ${tableName}.`);
+                    state[stateTableName] = [];
                 }
-            } catch(error) {
-                 Notification.error("Erro ao salvar produto.");
-                 console.error(error);
+            });
+            App.modules.Settings.loadCompanyInfo();
+        }
+    };
+    
+    // 4. MÓDULOS DA APLICAÇÃO
+    const Auth = {
+        init() {
+            document.getElementById('loginForm').addEventListener('submit', this.handleLogin);
+            document.getElementById('logoutBtn').addEventListener('click', this.handleLogout);
+        },
+        async handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            const { error } = await db.auth.signInWithPassword({
+                email: e.target.username.value,
+                password: e.target.password.value
+            });
+            if (error) {
+                Notification.error('Email ou senha inválidos.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
             }
-            this.clearForm();
-            await this.loadProducts();
         },
-        async editProduct(id) {
-            const doc = await db.collection(CONFIG.storageKeys.products).doc(id).get();
-            if (doc.exists) {
-                const product = doc.data();
-                document.getElementById('productRefCode').value = product.refCode;
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productQuantity').value = product.quantity;
-                document.getElementById('productCostPrice').value = product.costPrice;
-                document.getElementById('productSalePrice').value = product.salePrice;
-                this.currentEditId = id;
-                document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
-            }
+        async handleLogout() {
+            await db.auth.signOut();
         },
-        async deleteProduct(id) {
-            if (confirm('Tem certeza que deseja excluir este produto?')) {
-                await db.collection(CONFIG.storageKeys.products).doc(id).delete();
-                await this.loadProducts();
-                Notification.success('Produto excluído!');
-            }
+        showLogin() {
+            document.body.className = 'state-login';
         },
-        clearForm() {
-            document.getElementById('productForm').reset();
-            this.currentEditId = null;
+        async showApp() {
+            document.body.className = 'state-loading';
+            await App.loadAllData();
+            document.body.className = 'state-app';
+            const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage) || 'dashboard';
+            await Navigation.navigateTo(lastPage);
+        }
+    };
+    App.modules.Auth = Auth;
+    
+    const Navigation = {
+        init() {
+            const sidebar = document.getElementById('sidebar'), overlay = document.getElementById('sidebarOverlay');
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                if (link.id !== 'logoutBtn') {
+                    link.addEventListener('click', e => {
+                        e.preventDefault();
+                        this.navigateTo(link.dataset.page);
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            });
+            const toggle = () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); };
+            document.getElementById('mobileMenuToggle').addEventListener('click', toggle);
+            overlay.addEventListener('click', toggle);
         },
-        async filterProducts() {
-            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm) || p.refCode.toLowerCase().includes(searchTerm));
-            this.renderProducts(filtered);
+        async navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            const targetPage = document.getElementById(`${page}Page`);
+            if (targetPage) targetPage.classList.remove('hidden');
+            else { page = 'dashboard'; document.getElementById('dashboardPage').classList.remove('hidden'); }
+            
+            document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+            localStorage.setItem(CONFIG.storageKeys.lastActivePage, page);
+    
+            const activeModule = Object.values(App.modules).find(m => m.pageId === page);
+            if (activeModule && activeModule.load) await activeModule.load();
+        }
+    };
+    App.modules.Navigation = Navigation;
+    
+    App.modules.Dashboard = {
+        pageId: 'dashboard',
+        load() {
+            this.updateStats();
+            this.renderPaymentMethodChart();
+            this.renderOverdueAccounts();
         },
-        async loadProducts() {
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            this.renderProducts(products);
-            this.updateStats(products);
+        updateStats() {
+            const { cashFlow, receivables, sales, expenses } = state;
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const cashBalance = cashFlow.reduce((a, t) => a + (t.type === 'entrada' ? 1 : -1) * t.value, 0);
+            const totalReceivables = receivables.filter(r => ['Pendente', 'Vencido'].includes(r.status)).reduce((a, r) => a + r.value, 0);
+            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, s) => a + s.total, 0);
+            const monthlyExpenses = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, e) => a + e.value, 0);
+            
+            document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
+            document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
+            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
+            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
         },
-        updateStats(products) {
-            document.getElementById('totalProducts').textContent = products.length;
-            document.getElementById('outOfStockProducts').textContent = products.filter(p => p.quantity <= 0).length;
+        renderPaymentMethodChart() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const monthlySales = state.sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+
+            const dataByMethod = monthlySales.reduce((acc, sale) => {
+                acc[sale.payment_method] = (acc[sale.payment_method] || 0) + sale.total;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(dataByMethod);
+            const data = Object.values(dataByMethod);
+
+            Utils.renderChart('paymentMethodChart', 'doughnut', {
+                labels,
+                datasets: [{
+                    label: 'Vendas por Pagamento',
+                    data,
+                    backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6'],
+                    borderColor: 'var(--secondary-bg)',
+                    borderWidth: 2
+                }]
+            }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'var(--text-secondary)' } } } });
         },
-        renderProducts(products) {
-            const tbody = document.getElementById('productsTableBody');
-            if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado</td></tr>`;
+        renderOverdueAccounts() {
+            const today = new Date().toISOString().split('T')[0];
+            const overdue = state.receivables.filter(r => r.status === 'Pendente' && r.due_date < today);
+            const container = document.getElementById('overdueAccounts');
+            if (overdue.length === 0) {
+                container.innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. Ufa! ✅</p>`;
                 return;
             }
-            tbody.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(product => {
-                const margin = product.salePrice > 0 ? ((product.salePrice - product.costPrice) / product.salePrice * 100) : 0;
-                const statusClass = product.quantity > 5 ? 'badge-success' : (product.quantity > 0 ? 'badge-warning' : 'badge-danger');
-                const statusText = product.quantity > 0 ? 'Disponível' : 'Esgotado';
-                return `
-                    <tr>
-                        <td>${product.refCode}</td>
-                        <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${Utils.formatCurrency(product.costPrice)}</td>
-                        <td>${Utils.formatCurrency(product.salePrice)}</td>
-                        <td>${margin.toFixed(1)}%</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="flex gap-1">
-                                <button class="btn btn-secondary btn-sm" onclick="Products.editProduct('${product.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="Products.deleteProduct('${product.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
+            container.innerHTML = overdue.map(r => {
+                const client = state.clients.find(c => c.id === r.client_id)?.name || 'Cliente não encontrado';
+                return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color);">
+                    <div>
+                        <p style="font-weight: bold;">${client}</p>
+                        <p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p>
+                    </div>
+                    <strong style="color: var(--danger-color);">${Utils.formatCurrency(r.value)}</strong>
+                </div>`;
             }).join('');
-        },
-        async exportToCSV() {
-            const products = await Utils.loadFromStorage(CONFIG.storageKeys.products);
-            if (products.length === 0) return Notification.warning('Nenhum produto para exportar!');
-            Clients.downloadCSV(
-                ['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda', 'Margem %'].join(',') + '\n' +
-                products.map(p => {
-                    const margin = p.salePrice > 0 ? ((p.salePrice - p.costPrice) / p.salePrice * 100) : 0;
-                    return [`"${p.refCode}"`, `"${p.name}"`, p.quantity, p.costPrice.toFixed(2), p.salePrice.toFixed(2), margin.toFixed(1)].join(',');
-                }).join('\n'), 'estoque'
-            );
         }
     };
-
-    // Módulos Sales, Receipts, CashFlow, etc. (Omitidos para brevidade, mas seguem o mesmo padrão)
-    // ... Implementação completa de todos os outros módulos, convertendo para async/await e usando db.collection()...
-    // É um trabalho repetitivo mas crucial. O padrão é sempre:
-    // 1. Marcar a função como `async`.
-    // 2. Substituir `Utils.loadFromStorage` por `await Utils.loadFromStorage`.
-    // 3. Substituir `Utils.saveToStorage` com as chamadas diretas ao Firestore:
-    //    `await db.collection(...).doc(id).set(data)` para criar/sobrescrever.
-    //    `await db.collection(...).doc(id).update(data)` para atualizar campos.
-    //    `await db.collection(...).doc(id).delete()` para remover.
     
-    // Inicialização do Sistema
-    document.addEventListener('DOMContentLoaded', () => {
-        Auth.init();
-        Navigation.init();
-        Clients.init();
-        Products.init();
-        // Sales.init();
-        // Receipts.init();
-        // CashFlow.init();
-        // Expenses.init();
-        // Receivables.init();
-        // Reports.init();
-        // Settings.init();
+    // MÓDULOS CRUD (Clientes, Produtos, etc.)
+    const createCrudModule = (config) => ({
+        pageId: config.pageId,
+        init() {
+            document.getElementById(config.formId).addEventListener('submit', this.save.bind(this));
+            if (config.searchId) document.getElementById(config.searchId).addEventListener('input', Utils.debounce(() => this.render(), 300));
+            if (config.clearBtnId) document.getElementById(config.clearBtnId).addEventListener('click', () => this.clearForm());
+            if (config.exportBtnId) document.getElementById(config.exportBtnId).addEventListener('click', this.export.bind(this));
+        },
+        load() { this.render(); if (this.updateStats) this.updateStats(); this.clearForm(); },
+        getFiltered() {
+            if (!config.searchId) return state[config.stateKey];
+            const query = document.getElementById(config.searchId).value.toLowerCase();
+            return query ? state[config.stateKey].filter(item => config.filterKeys.some(key => (item[key] || '').toString().toLowerCase().includes(query))) : state[config.stateKey];
+        },
+        render() {
+            const data = this.getFiltered().sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+            if (config.countId) document.getElementById(config.countId).textContent = `${data.length} item(s)`;
+            const body = document.getElementById(config.tableBodyId);
+            if(body) body.innerHTML = data.length > 0 ? data.map(item => config.renderRow(item, state)).join('') : config.emptyRow;
+            if(this.updateStats) this.updateStats();
+        },
+        async save(e) {
+            e.preventDefault();
+            const itemData = config.getFormData(e.target);
+            if (config.validate && !config.validate(itemData)) return;
 
-        document.getElementById('modalClose').addEventListener('click', () => Modal.hide());
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') Modal.hide();
-        });
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            try {
+                const { data, error } = await (state.currentEditId
+                    ? db.from(config.tableName).update(itemData).eq('id', state.currentEditId)
+                    : db.from(config.tableName).insert(itemData)
+                ).select().single();
+                if (error) throw error;
+                
+                if (state.currentEditId) {
+                    state[config.stateKey] = state[config.stateKey].map(i => i.id === state.currentEditId ? data : i);
+                } else {
+                    state[config.stateKey].unshift(data);
+                }
+                
+                Notification.success(`${config.name} ${state.currentEditId ? 'atualizado' : 'salvo'}!`);
+                this.clearForm();
+                this.render();
+                if(config.onSave) config.onSave(data);
 
-        console.log('SGI - Flor de Maria v3.0 (Firebase) iniciado!');
+            } catch (error) { Notification.error(error.message); }
+            finally { btn.disabled = false; }
+        },
+        edit(id) {
+            const item = state[config.stateKey].find(i => i.id === id);
+            if (!item) return;
+            state.currentEditId = id;
+            config.populateForm(item);
+            document.querySelector(`#${config.formId} button[type="submit"]`).innerHTML = `<i class="fas fa-save"></i> Atualizar`;
+            document.getElementById(config.focusFieldId).focus();
+        },
+        async remove(id) {
+            if (!confirm(`Deseja realmente excluir este ${config.name}?`)) return;
+            try {
+                const { error } = await db.from(config.tableName).delete().eq('id', id);
+                if (error) throw error;
+                state[config.stateKey] = state[config.stateKey].filter(i => i.id !== id);
+                this.render();
+                if(config.onRemove) config.onRemove();
+                Notification.success(`${config.name} excluído.`);
+            } catch (error) { Notification.error(`Erro ao excluir ${config.name}.`); }
+        },
+        clearForm() {
+            state.currentEditId = null;
+            document.getElementById(config.formId).reset();
+            document.querySelector(`#${config.formId} button[type="submit"]`).innerHTML = `<i class="fas fa-save"></i> Salvar`;
+        },
+        export() {
+            Utils.exportToCSV(`${config.tableName}.csv`, this.getFiltered().map(config.mapExport));
+        }
     });
+
+    App.modules.Clients = { ...createCrudModule({
+        pageId: 'clients', name: 'Cliente', stateKey: 'clients', tableName: 'clients', formId: 'clientForm', tableBodyId: 'clientsTableBody',
+        searchId: 'clientSearch', clearBtnId: 'clearClientForm', exportBtnId: 'exportClients', countId: 'clientCount', focusFieldId: 'clientName',
+        filterKeys: ['name', 'phone'],
+        getFormData: f => ({ name: f.clientName.value.trim(), phone: f.clientPhone.value.trim() }),
+        validate: d => d.name ? true : (Notification.error('O nome é obrigatório.'), false),
+        populateForm: c => {
+            document.getElementById('clientName').value = c.name;
+            document.getElementById('clientPhone').value = c.phone || '';
+        },
+        renderRow: (c, s) => `<tr>
+            <td data-label="Nome">${c.name}</td>
+            <td data-label="Telefone">${c.phone || 'N/A'}</td>
+            <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
+            <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
+            <td data-label="Ações"><div class="table-actions">
+                <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
+            </div></td>
+        </tr>`,
+        emptyRow: `<tr><td colspan="5" class="text-center" style="padding: 20px;">Nenhum cliente encontrado.</td></tr>`,
+        mapExport: c => ({ id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at) })
+    })};
+    
+    App.modules.Products = { ...createCrudModule({
+        pageId: 'products', name: 'Produto', stateKey: 'products', tableName: 'products', formId: 'productForm', tableBodyId: 'productsTableBody',
+        searchId: 'productSearch', clearBtnId: 'clearProductForm', exportBtnId: 'exportProducts', focusFieldId: 'productRefCode',
+        filterKeys: ['name', 'ref_code'],
+        getFormData: f => ({ ref_code: f.productRefCode.value.trim(), name: f.productName.value.trim(), quantity: parseInt(f.productQuantity.value), cost_price: parseFloat(f.productCostPrice.value), sale_price: parseFloat(f.productSalePrice.value) }),
+        validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
+        populateForm: p => {
+            document.getElementById('productRefCode').value = p.ref_code;
+            document.getElementById('productName').value = p.name;
+            document.getElementById('productQuantity').value = p.quantity;
+            document.getElementById('productCostPrice').value = p.cost_price;
+            document.getElementById('productSalePrice').value = p.sale_price;
+        },
+        renderRow: p => {
+            const margin = p.cost_price > 0 && p.sale_price > 0 ? (((p.sale_price - p.cost_price) / p.sale_price) * 100).toFixed(2) + '%' : 'N/A';
+            const status = p.quantity > 5 ? `<span class="badge badge-success">Em Estoque</span>` : (p.quantity > 0 ? `<span class="badge badge-warning">Estoque Baixo</span>` : `<span class="badge badge-danger">Esgotado</span>`);
+            return `<tr>
+                <td data-label="Código">${p.ref_code}</td><td data-label="Nome">${p.name}</td><td data-label="Qtd.">${p.quantity}</td>
+                <td data-label="P. Custo">${Utils.formatCurrency(p.cost_price)}</td><td data-label="P. Venda">${Utils.formatCurrency(p.sale_price)}</td>
+                <td data-label="Margem">${margin}</td><td data-label="Status">${status}</td>
+                <td data-label="Ações"><div class="table-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="App.modules.Products.edit('${p.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="App.modules.Products.remove('${p.id}')"><i class="fas fa-trash"></i></button>
+                </div></td>
+            </tr>`;
+        },
+        emptyRow: `<tr><td colspan="8" class="text-center" style="padding:20px;">Nenhum produto encontrado.</td></tr>`,
+        mapExport: p => ({ codigo: p.ref_code, nome: p.name, quantidade: p.quantity, preco_custo: p.cost_price, preco_venda: p.sale_price }),
+        updateStats() {
+            document.getElementById('totalProducts').textContent = state.products.length;
+            document.getElementById('outOfStockProducts').textContent = state.products.filter(p => p.quantity <= 0).length;
+        }
+    })};
+    
+    App.modules.Sales = {
+        pageId: 'sales',
+        init() {
+            document.getElementById('pdvProductSearch').addEventListener('input', Utils.debounce(() => this.renderProductList(), 300));
+            document.getElementById('finalizeSaleBtn').addEventListener('click', this.finalizeSale.bind(this));
+        },
+        load() {
+            Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
+            this.renderProductList();
+            this.clearSale();
+        },
+        renderProductList() {
+            const query = document.getElementById('pdvProductSearch').value.toLowerCase();
+            const availableProducts = state.products.filter(p => p.quantity > 0 && (p.name.toLowerCase().includes(query) || p.ref_code.toLowerCase().includes(query)));
+            const listEl = document.getElementById('pdvProductList');
+            listEl.innerHTML = availableProducts.length > 0
+                ? availableProducts.map(p => `<div class="product-item-pdv" onclick="App.modules.Sales.addToCart('${p.id}')">
+                    <span>${p.name} (${p.ref_code})</span>
+                    <strong>${Utils.formatCurrency(p.sale_price)}</strong>
+                  </div>`).join('')
+                : `<p class="text-center text-muted" style="padding: 20px;">Nenhum produto encontrado ou em estoque.</p>`;
+        },
+        addToCart(productId) {
+            const product = state.products.find(p => p.id === productId);
+            if (!product) return;
+            const existingItem = state.cart.find(item => item.id === productId);
+            if (existingItem) {
+                if (existingItem.quantity < product.quantity) existingItem.quantity++;
+                else Notification.warning(`Estoque máximo para ${product.name} atingido.`);
+            } else {
+                state.cart.push({ ...product, quantity: 1 });
+            }
+            this.renderCart();
+        },
+        removeFromCart(productId) {
+            state.cart = state.cart.filter(item => item.id !== productId);
+            this.renderCart();
+        },
+        updateCartQuantity(productId, newQuantity) {
+            const item = state.cart.find(i => i.id === productId);
+            const product = state.products.find(p => p.id === productId);
+            newQuantity = parseInt(newQuantity);
+            if (item && newQuantity > 0 && newQuantity <= product.quantity) {
+                item.quantity = newQuantity;
+            }
+            this.renderCart();
+        },
+        renderCart() {
+            const cartEl = document.getElementById('pdvCartItems');
+            let total = 0;
+            if (state.cart.length === 0) {
+                cartEl.innerHTML = `<p class="text-center text-muted">Carrinho vazio</p>`;
+            } else {
+                cartEl.innerHTML = state.cart.map(item => {
+                    total += item.sale_price * item.quantity;
+                    return `<div class="cart-item">
+                        <div>
+                            <p style="font-size: 14px; margin-bottom: 5px;">${item.name}</p>
+                            <input type="number" value="${item.quantity}" min="1" max="${item.quantity}" onchange="App.modules.Sales.updateCartQuantity('${item.id}', this.value)" style="width: 60px; background: var(--primary-bg); border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 2px 5px;">
+                        </div>
+                        <div class="text-right">
+                           <p>${Utils.formatCurrency(item.sale_price * item.quantity)}</p>
+                           <button onclick="App.modules.Sales.removeFromCart('${item.id}')" style="background:none; border:none; color: var(--danger-color); cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            document.getElementById('pdvTotal').textContent = Utils.formatCurrency(total);
+        },
+        async finalizeSale() {
+            if (state.cart.length === 0) return Notification.warning('O carrinho está vazio.');
+            const clientId = document.getElementById('pdvClient').value;
+            const paymentMethod = document.getElementById('pdvPaymentMethod').value;
+            if (!clientId) return Notification.error('Por favor, selecione um cliente.');
+            
+            const btn = document.getElementById('finalizeSaleBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
+
+            const total = state.cart.reduce((sum, item) => sum + item.sale_price * item.quantity, 0);
+            const saleData = {
+                client_id: clientId,
+                total: total,
+                payment_method: paymentMethod,
+                items: state.cart.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.sale_price })),
+                date: new Date().toISOString()
+            };
+
+            try {
+                // 1. Inserir a venda
+                const { data: newSale, error: saleError } = await db.from('sales').insert(saleData).select().single();
+                if (saleError) throw saleError;
+                
+                // 2. Atualizar estoque
+                const stockUpdates = state.cart.map(item => 
+                    db.from('products').update({ quantity: item.quantity - item.quantity }).eq('id', item.id)
+                );
+                await Promise.all(stockUpdates);
+                
+                // 3. Adicionar ao fluxo de caixa
+                await db.from('cash_flow').insert({
+                    description: `Venda #${newSale.id}`,
+                    value: total,
+                    type: 'entrada',
+                    date: new Date().toISOString()
+                });
+                
+                // 4. Adicionar a contas a receber se for 'A Prazo'
+                if (paymentMethod === 'A Prazo') {
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + 30); // Vencimento em 30 dias
+                    await db.from('receivables').insert({
+                        client_id: clientId,
+                        sale_id: newSale.id,
+                        value: total,
+                        due_date: dueDate.toISOString(),
+                        status: 'Pendente'
+                    });
+                }
+                
+                Notification.success('Venda finalizada com sucesso!');
+                this.clearSale();
+                await App.loadAllData(); // Recarregar todos os dados
+                App.modules.Products.render();
+
+            } catch (error) {
+                Notification.error('Erro ao finalizar a venda: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Finalizar Venda';
+            }
+        },
+        clearSale() {
+            state.cart = [];
+            this.renderCart();
+            document.getElementById('pdvProductSearch').value = '';
+            document.getElementById('pdvClient').value = '';
+            document.getElementById('pdvPaymentMethod').value = 'Dinheiro';
+        }
+    };
+    App.modules.Sales = App.modules.Sales;
+
+    App.modules.Receipts = {
+        pageId: 'receipts',
+        load() { this.render(); },
+        render() {
+            const tableBody = document.getElementById('receiptsTableBody');
+            const sales = [...state.sales].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(sales.length === 0){
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma venda registrada.</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = sales.map(sale => {
+                const client = state.clients.find(c => c.id === sale.client_id)?.name || 'Cliente Avulso';
+                return `<tr>
+                    <td data-label="ID">#${sale.id}</td>
+                    <td data-label="Data">${Utils.formatDate(sale.date)}</td>
+                    <td data-label="Cliente">${client}</td>
+                    <td data-label="Total">${Utils.formatCurrency(sale.total)}</td>
+                    <td data-label="Pagamento"><span class="badge badge-info">${sale.payment_method}</span></td>
+                    <td data-label="Ações"><div class="table-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="App.modules.Receipts.viewDetails('${sale.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-primary btn-sm" onclick="App.modules.Receipts.printReceipt('${sale.id}')"><i class="fas fa-print"></i></button>
+                    </div></td>
+                </tr>`;
+            }).join('');
+        },
+        viewDetails(saleId) {
+            const sale = state.sales.find(s => s.id == saleId);
+            if (!sale) return;
+            const client = state.clients.find(c => c.id === sale.client_id);
+            const content = `
+                <p><strong>Cliente:</strong> ${client?.name || 'N/A'}</p>
+                <p><strong>Data:</strong> ${Utils.formatDate(sale.date)}</p>
+                <p><strong>Pagamento:</strong> ${sale.payment_method}</p>
+                <h4 style="margin-top: 20px; margin-bottom: 10px;">Itens:</h4>
+                <ul>
+                    ${sale.items.map(item => `<li>${item.quantity}x ${item.name} - ${Utils.formatCurrency(item.price)} cada</li>`).join('')}
+                </ul>
+                <hr style="margin: 15px 0; border-color: var(--border-color);">
+                <p class="text-right" style="font-size: 1.2rem;"><strong>Total: ${Utils.formatCurrency(sale.total)}</strong></p>
+            `;
+            Modal.show(`Detalhes da Venda #${sale.id}`, content);
+        },
+        printReceipt(saleId) {
+            const sale = state.sales.find(s => s.id == saleId);
+            if (!sale) return;
+            const client = state.clients.find(c => c.id === sale.client_id);
+            const { company } = CONFIG;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text(company.name, 105, 20, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(company.address, 105, 26, { align: 'center' });
+            doc.text(`CNPJ: ${company.cnpj} | Telefone: ${company.phone}`, 105, 32, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.text(`Recibo de Venda #${sale.id}`, 105, 45, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data: ${Utils.formatDate(sale.date)}`, 14, 55);
+            doc.text(`Cliente: ${client?.name || 'Não identificado'}`, 14, 62);
+            doc.text(`Telefone: ${client?.phone || 'N/A'}`, 14, 69);
+            
+            const head = [['Qtd', 'Produto', 'Preço Unit.', 'Subtotal']];
+            const body = sale.items.map(item => [
+                item.quantity,
+                item.name,
+                Utils.formatCurrency(item.price),
+                Utils.formatCurrency(item.price * item.quantity)
+            ]);
+            
+            doc.autoTable({
+                head,
+                body,
+                startY: 75,
+                theme: 'striped'
+            });
+
+            const finalY = doc.lastAutoTable.finalY;
+            doc.setFontSize(14);
+            doc.text('Total:', 150, finalY + 10, { align: 'right' });
+            doc.text(Utils.formatCurrency(sale.total), 200, finalY + 10, { align: 'right' });
+            doc.text('Pagamento:', 150, finalY + 17, { align: 'right' });
+            doc.text(sale.payment_method, 200, finalY + 17, { align: 'right' });
+
+            doc.save(`recibo_${sale.id}.pdf`);
+        }
+    };
+    App.modules.Receipts = App.modules.Receipts;
+
+    App.modules.CashFlow = {
+        pageId: 'cashflow',
+        load() { this.render(); },
+        render() {
+            const tableBody = document.getElementById('cashflowTableBody');
+            const flow = [...state.cashFlow].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(flow.length === 0){
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhum lançamento no caixa.</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = flow.map(item => `
+                <tr>
+                    <td data-label="Data">${Utils.formatDate(item.date)}</td>
+                    <td data-label="Descrição">${item.description}</td>
+                    <td data-label="Tipo">${item.type === 'entrada' ? `<span class="badge badge-success">Entrada</span>` : `<span class="badge badge-danger">Saída</span>`}</td>
+                    <td data-label="Valor" style="color: ${item.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'}; font-weight: bold;">
+                        ${Utils.formatCurrency(item.value)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+    };
+    App.modules.CashFlow = App.modules.CashFlow;
+    
+    App.modules.Expenses = {
+        pageId: 'expenses',
+        init() {
+            document.getElementById('expenseForm').addEventListener('submit', this.save.bind(this));
+        },
+        load() { this.render(); },
+        render() {
+            const tableBody = document.getElementById('expensesTableBody');
+            const expenses = [...state.expenses].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(expenses.length === 0){
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhuma despesa registrada.</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = expenses.map(e => `
+                <tr>
+                    <td data-label="Data">${Utils.formatDate(e.date)}</td>
+                    <td data-label="Descrição">${e.description}</td>
+                    <td data-label="Valor" style="font-weight: bold;">${Utils.formatCurrency(e.value)}</td>
+                    <td data-label="Ações"><div class="table-actions">
+                        <button class="btn btn-danger btn-sm" onclick="App.modules.Expenses.remove('${e.id}')"><i class="fas fa-trash"></i></button>
+                    </div></td>
+                </tr>
+            `).join('');
+        },
+        async save(e) {
+            e.preventDefault();
+            const formData = {
+                description: document.getElementById('expenseDescription').value,
+                value: parseFloat(document.getElementById('expenseValue').value),
+                date: document.getElementById('expenseDate').value,
+            };
+            if(!formData.description || isNaN(formData.value) || !formData.date) {
+                return Notification.error('Preencha todos os campos da despesa.');
+            }
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+
+            try {
+                // 1. Inserir a despesa
+                const { data: newExpense, error: expenseError } = await db.from('expenses').insert(formData).select().single();
+                if (expenseError) throw expenseError;
+                
+                // 2. Lançar no fluxo de caixa
+                await db.from('cash_flow').insert({
+                    description: `Despesa: ${formData.description}`,
+                    value: formData.value,
+                    type: 'saida',
+                    date: formData.date
+                });
+
+                Notification.success('Despesa registrada com sucesso!');
+                e.target.reset();
+                await App.loadAllData();
+                this.render();
+
+            } catch(error) {
+                Notification.error('Erro ao salvar despesa: ' + error.message);
+            } finally {
+                btn.disabled = false;
+            }
+        },
+        async remove(id) {
+            if(!confirm('Deseja realmente excluir esta despesa? Esta ação é irreversível.')) return;
+            try {
+                // É necessário remover também do fluxo de caixa, mas isso pode gerar inconsistências.
+                // A melhor abordagem é manter o registro ou ter um "soft delete".
+                // Para este sistema, faremos a exclusão direta.
+                const { error } = await db.from('expenses').delete().eq('id', id);
+                if (error) throw error;
+                Notification.success('Despesa excluída.');
+                await App.loadAllData();
+                this.render();
+            } catch(error) {
+                Notification.error('Erro ao excluir despesa: ' + error.message);
+            }
+        }
+    };
+    App.modules.Expenses = App.modules.Expenses;
+
+    App.modules.Receivables = {
+        pageId: 'receivables',
+        load() { this.render(); },
+        render() {
+            const tableBody = document.getElementById('receivablesTableBody');
+            const receivables = [...state.receivables].filter(r => r.status !== 'Pago').sort((a,b) => new Date(a.due_date) - new Date(b.due_date));
+            if(receivables.length === 0){
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma conta a receber.</td></tr>`;
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            tableBody.innerHTML = receivables.map(r => {
+                const client = state.clients.find(c => c.id === r.client_id)?.name || 'N/A';
+                let statusBadge;
+                if (r.status === 'Pendente' && r.due_date < today) {
+                    statusBadge = `<span class="badge badge-danger">Vencido</span>`;
+                } else {
+                    statusBadge = `<span class="badge badge-warning">Pendente</span>`;
+                }
+                return `<tr>
+                    <td data-label="Cliente">${client}</td>
+                    <td data-label="Valor">${Utils.formatCurrency(r.value)}</td>
+                    <td data-label="Data Venda">${Utils.formatDate(r.created_at)}</td>
+                    <td data-label="Vencimento">${Utils.formatDate(r.due_date)}</td>
+                    <td data-label="Status">${statusBadge}</td>
+                    <td data-label="Ações"><div class="table-actions">
+                        <button class="btn btn-accent btn-sm" onclick="App.modules.Receivables.markAsPaid('${r.id}')"><i class="fas fa-check-circle"></i> Marcar como Pago</button>
+                    </div></td>
+                </tr>`;
+            }).join('');
+        },
+        async markAsPaid(id) {
+            if(!confirm('Confirmar o recebimento desta conta?')) return;
+            const receivable = state.receivables.find(r => r.id == id);
+            if(!receivable) return;
+
+            try {
+                // 1. Atualizar status para 'Pago'
+                await db.from('receivables').update({ status: 'Pago', paid_at: new Date().toISOString() }).eq('id', id);
+
+                // 2. Registrar entrada no caixa
+                await db.from('cash_flow').insert({
+                    description: `Recebimento da venda #${receivable.sale_id}`,
+                    value: receivable.value,
+                    type: 'entrada',
+                    date: new Date().toISOString()
+                });
+                
+                Notification.success('Conta marcada como paga!');
+                await App.loadAllData();
+                this.render();
+                App.modules.Dashboard.load();
+            } catch(error) {
+                Notification.error('Erro ao processar pagamento: ' + error.message);
+            }
+        }
+    };
+    App.modules.Receivables = App.modules.Receivables;
+
+    App.modules.Reports = {
+        pageId: 'reports',
+        init() {
+            document.getElementById('generateSalesReportBtn').addEventListener('click', () => this.showDateRangeModal('sales'));
+            document.getElementById('generateTopProductsReportBtn').addEventListener('click', () => this.showDateRangeModal('topProducts'));
+            document.getElementById('generateClientSalesReportBtn').addEventListener('click', () => this.showClientSelectModal());
+        },
+        load() {
+            document.getElementById('reportOutput').innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Selecione um relatório para visualizar os dados aqui.</p>`;
+        },
+        showDateRangeModal(reportType) {
+            const content = `
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="reportStartDate">Data de Início</label>
+                        <input type="date" id="reportStartDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="reportEndDate">Data de Fim</label>
+                        <input type="date" id="reportEndDate" class="form-input" required>
+                    </div>
+                </div>
+                <button id="runReportBtn" class="btn btn-primary mt-4">Gerar Relatório</button>
+            `;
+            Modal.show('Selecione o Período', content);
+            document.getElementById('runReportBtn').onclick = () => {
+                const start = document.getElementById('reportStartDate').value;
+                const end = document.getElementById('reportEndDate').value;
+                if (!start || !end) return Notification.error('Selecione as datas de início e fim.');
+                if (reportType === 'sales') this.generateSalesReport(start, end);
+                if (reportType === 'topProducts') this.generateTopProductsReport(start, end);
+                Modal.hide();
+            };
+        },
+        showClientSelectModal() {
+            let options = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            const content = `
+                <div class="form-group">
+                    <label class="form-label" for="reportClientSelect">Selecione o Cliente</label>
+                    <select id="reportClientSelect" class="form-select">${options}</select>
+                </div>
+                <button id="runClientReportBtn" class="btn btn-primary mt-4">Gerar Relatório</button>
+            `;
+            Modal.show('Selecione o Cliente', content);
+            document.getElementById('runClientReportBtn').onclick = () => {
+                const clientId = document.getElementById('reportClientSelect').value;
+                if (!clientId) return Notification.error('Selecione um cliente.');
+                this.generateClientSalesReport(clientId);
+                Modal.hide();
+            }
+        },
+        generateSalesReport(start, end) {
+            const sales = state.sales.filter(s => s.date >= start && s.date <= end);
+            if (sales.length === 0) {
+                document.getElementById('reportOutput').innerHTML = '<p class="text-center text-muted">Nenhuma venda encontrada no período.</p>';
+                return;
+            }
+            const total = sales.reduce((sum, s) => sum + s.total, 0);
+            
+            let html = `
+                <h3 class="page-subtitle">Relatório de Vendas de ${Utils.formatDate(start)} a ${Utils.formatDate(end)}</h3>
+                <p><strong>Total de Vendas:</strong> ${sales.length}</p>
+                <p><strong>Faturamento Total:</strong> ${Utils.formatCurrency(total)}</p>
+                <canvas id="salesReportChart" style="margin-top:20px; max-height: 300px;"></canvas>
+            `;
+            document.getElementById('reportOutput').innerHTML = html;
+            
+            const salesByDay = sales.reduce((acc, sale) => {
+                const date = Utils.formatDate(sale.date);
+                acc[date] = (acc[date] || 0) + sale.total;
+                return acc;
+            }, {});
+
+            Utils.renderChart('salesReportChart', 'line', {
+                labels: Object.keys(salesByDay),
+                datasets: [{
+                    label: 'Faturamento Diário',
+                    data: Object.values(salesByDay),
+                    borderColor: 'var(--primary-color)',
+                    backgroundColor: 'rgba(var(--primary-color-rgb), 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            }, { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'var(--text-secondary)' } }, x: { ticks: { color: 'var(--text-secondary)' } } } });
+        },
+        generateTopProductsReport(start, end) {
+            const salesInPeriod = state.sales.filter(s => s.date >= start && s.date <= end);
+            const productCount = salesInPeriod.flatMap(s => s.items).reduce((acc, item) => {
+                acc[item.name] = (acc[item.name] || 0) + item.quantity;
+                return acc;
+            }, {});
+
+            const sortedProducts = Object.entries(productCount).sort(([,a],[,b]) => b-a).slice(0, 10);
+            if (sortedProducts.length === 0) {
+                document.getElementById('reportOutput').innerHTML = '<p class="text-center text-muted">Nenhum produto vendido no período.</p>';
+                return;
+            }
+            let html = `
+                <h3 class="page-subtitle">Top 10 Produtos Vendidos de ${Utils.formatDate(start)} a ${Utils.formatDate(end)}</h3>
+                <canvas id="topProductsChart" style="margin-top:20px; max-height: 300px;"></canvas>`;
+            document.getElementById('reportOutput').innerHTML = html;
+
+             Utils.renderChart('topProductsChart', 'bar', {
+                labels: sortedProducts.map(p => p[0]),
+                datasets: [{
+                    label: 'Quantidade Vendida',
+                    data: sortedProducts.map(p => p[1]),
+                    backgroundColor: 'rgba(var(--primary-color-rgb), 0.7)',
+                }]
+            }, { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { y: { ticks: { color: 'var(--text-secondary)' } }, x: { ticks: { color: 'var(--text-secondary)' } } } });
+        },
+        generateClientSalesReport(clientId) {
+            const client = state.clients.find(c => c.id == clientId);
+            const sales = state.sales.filter(s => s.client_id == clientId);
+            if (sales.length === 0) {
+                 document.getElementById('reportOutput').innerHTML = `<p class="text-center text-muted">Nenhuma compra encontrada para ${client.name}.</p>`;
+                return;
+            }
+            const totalSpent = sales.reduce((sum, s) => sum + s.total, 0);
+            let html = `
+                <h3 class="page-subtitle">Histórico de Compras de ${client.name}</h3>
+                <p><strong>Total de Compras:</strong> ${sales.length}</p>
+                <p><strong>Valor Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)}</p>
+                <div class="table-responsive mt-4">
+                    <table class="table">
+                    <thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead>
+                    <tbody>
+                    ${sales.map(s => `<tr><td>${Utils.formatDate(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.payment_method}</td></tr>`).join('')}
+                    </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('reportOutput').innerHTML = html;
+        }
+    };
+    App.modules.Reports = App.modules.Reports;
+
+    App.modules.Settings = {
+        pageId: 'settings',
+        init() {
+            document.getElementById('settingsForm').addEventListener('submit', this.save.bind(this));
+        },
+        load() {
+            this.loadCompanyInfo();
+            const { name, cnpj, address, phone } = CONFIG.company;
+            document.getElementById('companyName').value = name;
+            document.getElementById('companyCnpj').value = cnpj;
+            document.getElementById('companyAddress').value = address;
+            document.getElementById('companyPhone').value = phone;
+        },
+        loadCompanyInfo() {
+            const storedInfo = localStorage.getItem(CONFIG.storageKeys.companyInfo);
+            if(storedInfo) {
+                CONFIG.company = JSON.parse(storedInfo);
+            }
+        },
+        save(e) {
+            e.preventDefault();
+            const newConfig = {
+                name: document.getElementById('companyName').value,
+                cnpj: document.getElementById('companyCnpj').value,
+                address: document.getElementById('companyAddress').value,
+                phone: document.getElementById('companyPhone').value,
+            };
+            CONFIG.company = newConfig;
+            localStorage.setItem(CONFIG.storageKeys.companyInfo, JSON.stringify(newConfig));
+            Notification.success('Configurações salvas com sucesso!');
+        }
+    };
+    App.modules.Settings = App.modules.Settings;
+
+    // INICIALIZAÇÃO FINAL
+    document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
 </html>
