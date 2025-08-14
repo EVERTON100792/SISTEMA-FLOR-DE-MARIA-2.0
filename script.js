@@ -1,4 +1,4 @@
-// ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.5 (Sincronização Completa) =====
+// ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.6 (FUNCIONAL) =====
 
 // 1. Initialize Firebase
 const firebaseConfig = {
@@ -45,25 +45,38 @@ const state = {
     receivables: [],
     cart: [],
     currentEditId: null,
+    currentReport: {
+        data: [],
+        headers: [],
+        title: '',
+    },
 };
 
 // MÓDULOS DE UTILIDADES E COMPONENTES
 const Utils = {
     generateUUID: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        const r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     }),
-    formatCurrency: value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0),
+    formatCurrency: value => new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(value || 0),
     formatDate: dateStr => {
         if (!dateStr) return 'N/A';
         const date = new Date(dateStr);
+        // Corrige o fuso horário para exibir a data local corretamente
         const userTimezoneOffset = date.getTimezoneOffset() * 60000;
         return new Intl.DateTimeFormat('pt-BR').format(new Date(date.getTime() + userTimezoneOffset));
     },
     formatDateTime: dateStr => {
         if (!dateStr) return 'N/A';
         const date = new Date(dateStr);
-        return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(date);
+        return new Intl.DateTimeFormat('pt-BR', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        }).format(date);
     },
     debounce: (func, delay = 300) => {
         let timeout;
@@ -73,27 +86,67 @@ const Utils = {
         };
     },
     getToday: () => new Date().toISOString().split('T')[0],
-    populateClientSelects: (selectIds, defaultOptionText = 'Selecione um cliente') => {
-        selectIds.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                const currentValue = select.value;
-                select.innerHTML = `<option value="">${defaultOptionText}</option>`;
-                state.clients
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .forEach(c => {
-                        select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-                    });
-                select.value = currentValue;
-            }
-        });
+    populateSelect: (selectId, data, valueField, textField, defaultOptionText) => {
+        const select = document.getElementById(selectId);
+        if (select) {
+            const currentValue = select.value;
+            select.innerHTML = `<option value="">${defaultOptionText}</option>`;
+            data.sort((a, b) => a[textField].localeCompare(b[textField])).forEach(item => {
+                select.innerHTML += `<option value="${item[valueField]}">${item[textField]}</option>`;
+            });
+            select.value = currentValue;
+        }
     },
-    generatePDF: (content, filename) => {
-        console.log(`Gerando PDF com o nome: ${filename}`);
-        console.log("Conteúdo do PDF:\n", content);
-        // Aqui você usaria uma biblioteca como jsPDF ou html2canvas
-        // alert(`Simulando geração de PDF: ${filename}`);
-    }
+    exportToCSV: (filename, headers, data) => {
+        const csvRows = [];
+        csvRows.push(headers.join(','));
+
+        for (const row of data) {
+            const values = headers.map(header => {
+                const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                return `"${escaped}"`;
+            });
+            csvRows.push(values.join(','));
+        }
+
+        const blob = new Blob([csvRows.join('\n')], {
+            type: 'text/csv'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', filename);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        Notification.success('Exportação CSV concluída!');
+    },
+    exportToPDF: (title, head, body) => {
+        const {
+            jsPDF
+        } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text(title, 14, 22);
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Relatório gerado em: ${Utils.formatDateTime(new Date().toISOString())}`, 14, 29);
+
+        doc.autoTable({
+            head: [head],
+            body: body,
+            startY: 35,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [59, 130, 246]
+            } // --primary-color
+        });
+
+        doc.save(`${title.replace(/ /g, '_').toLowerCase()}_${Utils.getToday()}.pdf`);
+        Notification.success('Exportação PDF concluída!');
+    },
 };
 
 const Notification = {
@@ -182,7 +235,6 @@ const Navigation = {
     }
 };
 
-// MÓDULO DE AUTENTICAÇÃO
 const Auth = {
     init() {
         auth.onAuthStateChanged(user => {
@@ -208,7 +260,7 @@ const Auth = {
     handleLogout: async () => {
         await auth.signOut();
         localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
-        state.clients = [];
+        Object.keys(state).forEach(key => state[key] = Array.isArray(state[key]) ? [] : state[key]);
         Notification.success('Você saiu do sistema.');
     },
     showLogin: () => {
@@ -224,7 +276,6 @@ const Auth = {
     }
 };
 
-// MÓDULO PRINCIPAL DA APLICAÇÃO
 const App = {
     async loadAllData() {
         try {
@@ -234,10 +285,11 @@ const App = {
 
             snapshots.forEach((snapshot, index) => {
                 const collectionName = collections[index];
-                state[collectionName] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                state[collectionName] = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
             });
-
-            Utils.populateClientSelects(['saleClient', 'receiptClientFilter', 'receivableClient']);
 
         } catch (error) {
             console.error("Erro ao carregar todos os dados:", error);
@@ -262,11 +314,9 @@ const App = {
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        console.log('SGI - Flor de Maria v3.5 (Firebase) iniciado!');
+        console.log('SGI - Flor de Maria v3.6 (FUNCIONAL) iniciado!');
     }
 };
-
-// MÓDULOS DE NEGÓCIO
 
 const Dashboard = {
     chart: null,
@@ -282,7 +332,7 @@ const Dashboard = {
 
         const cashBalance = cashFlow.reduce((acc, t) => acc + (t.type === 'entrada' ? t.value : -t.value), 0);
         const totalReceivables = receivables.filter(r => r.status === 'Pendente' || r.status === 'Vencido').reduce((acc, r) => acc + r.value, 0);
-
+        
         const monthlySales = sales
             .filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; })
             .reduce((acc, s) => acc + s.total, 0);
@@ -312,25 +362,39 @@ const Dashboard = {
 
         const ctx = document.getElementById('paymentMethodChart').getContext('2d');
         if (this.chart) this.chart.destroy();
+        
+        if (Object.keys(data).length === 0) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = "16px 'Segoe UI'";
+            ctx.fillStyle = 'var(--text-muted)';
+            ctx.textAlign = 'center';
+            ctx.fillText('Nenhuma venda este mês para exibir o gráfico.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            return;
+        }
 
         this.chart = new Chart(ctx, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
                 labels: Object.keys(data),
                 datasets: [{
                     label: 'Vendas (R$)',
                     data: Object.values(data),
-                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#64748B'],
+                    borderColor: 'var(--surface-bg)',
+                    borderWidth: 2,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
-                    x: { ticks: { color: '#94A3B8' }, grid: { display: false } }
-                }
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94A3B8'
+                        }
+                    }
+                },
             }
         });
     },
@@ -338,7 +402,7 @@ const Dashboard = {
         const overdue = state.receivables.filter(r => r.status === 'Vencido');
         const container = document.getElementById('overdueAccounts');
         if (overdue.length === 0) {
-            container.innerHTML = '<p class="text-center" style="padding: 20px;">Nenhuma conta vencida. 🎉</p>';
+            container.innerHTML = '<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. 🎉</p>';
             return;
         }
 
@@ -368,16 +432,25 @@ const Dashboard = {
 const Clients = {
     init() {
         document.getElementById('clientForm').addEventListener('submit', this.save);
-        document.getElementById('clearClientForm').addEventListener('click', this.clearForm);
-        document.getElementById('clientSearch').addEventListener('input', Utils.debounce(() => this.render(this.getFiltered()), 300));
+        document.getElementById('clearClientForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('clientSearch').addEventListener('input', Utils.debounce(() => this.render(), 300));
         document.getElementById('exportClients').addEventListener('click', this.exportToCSV);
     },
     async load() {
-        this.render(state.clients);
+        this.render();
     },
-    render(clientsToRender) {
+    getFiltered() {
+        const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+        if (!searchTerm) return state.clients;
+        return state.clients.filter(c =>
+            c.name.toLowerCase().includes(searchTerm) ||
+            (c.phone && c.phone.includes(searchTerm))
+        );
+    },
+    render() {
         const tbody = document.getElementById('clientsTableBody');
         document.getElementById('clientCount').textContent = `${state.clients.length} clientes cadastrados`;
+        const clientsToRender = this.getFiltered();
 
         if (clientsToRender.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum cliente encontrado.</td></tr>`;
@@ -390,11 +463,11 @@ const Clients = {
                 const purchaseCount = state.sales.filter(s => s.clientId === client.id).length;
                 return `
                     <tr>
-                        <td>${client.name}</td>
-                        <td>${client.phone}</td>
-                        <td>${Utils.formatDate(client.createdAt)}</td>
-                        <td>${purchaseCount} compra(s)</td>
-                        <td>
+                        <td data-label="Nome">${client.name}</td>
+                        <td data-label="Telefone">${client.phone || 'N/A'}</td>
+                        <td data-label="Cadastro">${Utils.formatDate(client.createdAt)}</td>
+                        <td data-label="Compras">${purchaseCount} compra(s)</td>
+                        <td data-label="Ações">
                             <div class="flex gap-2">
                                 <button class="btn btn-secondary btn-sm" onclick="Clients.edit('${client.id}')" title="Editar"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-secondary btn-sm" onclick="Clients.viewHistory('${client.id}')" title="Histórico"><i class="fas fa-history"></i></button>
@@ -408,7 +481,7 @@ const Clients = {
         e.preventDefault();
         const name = document.getElementById('clientName').value.trim();
         const phone = document.getElementById('clientPhone').value.trim();
-        if (!name || !phone) return Notification.error('Nome e telefone são obrigatórios.');
+        if (!name) return Notification.error('O nome é obrigatório.');
 
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
@@ -442,9 +515,14 @@ const Clients = {
             document.getElementById('clientName').value = client.name;
             document.getElementById('clientPhone').value = client.phone;
             document.getElementById('clientForm').scrollIntoView({ behavior: 'smooth' });
+            document.querySelector('#clientForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Atualizar Cliente';
         }
     },
     remove: async (id) => {
+        const clientSales = state.sales.some(s => s.clientId === id);
+        if (clientSales) {
+            return Notification.error('Não é possível excluir um cliente com histórico de vendas.');
+        }
         if (!confirm('Tem certeza que deseja excluir este cliente? Esta ação é irreversível.')) return;
         try {
             await db.collection(CONFIG.collections.clients).doc(id).delete();
@@ -459,32 +537,75 @@ const Clients = {
     clearForm() {
         document.getElementById('clientForm').reset();
         state.currentEditId = null;
+        document.querySelector('#clientForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Salvar Cliente';
     },
-    getFiltered() {
-        const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
-        if (!searchTerm) return state.clients;
-        return state.clients.filter(c =>
-            c.name.toLowerCase().includes(searchTerm) ||
-            c.phone.includes(searchTerm)
-        );
+    viewHistory(id) {
+        const client = state.clients.find(c => c.id === id);
+        const clientSales = state.sales.filter(s => s.clientId === id).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (!client) return;
+
+        let content = `<p>Histórico de compras para <strong>${client.name}</strong>.</p><br>`;
+        if (clientSales.length === 0) {
+            content += '<p>Este cliente ainda não realizou compras.</p>';
+        } else {
+            const tableRows = clientSales.map(sale =>
+                `<tr>
+                    <td>${Utils.formatDate(sale.date)}</td>
+                    <td>${sale.items.map(i => `${i.quantity}x ${i.name}`).join('<br>')}</td>
+                    <td>${Utils.formatCurrency(sale.total)}</td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="Receipts.generateReceiptPDF('${sale.id}')"><i class="fas fa-file-pdf"></i></button></td>
+                </tr>`
+            ).join('');
+
+            content += `
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr><th>Data</th><th>Itens</th><th>Total</th><th>Recibo</th></tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+        Modal.show(`Histórico de ${client.name}`, content);
     },
-    viewHistory: (id) => { /* Implementação do Modal */ },
-    exportToCSV: () => { /* Implementação da exportação */ }
+    exportToCSV() {
+        const headers = ['id', 'name', 'phone', 'createdAt'];
+        const data = state.clients.map(c => ({
+            id: c.id,
+            name: c.name,
+            phone: c.phone,
+            createdAt: Utils.formatDate(c.createdAt)
+        }));
+        Utils.exportToCSV('clientes_flor_de_maria.csv', headers, data);
+    }
 };
 
 const Products = {
     init() {
         document.getElementById('productForm').addEventListener('submit', this.save);
-        document.getElementById('clearProductForm').addEventListener('click', this.clearForm);
-        document.getElementById('productSearch').addEventListener('input', Utils.debounce(() => this.render(this.getFiltered()), 300));
+        document.getElementById('clearProductForm').addEventListener('click', () => this.clearForm());
+        document.getElementById('productSearch').addEventListener('input', Utils.debounce(() => this.render(), 300));
         document.getElementById('exportProducts').addEventListener('click', this.exportToCSV);
     },
     async load() {
-        this.render(state.products);
+        this.render();
         this.updateStats();
     },
-    render(productsToRender) {
+    getFiltered() {
+        const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+        if (!searchTerm) return state.products;
+        return state.products.filter(p =>
+            p.name.toLowerCase().includes(searchTerm) ||
+            p.refCode.toLowerCase().includes(searchTerm)
+        );
+    },
+    render() {
         const tbody = document.getElementById('productsTableBody');
+        const productsToRender = this.getFiltered();
+
         if (productsToRender.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px;">Nenhum produto encontrado.</td></tr>`;
             return;
@@ -499,14 +620,14 @@ const Products = {
 
                 return `
                     <tr>
-                        <td>${product.refCode}</td>
-                        <td style="white-space:normal;">${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${Utils.formatCurrency(product.costPrice)}</td>
-                        <td>${Utils.formatCurrency(product.salePrice)}</td>
-                        <td>${margin.toFixed(1)}%</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
+                        <td data-label="Código">${product.refCode}</td>
+                        <td data-label="Nome" style="white-space:normal;">${product.name}</td>
+                        <td data-label="Qtd.">${product.quantity}</td>
+                        <td data-label="P. Custo">${Utils.formatCurrency(product.costPrice)}</td>
+                        <td data-label="P. Venda">${Utils.formatCurrency(product.salePrice)}</td>
+                        <td data-label="Margem">${margin.toFixed(1)}%</td>
+                        <td data-label="Status"><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td data-label="Ações">
                             <div class="flex gap-2">
                                 <button class="btn btn-secondary btn-sm" onclick="Products.edit('${product.id}')" title="Editar"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-danger btn-sm" onclick="Products.remove('${product.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
@@ -560,6 +681,7 @@ const Products = {
             document.getElementById('productCostPrice').value = product.costPrice;
             document.getElementById('productSalePrice').value = product.salePrice;
             document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+            document.querySelector('#productForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Atualizar Produto';
         }
     },
     remove: async (id) => {
@@ -577,31 +699,27 @@ const Products = {
     clearForm() {
         document.getElementById('productForm').reset();
         state.currentEditId = null;
+        document.querySelector('#productForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Salvar Produto';
     },
     updateStats() {
         document.getElementById('totalProducts').textContent = state.products.length;
         document.getElementById('outOfStockProducts').textContent = state.products.filter(p => p.quantity <= 0).length;
     },
-    getFiltered() {
-        const searchTerm = document.getElementById('productSearch').value.toLowerCase();
-        if (!searchTerm) return state.products;
-        return state.products.filter(p =>
-            p.name.toLowerCase().includes(searchTerm) ||
-            p.refCode.toLowerCase().includes(searchTerm)
-        );
-    },
-    exportToCSV: () => { /* Implementação */ }
+    exportToCSV() {
+        const headers = ['refCode', 'name', 'quantity', 'costPrice', 'salePrice'];
+        Utils.exportToCSV('estoque_flor_de_maria.csv', headers, state.products);
+    }
 };
 
 const Sales = {
     init() {
         document.getElementById('productSearchPDV').addEventListener('input', Utils.debounce(this.showSuggestions, 300));
-        document.getElementById('clearCart').addEventListener('click', this.clearCart);
+        document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
         document.getElementById('finalizeSale').addEventListener('click', this.finalize);
         document.getElementById('salePaymentMethod').addEventListener('change', this.toggleInstallments);
     },
     async load() {
-        Utils.populateClientSelects(['saleClient'], 'Consumidor Final');
+        Utils.populateSelect('saleClient', state.clients, 'id', 'name', 'Consumidor Final');
         this.clearCart();
     },
     showSuggestions() {
@@ -619,7 +737,7 @@ const Sales = {
         if (filtered.length === 0) {
             suggestionsEl.innerHTML = '<div class="suggestion-item text-muted p-2">Nenhum produto encontrado.</div>';
         } else {
-            suggestionsEl.innerHTML = filtered.map(p => `
+            suggestionsEl.innerHTML = filtered.slice(0, 10).map(p => `
                 <div class="suggestion-item" onclick="Sales.addToCart('${p.id}')">
                     <strong>${p.name}</strong> (${p.refCode})<br>
                     <small>Estoque: ${p.quantity} | Preço: ${Utils.formatCurrency(p.salePrice)}</small>
@@ -630,7 +748,10 @@ const Sales = {
     },
     addToCart(productId) {
         const product = state.products.find(p => p.id === productId);
-        if (!product) return;
+        if (!product || product.quantity <= 0) {
+             Notification.warning('Produto esgotado ou inválido.');
+             return;
+        }
 
         const existingItem = state.cart.find(item => item.id === productId);
         if (existingItem) {
@@ -640,11 +761,12 @@ const Sales = {
                 Notification.warning('Quantidade máxima em estoque atingida.');
             }
         } else {
-            state.cart.push({ ...product, quantity: 1, originalQuantity: product.quantity });
+            state.cart.push({ ...product, quantity: 1 });
         }
         this.updateCartView();
         document.getElementById('productSearchPDV').value = '';
         document.getElementById('productSuggestions').classList.add('hidden');
+        document.getElementById('productSearchPDV').focus();
     },
     updateCartView() {
         const tbody = document.getElementById('cartTableBody');
@@ -666,17 +788,17 @@ const Sales = {
             total += subtotal;
             return `
                 <tr>
-                    <td style="white-space:normal;">${item.name}</td>
-                    <td>${Utils.formatCurrency(item.salePrice)}</td>
-                    <td>
+                    <td data-label="Produto" style="white-space:normal;">${item.name}</td>
+                    <td data-label="Preço Unit.">${Utils.formatCurrency(item.salePrice)}</td>
+                    <td data-label="Qtd.">
                         <div class="quantity-control">
                             <button class="btn btn-secondary btn-sm" onclick="Sales.updateQuantity('${item.id}', -1)">-</button>
                             <span>${item.quantity}</span>
                             <button class="btn btn-secondary btn-sm" onclick="Sales.updateQuantity('${item.id}', 1)">+</button>
                         </div>
                     </td>
-                    <td>${Utils.formatCurrency(subtotal)}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.id}')" title="Remover"><i class="fas fa-trash"></i></button></td>
+                    <td data-label="Subtotal">${Utils.formatCurrency(subtotal)}</td>
+                    <td data-label="Ações"><button class="btn btn-danger btn-sm" onclick="Sales.removeFromCart('${item.id}')" title="Remover"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `;
         }).join('');
@@ -719,27 +841,29 @@ const Sales = {
         const paymentMethod = document.getElementById('salePaymentMethod').value;
         const clientId = document.getElementById('saleClient').value;
         const finalizeBtn = document.getElementById('finalizeSale');
-        finalizeBtn.disabled = true;
 
         if (paymentMethod === 'Crediário' && !clientId) {
-            finalizeBtn.disabled = false;
             return Notification.error('Selecione um cliente para vendas no crediário.');
         }
         if (state.cart.length === 0) {
-            finalizeBtn.disabled = false;
             return Notification.warning('O carrinho está vazio.');
         }
 
+        finalizeBtn.disabled = true;
+        finalizeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
+
         const saleId = Utils.generateUUID();
         const total = state.cart.reduce((acc, item) => acc + (item.salePrice * item.quantity), 0);
+        const totalCost = state.cart.reduce((acc, item) => acc + (item.costPrice * item.quantity), 0);
 
         const saleData = {
             id: saleId,
             date: new Date().toISOString(),
             clientId: clientId || null,
             clientName: state.clients.find(c => c.id === clientId)?.name || 'Consumidor Final',
-            items: state.cart.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.salePrice })),
+            items: state.cart.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.salePrice, cost: i.costPrice })),
             total,
+            totalCost,
             paymentMethod,
         };
 
@@ -760,12 +884,10 @@ const Sales = {
                 dueDate.setMonth(dueDate.getMonth() + 1);
                 const receivableId = Utils.generateUUID();
                 const receivableData = {
-                    id: receivableId,
-                    clientId,
-                    saleId,
+                    id: receivableId, clientId, saleId,
                     description: `Parcela ${i}/${installments} da Venda #${saleId.substring(0, 6)}`,
                     value: installmentValue,
-                    dueDate: dueDate.toISOString(),
+                    dueDate: new Date(dueDate).toISOString().split('T')[0],
                     status: 'Pendente',
                     createdAt: new Date().toISOString()
                 };
@@ -786,48 +908,52 @@ const Sales = {
         }
 
         try {
-            await batch.commit(); // Espera a transação ser concluída
+            await batch.commit();
             Notification.success('Venda finalizada com sucesso!');
+            Receipts.generateReceiptPDF(saleId, true); // Pergunta se quer imprimir
             Sales.clearCart();
-            await App.loadAllData(); // Recarrega os dados após a transação
+            await App.loadAllData();
             await Sales.load();
         } catch (error) {
             Notification.error('Erro ao finalizar a venda.');
             console.error(error);
         } finally {
             finalizeBtn.disabled = false;
+            finalizeBtn.innerHTML = '<i class="fas fa-check"></i> Finalizar Venda';
         }
     },
 };
 
 const Receipts = {
     init() {
-        document.getElementById('receiptClientFilter').addEventListener('change', this.render);
-        document.getElementById('receiptSearch').addEventListener('input', Utils.debounce(this.render, 300));
+        document.getElementById('receiptClientFilter').addEventListener('change', () => this.render());
+        document.getElementById('receiptDateFilter').addEventListener('change', () => this.render());
+        document.getElementById('clearReceiptFilters').addEventListener('click', () => {
+            document.getElementById('receiptClientFilter').value = '';
+            document.getElementById('receiptDateFilter').value = '';
+            this.render();
+        });
     },
     async load() {
-        Utils.populateClientSelects(['receiptClientFilter'], 'Todos os Clientes');
+        Utils.populateSelect('receiptClientFilter', state.clients, 'id', 'name', 'Todos os Clientes');
         this.render();
+    },
+    getFiltered() {
+        const clientId = document.getElementById('receiptClientFilter').value;
+        const dateFilter = document.getElementById('receiptDateFilter').value;
+
+        return state.sales.filter(s => {
+            const clientMatch = !clientId || s.clientId === clientId;
+            const dateMatch = !dateFilter || s.date.startsWith(dateFilter);
+            return clientMatch && dateMatch;
+        });
     },
     render() {
         const tbody = document.getElementById('receiptsTableBody');
-        const clientId = document.getElementById('receiptClientFilter').value;
-        const searchTerm = document.getElementById('receiptSearch').value.toLowerCase();
-
-        let salesToRender = state.sales;
-
-        if (clientId) {
-            salesToRender = salesToRender.filter(s => s.clientId === clientId);
-        }
-        if (searchTerm) {
-            salesToRender = salesToRender.filter(s =>
-                s.id.toLowerCase().includes(searchTerm) ||
-                s.clientName.toLowerCase().includes(searchTerm)
-            );
-        }
+        const salesToRender = this.getFiltered();
 
         if (salesToRender.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma venda encontrada.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma venda encontrada para os filtros selecionados.</td></tr>';
             return;
         }
 
@@ -835,106 +961,223 @@ const Receipts = {
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(s => `
                 <tr>
-                    <td>${Utils.formatDate(s.date)}</td>
-                    <td>${s.clientName}</td>
-                    <td>${s.paymentMethod}</td>
-                    <td>${Utils.formatCurrency(s.total)}</td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" onclick="Receipts.generateReceipt('${s.id}')" title="Gerar Recibo"><i class="fas fa-file-invoice-dollar"></i></button>
+                    <td data-label="ID da Venda">#${s.id.substring(0, 6)}</td>
+                    <td data-label="Data">${Utils.formatDate(s.date)}</td>
+                    <td data-label="Cliente">${s.clientName}</td>
+                    <td data-label="Total">${Utils.formatCurrency(s.total)}</td>
+                    <td data-label="Pagamento">${s.paymentMethod}</td>
+                    <td data-label="Ações">
+                        <button class="btn btn-secondary btn-sm" onclick="Receipts.generateReceiptPDF('${s.id}')" title="Gerar Recibo PDF"><i class="fas fa-file-pdf"></i></button>
                     </td>
                 </tr>
             `).join('');
     },
-    generateReceipt(saleId) {
+    generateReceiptPDF(saleId, askToPrint = false) {
         const sale = state.sales.find(s => s.id === saleId);
         if (!sale) return Notification.error("Venda não encontrada.");
 
-        const companyInfo = `
-            <h3>${CONFIG.company.name}</h3>
-            <p>${CONFIG.company.address}</p>
-            <p>CNPJ: ${CONFIG.company.cnpj}</p>
-            <p>Telefone: ${CONFIG.company.phone}</p>
-            <hr>
-        `;
+        if (askToPrint && !confirm("Venda finalizada. Deseja imprimir o recibo?")) {
+            return;
+        }
 
-        const clientInfo = `
-            <h4>Dados do Cliente</h4>
-            <p><strong>Nome:</strong> ${sale.clientName}</p>
-            <p><strong>Data da Venda:</strong> ${Utils.formatDate(sale.date)}</p>
-            <hr>
-        `;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Cabeçalho
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.text(CONFIG.company.name, 105, 20, { align: 'center' });
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(CONFIG.company.address, 105, 27, { align: 'center' });
+        doc.text(`CNPJ: ${CONFIG.company.cnpj} | Telefone: ${CONFIG.company.phone}`, 105, 32, { align: 'center' });
+        
+        doc.setLineWidth(0.5);
+        doc.line(20, 38, 190, 38);
 
-        const itemsList = sale.items.map(item => `
-            <li>${item.quantity}x ${item.name} - ${Utils.formatCurrency(item.price)} cada</li>
-        `).join('');
+        // Informações da Venda
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("RECIBO DE VENDA", 20, 48);
+        doc.setFont("helvetica", "normal");
+        doc.text(`ID da Venda: #${sale.id.substring(0, 8)}`, 190, 48, { align: 'right' });
+        doc.text(`Data: ${Utils.formatDateTime(sale.date)}`, 190, 55, { align: 'right' });
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Cliente:", 20, 55);
+        doc.setFont("helvetica", "normal");
+        doc.text(sale.clientName, 38, 55);
+        
+        doc.line(20, 62, 190, 62);
 
-        const saleInfo = `
-            <h4>Detalhes da Venda</h4>
-            <ul>${itemsList}</ul>
-            <p><strong>Método de Pagamento:</strong> ${sale.paymentMethod}</p>
-            <p><strong>Total:</strong> ${Utils.formatCurrency(sale.total)}</p>
-        `;
+        // Tabela de Itens
+        const tableBody = sale.items.map(item => [
+            item.name,
+            item.quantity,
+            Utils.formatCurrency(item.price),
+            Utils.formatCurrency(item.price * item.quantity)
+        ]);
 
-        const receiptContent = `${companyInfo}${clientInfo}${saleInfo}`;
+        doc.autoTable({
+            startY: 68,
+            head: [['Produto', 'Qtd.', 'Preço Unit.', 'Subtotal']],
+            body: tableBody,
+            theme: 'striped',
+            headStyles: { fillColor: [30, 41, 59] },
+        });
 
-        Modal.show('Recibo de Venda', `
-            <div class="receipt-preview">${receiptContent}</div>
-            <div class="mt-4 text-right">
-                <button class="btn btn-primary" onclick="Utils.generatePDF(document.querySelector('.receipt-preview').innerHTML, 'recibo-${sale.id.substring(0, 6)}.pdf')"><i class="fas fa-print"></i> Imprimir/Salvar PDF</button>
-            </div>
-        `);
+        // Rodapé com Totais
+        let finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("Total:", 140, finalY);
+        doc.text(Utils.formatCurrency(sale.total), 190, finalY, { align: 'right' });
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Método de Pagamento: ${sale.paymentMethod}`, 140, finalY + 7);
+
+        doc.save(`recibo_${sale.id.substring(0, 6)}.pdf`);
+        Notification.success('Recibo gerado com sucesso!');
     }
 };
 
 const CashFlow = {
-    init() {
-        document.getElementById('cashflowFilter').addEventListener('change', this.render);
-        document.getElementById('cashflowSort').addEventListener('change', this.render);
+     init() {
+        document.getElementById('cashFlowForm').addEventListener('submit', this.saveManual);
+        document.getElementById('clearCashFlowForm').addEventListener('click', this.clearForm);
+        document.getElementById('cashFlowSearch').addEventListener('input', Utils.debounce(() => this.render(), 300));
+        document.getElementById('exportCashFlow').addEventListener('click', this.exportToCSV);
+        document.getElementById('cashFlowDate').value = Utils.getToday();
     },
     async load() {
         this.render();
+        this.updateSummary();
+    },
+    getFiltered() {
+        const searchTerm = document.getElementById('cashFlowSearch').value.toLowerCase();
+        if (!searchTerm) return state.cashFlow;
+        return state.cashFlow.filter(c => c.description.toLowerCase().includes(searchTerm));
     },
     render() {
         const tbody = document.getElementById('cashFlowTableBody');
-        const filter = document.getElementById('cashflowFilter').value;
-        const sort = document.getElementById('cashflowSort').value;
-
-        let cashFlowToRender = state.cashFlow;
-
-        if (filter !== 'todos') {
-            cashFlowToRender = cashFlowToRender.filter(c => c.type === filter);
-        }
-        if (sort === 'date-desc') {
-            cashFlowToRender.sort((a, b) => new Date(b.date) - new Date(a.date));
-        } else {
-            cashFlowToRender.sort((a, b) => new Date(a.date) - new Date(b.date));
-        }
+        const cashFlowToRender = this.getFiltered();
 
         if (cashFlowToRender.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhum lançamento encontrado.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = cashFlowToRender.map(c => `
+        tbody.innerHTML = cashFlowToRender
+            .sort((a,b) => new Date(b.date) - new Date(a.date))
+            .map(c => `
             <tr>
-                <td>${Utils.formatDate(c.date)}</td>
-                <td>${c.description}</td>
-                <td><span class="badge badge-${c.type === 'entrada' ? 'success' : 'danger'}">${c.type === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
-                <td>${Utils.formatCurrency(c.value)}</td>
+                <td data-label="Data">${Utils.formatDate(c.date)}</td>
+                <td data-label="Tipo"><span class="badge ${c.type === 'entrada' ? 'badge-success' : 'badge-danger'}">${c.type}</span></td>
+                <td data-label="Descrição" style="white-space:normal;">${c.description}</td>
+                <td data-label="Valor" style="color:${c.type === 'entrada' ? 'var(--accent-color)' : 'var(--danger-color)'}">${Utils.formatCurrency(c.value)}</td>
+                <td data-label="Ações">
+                    ${!c.source ? `<button class="btn btn-danger btn-sm" onclick="CashFlow.remove('${c.id}')" title="Excluir Lançamento Manual"><i class="fas fa-trash"></i></button>` : `<span class="text-muted">Automático</span>`}
+                </td>
             </tr>
         `).join('');
+    },
+    updateSummary() {
+        const totalEntradas = state.cashFlow.filter(c => c.type === 'entrada').reduce((acc, c) => acc + c.value, 0);
+        const totalSaidas = state.cashFlow.filter(c => c.type === 'saida').reduce((acc, c) => acc + c.value, 0);
+        const saldoAtual = totalEntradas - totalSaidas;
+
+        document.getElementById('totalEntradas').textContent = Utils.formatCurrency(totalEntradas);
+        document.getElementById('totalSaidas').textContent = Utils.formatCurrency(totalSaidas);
+        document.getElementById('saldoAtual').textContent = Utils.formatCurrency(saldoAtual);
+        document.getElementById('saldoAtual').style.color = saldoAtual >= 0 ? 'var(--accent-color)' : 'var(--danger-color)';
+    },
+    saveManual: async (e) => {
+        e.preventDefault();
+        const data = {
+            id: Utils.generateUUID(),
+            type: document.getElementById('cashFlowType').value,
+            description: document.getElementById('cashFlowDescription').value.trim(),
+            value: parseFloat(document.getElementById('cashFlowValue').value),
+            date: document.getElementById('cashFlowDate').value,
+            source: null, // indica que é manual
+        };
+        
+        if (!data.description || !data.value || !data.date) {
+            return Notification.error('Todos os campos são obrigatórios.');
+        }
+
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        try {
+            await db.collection(CONFIG.collections.cashFlow).doc(data.id).set(data);
+            Notification.success('Lançamento salvo com sucesso!');
+            CashFlow.clearForm();
+            await App.loadAllData();
+            await CashFlow.load();
+        } catch(error) {
+            Notification.error('Erro ao salvar lançamento.');
+            console.error(error);
+        } finally {
+            submitButton.disabled = false;
+        }
+    },
+    remove: async(id) => {
+        if (!confirm('Tem certeza que deseja remover este lançamento manual?')) return;
+        try {
+            await db.collection(CONFIG.collections.cashFlow).doc(id).delete();
+            Notification.success('Lançamento removido.');
+            await App.loadAllData();
+            await CashFlow.load();
+        } catch (error) {
+            Notification.error('Erro ao remover lançamento.');
+            console.error(error);
+        }
+    },
+    clearForm() {
+        document.getElementById('cashFlowForm').reset();
+        document.getElementById('cashFlowDate').value = Utils.getToday();
+    },
+    exportToCSV() {
+        const headers = ['id', 'date', 'type', 'description', 'value'];
+        const data = state.cashFlow.map(item => ({
+            ...item,
+            date: Utils.formatDate(item.date)
+        }));
+        Utils.exportToCSV('fluxo_caixa_flor_de_maria.csv', headers, data);
     }
 };
 
 const Expenses = {
     init() {
         document.getElementById('expenseForm').addEventListener('submit', this.save);
+        document.getElementById('clearExpenseForm').addEventListener('click', this.clearForm);
+        document.getElementById('expenseSearch').addEventListener('input', Utils.debounce(() => this.render(), 300));
+        document.getElementById('expenseFilterCategory').addEventListener('change', () => this.render());
+        document.getElementById('exportExpenses').addEventListener('click', this.exportToCSV);
+        document.getElementById('expenseDate').value = Utils.getToday();
     },
     async load() {
-        this.render(state.expenses);
+        this.updateSummary();
+        this.populateCategoryFilter();
+        this.render();
     },
-    render(expensesToRender) {
+    getFiltered() {
+        const searchTerm = document.getElementById('expenseSearch').value.toLowerCase();
+        const categoryFilter = document.getElementById('expenseFilterCategory').value;
+        
+        return state.expenses.filter(e => {
+            const searchMatch = !searchTerm || e.description.toLowerCase().includes(searchTerm);
+            const categoryMatch = !categoryFilter || e.category === categoryFilter;
+            return searchMatch && categoryMatch;
+        });
+    },
+    render() {
         const tbody = document.getElementById('expensesTableBody');
+        const expensesToRender = this.getFiltered();
+        
         if (expensesToRender.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px;">Nenhuma despesa encontrada.</td></tr>';
             return;
@@ -943,10 +1186,11 @@ const Expenses = {
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(e => `
                 <tr>
-                    <td>${Utils.formatDate(e.date)}</td>
-                    <td>${e.description}</td>
-                    <td>${Utils.formatCurrency(e.value)}</td>
-                    <td>
+                    <td data-label="Data">${Utils.formatDate(e.date)}</td>
+                    <td data-label="Descrição">${e.description}</td>
+                    <td data-label="Categoria">${e.category}</td>
+                    <td data-label="Valor">${Utils.formatCurrency(e.value)}</td>
+                    <td data-label="Ações">
                         <button class="btn btn-danger btn-sm" onclick="Expenses.remove('${e.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
@@ -954,40 +1198,44 @@ const Expenses = {
     },
     save: async (e) => {
         e.preventDefault();
-        const description = document.getElementById('expenseDescription').value.trim();
-        const value = parseFloat(document.getElementById('expenseValue').value);
-        if (!description || !value) return Notification.error('Descrição e valor são obrigatórios.');
+        const expenseData = {
+            id: Utils.generateUUID(),
+            description: document.getElementById('expenseDescription').value.trim(),
+            category: document.getElementById('expenseCategory').value,
+            value: parseFloat(document.getElementById('expenseValue').value),
+            date: document.getElementById('expenseDate').value,
+        };
+
+        if (!expenseData.description || !expenseData.category || !expenseData.value || !expenseData.date) {
+            return Notification.error('Todos os campos são obrigatórios.');
+        }
 
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
         try {
-            const expenseId = Utils.generateUUID();
-            const newExpense = {
-                id: expenseId,
-                date: Utils.getToday(),
-                description,
-                value,
-                createdAt: new Date().toISOString()
-            };
-            await db.collection(CONFIG.collections.expenses).doc(expenseId).set(newExpense);
+            const batch = db.batch();
+            
+            // Salva a despesa
+            batch.set(db.collection(CONFIG.collections.expenses).doc(expenseData.id), expenseData);
 
-            const cashFlowId = Utils.generateUUID();
+            // Cria o lançamento no fluxo de caixa
             const cashFlowData = {
-                id: cashFlowId,
-                date: newExpense.date,
+                id: Utils.generateUUID(),
+                date: expenseData.date,
                 type: 'saida',
-                description: `Despesa: ${newExpense.description}`,
-                value: newExpense.value,
+                description: `Despesa: ${expenseData.description}`,
+                value: expenseData.value,
                 source: 'despesa',
-                sourceId: expenseId,
+                sourceId: expenseData.id,
             };
-            await db.collection(CONFIG.collections.cashFlow).doc(cashFlowId).set(cashFlowData);
+            batch.set(db.collection(CONFIG.collections.cashFlow).doc(cashFlowData.id), cashFlowData);
 
+            await batch.commit();
             Notification.success('Despesa registrada com sucesso!');
-            document.getElementById('expenseForm').reset();
+            this.clearForm();
             await App.loadAllData();
-            await Expenses.load();
+            await this.load();
 
         } catch (error) {
             Notification.error('Erro ao registrar despesa.');
@@ -997,20 +1245,63 @@ const Expenses = {
         }
     },
     remove: async (id) => {
-        if (!confirm('Tem certeza que deseja excluir esta despesa?')) return;
+        if (!confirm('Tem certeza que deseja excluir esta despesa? Isso também removerá o lançamento do fluxo de caixa.')) return;
         try {
-            await db.collection(CONFIG.collections.expenses).doc(id).delete();
+            const batch = db.batch();
+            
+            // Remove a despesa
+            batch.delete(db.collection(CONFIG.collections.expenses).doc(id));
+            
+            // Remove o lançamento do fluxo de caixa associado
             const cashFlowEntry = state.cashFlow.find(cf => cf.sourceId === id && cf.source === 'despesa');
             if (cashFlowEntry) {
-                await db.collection(CONFIG.collections.cashFlow).doc(cashFlowEntry.id).delete();
+                batch.delete(db.collection(CONFIG.collections.cashFlow).doc(cashFlowEntry.id));
             }
+            
+            await batch.commit();
             Notification.success('Despesa excluída com sucesso.');
             await App.loadAllData();
-            await Expenses.load();
+            await this.load();
+            await CashFlow.load(); // Recarrega o fluxo de caixa também
         } catch (error) {
             Notification.error('Erro ao excluir despesa.');
             console.error(error);
         }
+    },
+    clearForm() {
+        document.getElementById('expenseForm').reset();
+        document.getElementById('expenseDate').value = Utils.getToday();
+    },
+    updateSummary() {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        const monthly = state.expenses
+            .filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear;})
+            .reduce((acc, e) => acc + e.value, 0);
+        
+        const yearly = state.expenses
+            .filter(e => new Date(e.date).getFullYear() === currentYear)
+            .reduce((acc, e) => acc + e.value, 0);
+        
+        document.getElementById('totalExpensesMonth').textContent = Utils.formatCurrency(monthly);
+        document.getElementById('totalExpensesYear').textContent = Utils.formatCurrency(yearly);
+    },
+    populateCategoryFilter() {
+        const categories = [...new Set(state.expenses.map(e => e.category))];
+        const select = document.getElementById('expenseFilterCategory');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Todas as categorias</option>';
+        categories.sort().forEach(cat => {
+            select.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+        select.value = currentVal;
+    },
+    exportToCSV() {
+        const headers = ['id', 'date', 'description', 'category', 'value'];
+        const data = this.getFiltered().map(item => ({...item, date: Utils.formatDate(item.date)}));
+        Utils.exportToCSV('despesas_flor_de_maria.csv', headers, data);
     }
 };
 
@@ -1018,22 +1309,39 @@ const Receivables = {
     init() {
         document.getElementById('receivableForm').addEventListener('submit', this.saveManual);
         document.getElementById('clearReceivableForm').addEventListener('click', this.clearForm);
+        document.getElementById('receivableSearch').addEventListener('input', Utils.debounce(() => this.render(), 300));
+        document.getElementById('receivableFilterStatus').addEventListener('change', () => this.render());
+        document.getElementById('exportReceivables').addEventListener('click', this.exportToCSV);
     },
     async load() {
         await this.updateStatuses();
-        Utils.populateClientSelects(['receivableClient']);
-        this.render(state.receivables);
+        Utils.populateSelect('receivableClient', state.clients, 'id', 'name', 'Selecione um cliente');
+        this.render();
         this.updateSummary();
     },
-    render(receivablesToRender) {
+    getFiltered() {
+        const searchTerm = document.getElementById('receivableSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('receivableFilterStatus').value;
+        const clients = state.clients;
+
+        return state.receivables.filter(r => {
+            const client = clients.find(c => c.id === r.clientId);
+            const searchMatch = !searchTerm || r.description.toLowerCase().includes(searchTerm) || (client && client.name.toLowerCase().includes(searchTerm));
+            const statusMatch = !statusFilter || r.status === statusFilter;
+            return searchMatch && statusMatch;
+        });
+    },
+    render() {
         const tbody = document.getElementById('receivablesTableBody');
+        const receivablesToRender = this.getFiltered();
+        
         if (receivablesToRender.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 40px;">Nenhuma conta a receber encontrada.</td></tr>';
             return;
         }
 
         tbody.innerHTML = receivablesToRender
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
             .map(r => {
                 const client = state.clients.find(c => c.id === r.clientId);
                 let statusClass = 'badge-info';
@@ -1042,46 +1350,48 @@ const Receivables = {
 
                 return `
                     <tr>
-                        <td>${client?.name || 'N/A'}</td>
-                        <td style="white-space:normal;">${r.description}</td>
-                        <td>${Utils.formatCurrency(r.value)}</td>
-                        <td>${Utils.formatDate(r.dueDate)}</td>
-                        <td><span class="badge ${statusClass}">${r.status}</span></td>
-                        <td>
-                            ${r.status !== 'Pago' ? `<button class="btn btn-primary btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i> Pagar</button>` : '<span>Recebido</span>'}
+                        <td data-label="Cliente">${client?.name || 'N/A'}</td>
+                        <td data-label="Descrição" style="white-space:normal;">${r.description}</td>
+                        <td data-label="Valor">${Utils.formatCurrency(r.value)}</td>
+                        <td data-label="Vencimento">${Utils.formatDate(r.dueDate)}</td>
+                        <td data-label="Status"><span class="badge ${statusClass}">${r.status}</span></td>
+                        <td data-label="Ações">
+                            ${r.status !== 'Pago' ? `<button class="btn btn-primary btn-sm" onclick="Receivables.markAsPaid('${r.id}')" title="Marcar como Pago"><i class="fas fa-check"></i> Pagar</button>` : `<span class="text-muted">Recebido</span>`}
                         </td>
                     </tr>
                 `;
             }).join('');
     },
-    async markAsPaid(id) {
+    markAsPaid: async (id) => {
         if (!confirm('Confirmar recebimento desta conta?')) return;
 
         const receivable = state.receivables.find(r => r.id === id);
-        if (!receivable) {
-            return Notification.error('Conta não encontrada.');
-        }
-
+        if (!receivable) return Notification.error('Conta não encontrada.');
+        
         const batch = db.batch();
-        const receivableRef = db.collection(CONFIG.collections.receivables).doc(id);
-        batch.update(receivableRef, { status: 'Pago', paidAt: new Date().toISOString() });
-        const cashFlowId = Utils.generateUUID();
+        const paidAtDate = new Date().toISOString();
+        
+        // Atualiza a conta a receber
+        batch.update(db.collection(CONFIG.collections.receivables).doc(id), { status: 'Pago', paidAt: paidAtDate });
+        
+        // Adiciona ao fluxo de caixa
         const cashFlowData = {
-            id: cashFlowId,
-            date: new Date().toISOString(),
+            id: Utils.generateUUID(),
+            date: paidAtDate,
             type: 'entrada',
-            description: `Recebimento da conta: ${receivable.description}`,
+            description: `Recebimento: ${receivable.description}`,
             value: receivable.value,
             source: 'recebivel',
             sourceId: id,
         };
-        batch.set(db.collection(CONFIG.collections.cashFlow).doc(cashFlowId), cashFlowData);
+        batch.set(db.collection(CONFIG.collections.cashFlow).doc(cashFlowData.id), cashFlowData);
 
         try {
             await batch.commit();
             Notification.success('Conta marcada como paga!');
             await App.loadAllData();
             await this.load();
+            await CashFlow.load(); // Recarrega o fluxo de caixa
         } catch (error) {
             Notification.error('Erro ao registrar pagamento.');
             console.error(error);
@@ -1089,16 +1399,14 @@ const Receivables = {
     },
     async updateStatuses() {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setHours(23, 59, 59, 999); // Final do dia
         const batch = db.batch();
         let hasChanges = false;
 
         state.receivables.forEach(r => {
             if (r.status === 'Pendente' && new Date(r.dueDate) < today) {
-                const ref = db.collection(CONFIG.collections.receivables).doc(r.id);
-                batch.update(ref, { status: 'Vencido' });
+                batch.update(db.collection(CONFIG.collections.receivables).doc(r.id), { status: 'Vencido' });
                 hasChanges = true;
-                r.status = 'Vencido';
             }
         });
 
@@ -1106,6 +1414,7 @@ const Receivables = {
             try {
                 await batch.commit();
                 console.log("Status de contas vencidas atualizados.");
+                await App.loadAllData(); // Recarrega dados após a atualização
             } catch (error) {
                 console.error("Erro ao atualizar status de contas vencidas:", error);
             }
@@ -1126,91 +1435,285 @@ const Receivables = {
     },
     saveManual: async (e) => {
         e.preventDefault();
-        const clientId = document.getElementById('receivableClient').value;
-        const description = document.getElementById('receivableDescription').value.trim();
-        const value = parseFloat(document.getElementById('receivableValue').value);
-        const dueDate = document.getElementById('receivableDueDate').value;
+        const data = {
+            id: Utils.generateUUID(),
+            clientId: document.getElementById('receivableClient').value,
+            description: document.getElementById('receivableDescription').value.trim(),
+            value: parseFloat(document.getElementById('receivableValue').value),
+            dueDate: document.getElementById('receivableDueDate').value,
+            status: 'Pendente',
+            createdAt: new Date().toISOString()
+        };
 
-        if (!clientId || !description || !value || !dueDate) {
-            return Notification.error('Todos os campos são obrigatórios para uma conta manual.');
+        if (!data.clientId || !data.description || !data.value || !data.dueDate) {
+            return Notification.error('Todos os campos são obrigatórios.');
         }
 
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
         try {
-            const receivableId = Utils.generateUUID();
-            const newReceivable = {
-                id: receivableId,
-                clientId,
-                description,
-                value,
-                dueDate,
-                status: 'Pendente',
-                createdAt: new Date().toISOString()
-            };
-            await db.collection(CONFIG.collections.receivables).doc(receivableId).set(newReceivable);
-            Notification.success('Conta a receber manual cadastrada com sucesso!');
-            Receivables.clearForm();
+            await db.collection(CONFIG.collections.receivables).doc(data.id).set(data);
+            Notification.success('Conta manual cadastrada!');
+            this.clearForm();
             await App.loadAllData();
-            await Receivables.load();
+            await this.load();
         } catch (error) {
-            Notification.error('Erro ao cadastrar conta a receber.');
+            Notification.error('Erro ao cadastrar conta.');
             console.error(error);
         } finally {
             submitButton.disabled = false;
         }
     },
-    clearForm: () => {
+    clearForm() {
         document.getElementById('receivableForm').reset();
+    },
+    exportToCSV() {
+        const headers = ['clientName', 'description', 'value', 'dueDate', 'status'];
+        const data = this.getFiltered().map(r => ({
+            clientName: state.clients.find(c => c.id === r.clientId)?.name || 'N/A',
+            description: r.description,
+            value: r.value,
+            dueDate: Utils.formatDate(r.dueDate),
+            status: r.status
+        }));
+        Utils.exportToCSV('contas_receber_flor_de_maria.csv', headers, data);
     }
 };
 
 const Reports = {
+    chart: null,
     init() {
-        document.getElementById('generateReportsBtn').addEventListener('click', this.generateReports);
+        document.getElementById('generateReport').addEventListener('click', this.generateReport);
+        document.getElementById('exportReportPDF').addEventListener('click', this.exportPDF);
+        document.getElementById('exportReportCSV').addEventListener('click', this.exportCSV);
+        
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        document.getElementById('reportStartDate').value = firstDayOfMonth;
+        document.getElementById('reportEndDate').value = Utils.getToday();
     },
     async load() {
-        this.updateStats();
+        // Limpa a área de resultados ao carregar a página
+        document.getElementById('reportResultContainer').classList.add('hidden');
     },
-    updateStats() {
-        document.getElementById('reportTotalSales').textContent = Utils.formatCurrency(state.sales.reduce((acc, s) => acc + s.total, 0));
-        document.getElementById('reportTotalExpenses').textContent = Utils.formatCurrency(state.expenses.reduce((acc, e) => acc + e.value, 0));
-        const totalProfit = state.sales.reduce((acc, s) => acc + s.total, 0) - state.expenses.reduce((acc, e) => acc + e.value, 0);
-        document.getElementById('reportTotalProfit').textContent = Utils.formatCurrency(totalProfit);
-        document.getElementById('reportTotalClients').textContent = state.clients.length;
+    generateReport: async () => {
+        const type = document.getElementById('reportType').value;
+        const startDate = document.getElementById('reportStartDate').value;
+        const endDate = document.getElementById('reportEndDate').value;
+
+        if (!startDate || !endDate) {
+            return Notification.error('Por favor, selecione as datas inicial e final.');
+        }
+        
+        document.getElementById('reportResultContainer').classList.remove('hidden');
+        
+        let reportData = [];
+        let summary = {};
+        let highlights = [];
+        let chartData = {};
+        let tableHeaders = [];
+        let tableRows = [];
+        let title = '';
+
+        const filteredSales = state.sales.filter(s => new Date(s.date) >= new Date(startDate) && new Date(s.date) <= new Date(endDate + 'T23:59:59'));
+        const filteredExpenses = state.expenses.filter(e => new Date(e.date) >= new Date(startDate) && new Date(e.date) <= new Date(endDate + 'T23:59:59'));
+
+        switch (type) {
+            case 'vendas':
+                title = "Relatório de Vendas";
+                summary = this.getSalesSummary(filteredSales);
+                highlights = this.getTopSellingProducts(filteredSales);
+                chartData = this.getSalesOverTimeChart(filteredSales, startDate, endDate);
+                tableHeaders = ['Data', 'Cliente', 'Itens', 'Pagamento', 'Total'];
+                tableRows = filteredSales.map(s => [Utils.formatDate(s.date), s.clientName, s.items.length, s.paymentMethod, Utils.formatCurrency(s.total)]);
+                state.currentReport.data = filteredSales.map(s => ({ Data: Utils.formatDate(s.date), Cliente: s.clientName, Itens: s.items.length, Pagamento: s.paymentMethod, Total: s.total }));
+                break;
+
+            case 'financeiro':
+                title = "Relatório Financeiro (DRE)";
+                summary = this.getFinancialSummary(filteredSales, filteredExpenses);
+                highlights = this.getTopExpenseCategories(filteredExpenses);
+                chartData = this.getRevenueVsExpenseChart(filteredSales, filteredExpenses, startDate, endDate);
+                tableHeaders = ['Data', 'Tipo', 'Descrição', 'Valor'];
+                const combined = [
+                    ...filteredSales.map(s => ({ date: s.date, type: 'Receita', description: `Venda #${s.id.substring(0,6)}`, value: s.total})),
+                    ...filteredExpenses.map(e => ({ date: e.date, type: 'Despesa', description: e.description, value: -e.value}))
+                ].sort((a,b) => new Date(a.date) - new Date(b.date));
+                tableRows = combined.map(item => [Utils.formatDate(item.date), item.type, item.description, Utils.formatCurrency(item.value)]);
+                state.currentReport.data = combined.map(item => ({ Data: Utils.formatDate(item.date), Tipo: item.type, Descrição: item.description, Valor: item.value }));
+                break;
+            
+            // Outros cases (produtos, clientes, etc.) podem ser adicionados aqui seguindo o mesmo padrão.
+            default:
+                 Notification.warning('Tipo de relatório não implementado.');
+                 document.getElementById('reportResultContainer').classList.add('hidden');
+                 return;
+        }
+        
+        state.currentReport.title = title;
+        state.currentReport.headers = tableHeaders;
+
+        this.renderSummary(summary);
+        this.renderHighlights(highlights, type);
+        this.renderChart(chartData);
+        this.renderTable(tableHeaders, tableRows);
     },
-    generateReports() {
-        let reportContent = `
-            <h2>Relatório Completo - ${CONFIG.company.name}</h2>
-            <p><strong>Data de Geração:</strong> ${Utils.formatDate(new Date().toISOString())}</p>
-            <hr>
+    
+    // Métodos de Geração de Dados para Relatórios
+    getSalesSummary(sales) {
+        const totalRevenue = sales.reduce((acc, s) => acc + s.total, 0);
+        const avgTicket = totalRevenue / (sales.length || 1);
+        return {
+            'Receita Total': Utils.formatCurrency(totalRevenue),
+            'Total de Vendas': sales.length,
+            'Ticket Médio': Utils.formatCurrency(avgTicket),
+            'Total de Itens Vendidos': sales.reduce((acc, s) => acc + s.items.reduce((iAcc, i) => iAcc + i.quantity, 0), 0),
+        };
+    },
+    getFinancialSummary(sales, expenses) {
+        const totalRevenue = sales.reduce((acc, s) => acc + s.total, 0);
+        const totalCost = sales.reduce((acc, s) => acc + s.totalCost, 0);
+        const totalExpenses = expenses.reduce((acc, e) => acc + e.value, 0);
+        const grossProfit = totalRevenue - totalCost;
+        const netProfit = grossProfit - totalExpenses;
+        return {
+            'Receita Bruta': Utils.formatCurrency(totalRevenue),
+            'Custos de Produtos (CMV)': Utils.formatCurrency(totalCost),
+            'Lucro Bruto': Utils.formatCurrency(grossProfit),
+            'Despesas Operacionais': Utils.formatCurrency(totalExpenses),
+            '<strong class="text-primary">Lucro Líquido</strong>': `<strong class="text-primary">${Utils.formatCurrency(netProfit)}</strong>`,
+        };
+    },
+    getTopSellingProducts(sales) {
+        const productSales = {};
+        sales.forEach(sale => {
+            sale.items.forEach(item => {
+                productSales[item.name] = (productSales[item.name] || 0) + item.quantity;
+            });
+        });
+        return Object.entries(productSales).sort((a,b) => b[1] - a[1]).slice(0,5);
+    },
+    getTopExpenseCategories(expenses) {
+        const categoryTotals = {};
+        expenses.forEach(expense => {
+            categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.value;
+        });
+        return Object.entries(categoryTotals).sort((a,b) => b[1] - a[1]).slice(0,5);
+    },
 
-            <h3>Resumo Financeiro</h3>
-            <p><strong>Vendas Totais:</strong> ${document.getElementById('reportTotalSales').textContent}</p>
-            <p><strong>Despesas Totais:</strong> ${document.getElementById('reportTotalExpenses').textContent}</p>
-            <p><strong>Lucro/Prejuízo Total:</strong> ${document.getElementById('reportTotalProfit').textContent}</p>
-            <hr>
+    // Métodos de Geração de Gráficos
+    getSalesOverTimeChart(sales, startDate, endDate) {
+        const labels = this.getDateLabels(startDate, endDate);
+        const data = labels.map(label => {
+            return sales
+                .filter(s => Utils.formatDate(s.date) === label)
+                .reduce((acc, s) => acc + s.total, 0);
+        });
+        return { 
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Vendas (R$)', data, borderColor: 'var(--primary-color)', tension: 0.1 }] },
+            title: 'Vendas ao Longo do Tempo'
+        };
+    },
+    getRevenueVsExpenseChart(sales, expenses, startDate, endDate) {
+        const labels = this.getDateLabels(startDate, endDate);
+        const revenueData = labels.map(label => sales.filter(s => Utils.formatDate(s.date) === label).reduce((acc, s) => acc + s.total, 0));
+        const expenseData = labels.map(label => expenses.filter(e => Utils.formatDate(e.date) === label).reduce((acc, e) => acc + e.value, 0));
+        
+        return {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Receita (R$)', data: revenueData, backgroundColor: 'var(--accent-color)' },
+                    { label: 'Despesa (R$)', data: expenseData, backgroundColor: 'var(--danger-color)' }
+                ]
+            },
+            title: 'Receita vs. Despesas'
+        };
+    },
+    getDateLabels(startDate, endDate) {
+        const labels = [];
+        let currentDate = new Date(startDate + 'T00:00:00');
+        const finalDate = new Date(endDate + 'T00:00:00');
+        while (currentDate <= finalDate) {
+            labels.push(Utils.formatDate(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return labels;
+    },
 
-            <h3>Vendas Recentes</h3>
-            <p>Detalhes das últimas 10 vendas...</p>
-            <ul>
-                ${state.sales.slice(0, 10).map(s => `<li>Venda #${s.id.substring(0, 6)} - ${s.clientName} - ${Utils.formatCurrency(s.total)}</li>`).join('')}
-            </ul>
-            <hr>
-
-            <h3>Contas Vencidas</h3>
-            <p>Contas a receber com status 'Vencido'...</p>
-            <ul>
-                ${state.receivables.filter(r => r.status === 'Vencido').map(r => `<li>${r.description} - Cliente: ${state.clients.find(c => c.id === r.clientId)?.name || 'N/A'} - ${Utils.formatCurrency(r.value)}</li>`).join('')}
-            </ul>
-        `;
-        Modal.show('Relatório Completo', `
-            <div class="report-preview">${reportContent}</div>
-            <div class="mt-4 text-right">
-                <button class="btn btn-primary" onclick="Utils.generatePDF(document.querySelector('.report-preview').innerHTML, 'relatorio-${Utils.getToday()}.pdf')"><i class="fas fa-print"></i> Imprimir/Salvar PDF</button>
+    // Métodos de Renderização
+    renderSummary(summary) {
+        const container = document.getElementById('reportSummaryContent');
+        container.innerHTML = Object.entries(summary).map(([key, value]) => `
+            <div class="text-center">
+                <div class="stat-value">${value}</div>
+                <div class="stat-label">${key}</div>
             </div>
-        `);
+        `).join('');
+    },
+    renderHighlights(highlights, type) {
+        const container = document.getElementById('topItemsList');
+        const titleEl = document.getElementById('reportHighlightsTitle');
+        const title = type === 'vendas' ? 'Produtos Mais Vendidos' : 'Principais Despesas';
+        titleEl.innerHTML = `<i class="fas fa-trophy"></i> ${title}`;
+        
+        if(highlights.length === 0){
+            container.innerHTML = `<p class="text-center text-muted p-3">Nenhum dado para destacar.</p>`;
+            return;
+        }
+
+        container.innerHTML = highlights.map(([name, value]) => `
+            <div class="top-item">
+                <span class="top-item-name">${name}</span>
+                <span class="top-item-value">${type === 'vendas' ? value + ' un.' : Utils.formatCurrency(value)}</span>
+            </div>
+        `).join('');
+    },
+    renderChart(chartConfig) {
+        const ctx = document.getElementById('reportChart').getContext('2d');
+        if (this.chart) this.chart.destroy();
+        this.chart = new Chart(ctx, {
+            type: chartConfig.type,
+            data: chartConfig.data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#94A3B8' }, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+                    x: { ticks: { color: '#94A3B8' }, grid: { display: false } }
+                },
+                plugins: { legend: { labels: { color: '#94A3B8' } } }
+            }
+        });
+    },
+    renderTable(headers, rows) {
+        const head = document.getElementById('reportTableHead');
+        const body = document.getElementById('reportTableBody');
+        head.innerHTML = `<tr>${headers.map(h => `<th data-label="${h}">${h}</th>`).join('')}</tr>`;
+        
+        if(rows.length === 0){
+            body.innerHTML = `<tr><td colspan="${headers.length}" class="text-center p-5">Nenhum dado detalhado para exibir.</td></tr>`;
+            return;
+        }
+
+        body.innerHTML = rows.map(row => `<tr>${row.map((cell, index) => `<td data-label="${headers[index]}">${cell}</td>`).join('')}</tr>`).join('');
+    },
+    
+    // Métodos de Exportação
+    exportPDF() {
+        const { title, headers, data } = state.currentReport;
+        if (!data || data.length === 0) return Notification.warning('Gere um relatório primeiro para exportar.');
+        const body = data.map(row => headers.map(header => row[header]));
+        Utils.exportToPDF(title, headers, body);
+    },
+    exportCSV() {
+        const { title, headers, data } = state.currentReport;
+        if (!data || data.length === 0) return Notification.warning('Gere um relatório primeiro para exportar.');
+        const filename = `${title.replace(/ /g, '_').toLowerCase()}_${Utils.getToday()}.csv`;
+        Utils.exportToCSV(filename, headers, data);
     }
 };
 
@@ -1235,7 +1738,15 @@ const Settings = {
         document.getElementById('backupReceivablesCount').textContent = state.receivables.length;
     },
     downloadBackup() {
-        const dataStr = JSON.stringify(state, null, 2);
+        const backupState = {
+            clients: state.clients,
+            products: state.products,
+            sales: state.sales,
+            cashFlow: state.cashFlow,
+            expenses: state.expenses,
+            receivables: state.receivables,
+        };
+        const dataStr = JSON.stringify(backupState, null, 2);
         const blob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -1260,6 +1771,7 @@ const Settings = {
 
                 Notification.warning("Restaurando dados... Por favor, aguarde.");
 
+                // Apaga os dados antigos
                 for (const collectionName of collections) {
                     const snapshot = await db.collection(collectionName).get();
                     const deleteBatch = db.batch();
@@ -1267,13 +1779,14 @@ const Settings = {
                     await deleteBatch.commit();
                 }
 
+                // Escreve os novos dados
                 for (const collectionName of collections) {
                     if (restoredState[collectionName] && Array.isArray(restoredState[collectionName])) {
                         const writeBatch = db.batch();
                         restoredState[collectionName].forEach(item => {
-                            const docId = item.id || Utils.generateUUID();
-                            const docRef = db.collection(collectionName).doc(docId);
-                            writeBatch.set(docRef, { ...item, id: docId });
+                            if (!item.id) item.id = Utils.generateUUID(); // Garante que todos os itens tenham ID
+                            const docRef = db.collection(collectionName).doc(item.id);
+                            writeBatch.set(docRef, item);
                         });
                         await writeBatch.commit();
                     }
