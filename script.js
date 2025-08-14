@@ -116,15 +116,15 @@ const App = {
             clients: 'name', products: 'name', sales: 'created_at',
             cash_flow: 'created_at', expenses: 'created_at', receivables: 'due_date'
         };
-        document.getElementById('loadingOverlay').classList.remove('hidden');
         const promises = Object.keys(tables).map(t => db.from(t).select('*'));
         const results = await Promise.allSettled(promises);
-        document.getElementById('loadingOverlay').classList.add('hidden');
+        
         results.forEach((res, i) => {
             const tableName = Object.keys(tables)[i];
             if (res.status === 'fulfilled' && !res.value.error) {
                 state[tableName] = res.value.data;
             } else {
+                console.error(`Falha ao carregar ${tableName}:`, res.value.error);
                 Notification.error(`Falha ao carregar ${tableName}.`);
                 state[tableName] = [];
             }
@@ -163,10 +163,15 @@ const Auth = {
     },
     async showApp() {
         document.body.className = 'state-loading';
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+        
         await App.loadAllData();
+        
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        document.body.className = 'state-app';
+        
         const lastPage = localStorage.getItem(CONFIG.storageKeys.lastActivePage) || 'dashboard';
         await Navigation.navigateTo(lastPage);
-        document.body.className = 'state-app';
     }
 };
 App.modules.Auth = Auth;
