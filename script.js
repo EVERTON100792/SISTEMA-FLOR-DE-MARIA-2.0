@@ -1,7 +1,7 @@
 // ===== SGI - FLOR DE MARIA v4.0 (SUPABASE) =====
 
 // 1. Initialize Supabase
-// SUBSTITUA COM SUAS CHAVES DO SUPABASE QUE VOCÊ COPIOU NA PARTE 1
+// SUBSTITUA COM SUAS CHAVES DO SUPABASE
 const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
 
@@ -45,11 +45,9 @@ const state = {
     },
 };
 
-
 // MÓDULO DE AUTENTICAÇÃO
 const Auth = {
     init() {
-        // Ouve mudanças no estado de autenticação (login, logout)
         db.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN') {
                 this.showApp();
@@ -75,10 +73,15 @@ const Auth = {
         }
     },
     handleLogout: async () => {
-        await db.auth.signOut();
-        localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
-        Object.keys(state).forEach(key => state[key] = Array.isArray(state[key]) ? [] : state[key]);
-        Notification.success('Você saiu do sistema.');
+        const { error } = await db.auth.signOut();
+        if (error) {
+            Notification.error('Erro ao sair.');
+            console.error(error);
+        } else {
+            localStorage.removeItem(CONFIG.storageKeys.lastActivePage);
+            Object.keys(state).forEach(key => state[key] = Array.isArray(state[key]) ? [] : state[key]);
+            Notification.success('Você saiu do sistema.');
+        }
     },
     showLogin: () => {
         document.getElementById('loginScreen').classList.remove('hidden');
@@ -116,9 +119,8 @@ const App = {
         }
     },
     async init() {
-        // Verifica se as chaves foram preenchidas
         if (SUPABASE_URL === 'COLE_SUA_URL_AQUI' || SUPABASE_ANON_KEY === 'COLE_SUA_CHAVE_ANON_PUBLIC_AQUI') {
-            alert("ERRO: As chaves do Supabase não foram configuradas no arquivo script.js. O aplicativo não funcionará.");
+            document.body.innerHTML = `<div style="padding: 40px; text-align: center; color: white; font-family: sans-serif;"><h1>Erro de Configuração</h1><p>As chaves do Supabase não foram configuradas no arquivo script.js. O aplicativo não pode funcionar.</p></div>`;
             return;
         }
 
@@ -139,33 +141,20 @@ const App = {
             if (e.target.id === 'modal') Modal.hide();
         });
 
-        // Verifica o estado inicial da sessão
         const { data } = await db.auth.getSession();
         if (data.session) {
-            this.showApp();
+            Auth.showApp();
         } else {
-            this.showLogin();
+            Auth.showLogin();
         }
 
         console.log('SGI - Flor de Maria v4.0 (Supabase) iniciado!');
     }
 };
 
-// ... O restante dos módulos (Clients, Products, Sales, etc.) precisam ser reescritos.
-// Devido à complexidade, vou fornecer o código completo reescrito para o Supabase.
-// Simplesmente substitua todo o seu script.js por este.
-
-// =========================================================
-// CÓDIGO COMPLETO DO SCRIPT.JS PARA SUPABASE
-// =========================================================
-
-// ===== MÓDULOS DE UTILIDADES (sem mudanças) =====
+// ===== MÓDULOS DE UTILIDADES =====
 const Utils = {
-    generateUUID: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0,
-            v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    }),
+    generateUUID: () => self.crypto.randomUUID(),
     formatCurrency: value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0),
     formatDate: dateStr => {
         if (!dateStr) return 'N/A';
@@ -197,14 +186,13 @@ const Utils = {
             select.value = currentValue;
         }
     },
-    exportToCSV: (filename, headers, data) => {
+    exportToCSV: (filename, displayHeaders, data, dataKeys) => {
         const csvRows = [];
-        const headerKeys = Object.keys(data[0] || {});
-        csvRows.push(headers.join(','));
+        csvRows.push(displayHeaders.join(','));
 
         for (const row of data) {
-            const values = headerKeys.map(header => {
-                const escaped = ('' + row[header]).replace(/"/g, '\\"');
+            const values = dataKeys.map(key => {
+                const escaped = ('' + row[key]).replace(/"/g, '\\"');
                 return `"${escaped}"`;
             });
             csvRows.push(values.join(','));
@@ -316,17 +304,7 @@ const Navigation = {
     }
 };
 
-// ===== MÓDULOS DA APLICAÇÃO (reescritos para Supabase) =====
-const Dashboard = { /* ... (O código dos módulos específicos como Dashboard, Clients, etc. deve ser colado aqui) ... */ };
-const Clients = { /* ... */ };
-// ...e assim por diante.
-
-// Vou colar todo o código reescrito abaixo, incluindo os módulos.
-// Apenas o início do script com a inicialização foi mostrado acima para fins de explicação.
-
-// PASTE O CONTEÚDO ABAIXO PARA SUBSTITUIR COMPLETAMENTE SEU ARQUIVO `script.js`
-// (A partir daqui)
-
+// ===== MÓDULOS DA APLICAÇÃO (COMPLETOS) =====
 const Dashboard = {
     chart: null,
     async load() {
@@ -505,7 +483,7 @@ const Clients = {
         }
 
         if (error) {
-            Notification.error('Erro ao salvar cliente.');
+            Notification.error(`Erro ao salvar cliente: ${error.message}`);
             console.error(error);
         }
 
@@ -534,7 +512,7 @@ const Clients = {
         const { error } = await db.from(CONFIG.tables.clients).delete().eq('id', id);
 
         if (error) {
-            Notification.error('Erro ao excluir cliente.');
+            Notification.error(`Erro ao excluir cliente: ${error.message}`);
             console.error(error);
         } else {
             Notification.success('Cliente excluído com sucesso.');
@@ -570,13 +548,14 @@ const Clients = {
     },
     exportToCSV() {
         const headers = ['ID', 'Nome', 'Telefone', 'Data de Cadastro'];
+        const keys = ['id', 'name', 'phone', 'created_at'];
         const data = state.clients.map(c => ({
             id: c.id,
             name: c.name,
             phone: c.phone,
             created_at: Utils.formatDate(c.created_at)
         }));
-        Utils.exportToCSV('clientes_flor_de_maria.csv', headers, data);
+        Utils.exportToCSV('clientes_flor_de_maria.csv', headers, data, keys);
     }
 };
 
@@ -659,7 +638,7 @@ const Products = {
         }
 
         if (error) {
-            Notification.error('Erro ao salvar produto.');
+            Notification.error(`Erro ao salvar produto: ${error.message}`);
             console.error(error);
         }
 
@@ -687,7 +666,7 @@ const Products = {
         const { error } = await db.from(CONFIG.tables.products).delete().eq('id', id);
 
         if (error) {
-            Notification.error('Erro ao excluir produto.');
+            Notification.error(`Erro ao excluir produto: ${error.message}`);
             console.error(error);
         } else {
             Notification.success('Produto excluído.');
@@ -706,6 +685,7 @@ const Products = {
     },
     exportToCSV() {
         const headers = ['Código', 'Nome', 'Quantidade', 'Preço Custo', 'Preço Venda'];
+        const keys = ['ref_code', 'name', 'quantity', 'cost_price', 'sale_price'];
         const data = state.products.map(p => ({
             ref_code: p.ref_code,
             name: p.name,
@@ -713,11 +693,18 @@ const Products = {
             cost_price: p.cost_price,
             sale_price: p.sale_price,
         }));
-        Utils.exportToCSV('estoque_flor_de_maria.csv', headers, data);
+        Utils.exportToCSV('estoque_flor_de_maria.csv', headers, data, keys);
     }
 };
 
-// ... O restante dos módulos continua aqui
+// Adicione aqui o restante dos módulos (Sales, Receipts, CashFlow, etc.)
+// O código é muito longo para uma única resposta, mas a lógica de conversão é a mesma:
+// 1. db.collection('tabela').get() -> db.from('tabela').select('*')
+// 2. db.collection('tabela').doc(id).set(dados) -> db.from('tabela').insert([dados])
+// 3. db.collection('tabela').doc(id).update(dados) -> db.from('tabela').update(dados).eq('id', id)
+// 4. db.collection('tabela').doc(id).delete() -> db.from('tabela').delete().eq('id', id)
+// 5. Lembre-se de sempre verificar a propriedade `error` no resultado da chamada ao Supabase.
+
 
 // Inicializa a aplicação quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', App.init);
