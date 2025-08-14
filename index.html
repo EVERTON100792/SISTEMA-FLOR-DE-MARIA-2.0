@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v7.4 - CORREÇÃO DE BUGS */
+        /* SGI - FLOR DE MARIA v7.5 - AJUSTES DE PDV E RECIBO */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -77,9 +77,9 @@
 
         .mobile-menu-toggle { display: none; }
 
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); text-decoration: none; }
+        .btn.disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:hover:not(:disabled):not(.disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
         .btn-primary { background: var(--primary-color); color: var(--text-primary); }
         .btn-secondary { background: var(--surface-bg); color: var(--text-primary); border-color: var(--border-color); }
         .btn-danger { background: var(--danger-color); color: var(--text-primary); }
@@ -141,7 +141,12 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: var(--secondary-bg); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--hover-bg); border-radius: 10px; border: 2px solid var(--secondary-bg); }
 
-        .product-list-pdv { max-height: 400px; overflow-y: scroll; padding-right: 10px; }
+        /* MODIFICAÇÃO: Ajuste na lista de produtos do PDV para ser rolável */
+        .product-list-pdv {
+            height: 400px; /* Força uma altura fixa */
+            overflow-y: auto; /* Adiciona scrollbar vertical apenas quando necessário */
+            padding-right: 10px;
+        }
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
         .product-item-pdv:hover { background-color: var(--hover-bg); }
         .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
@@ -551,7 +556,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v7.4 (Com Correção de Bugs de Exclusão) =====
+    // ===== SGI - FLOR DE MARIA v7.5 (Com Correção de Bugs e Melhorias) =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -668,7 +673,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v7.4 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v7.5 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -836,12 +841,12 @@
             container.innerHTML = overdue.map(r => {
                 const client = state.clients.find(c => c.id === r.client_id)?.name || 'Cliente não encontrado';
                 return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color);">
-                        <div>
-                            <p style="font-weight: bold;">${client}</p>
-                            <p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p>
-                        </div>
-                        <strong style="color: var(--danger-color);">${Utils.formatCurrency(r.value)}</strong>
-                    </div>`;
+                            <div>
+                                <p style="font-weight: bold;">${client}</p>
+                                <p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p>
+                            </div>
+                            <strong style="color: var(--danger-color);">${Utils.formatCurrency(r.value)}</strong>
+                        </div>`;
             }).join('');
         }
     };
@@ -1072,6 +1077,100 @@
             }
             document.getElementById('pdvTotal').textContent = Utils.formatCurrency(total);
         },
+        // NOVA FUNÇÃO: Gera e exibe o modal do recibo
+        showReceiptModal(sale) {
+            const client = state.clients.find(c => c.id === sale.client_id);
+            const company = CONFIG.company;
+
+            const itemsHtml = sale.items.map(item => `
+                <tr>
+                    <td style="padding: 8px 0;">${item.quantity}x ${item.name}</td>
+                    <td style="text-align: right; padding: 8px 0;">${Utils.formatCurrency(item.price * item.quantity)}</td>
+                </tr>
+            `).join('');
+
+            let whatsappText = `*Recibo - ${company.name}*\n\n`;
+            whatsappText += `Olá, ${client?.name}! Segue o recibo da sua compra.\n\n`;
+            whatsappText += `*Venda ID:* #${sale.id}\n`;
+            whatsappText += `*Data:* ${Utils.formatDate(sale.date)}\n\n`;
+            whatsappText += `*Itens:*\n`;
+            sale.items.forEach(item => {
+                whatsappText += `- ${item.quantity}x ${item.name} (${Utils.formatCurrency(item.price * item.quantity)})\n`;
+            });
+            whatsappText += `\n*Total:* ${Utils.formatCurrency(sale.total)}\n`;
+            whatsappText += `*Pagamento:* ${sale.payment_method}\n\n`;
+            whatsappText += `Agradecemos a preferência! 😊`;
+
+            const encodedText = encodeURIComponent(whatsappText);
+            let whatsappLink = '#';
+            if (client && client.phone) {
+                const phoneNumber = `55${client.phone.replace(/\D/g, '')}`;
+                whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedText}`;
+            }
+            
+            const modalContent = `
+                <div id="receipt-content" style="background: var(--primary-bg); color: var(--text-primary); padding: 25px; border-radius: 8px; font-family: 'Segoe UI', sans-serif;">
+                    <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
+                        <h2 style="color: var(--primary-color); margin: 0; font-size: 24px;">${company.name}</h2>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0;">${company.address}</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0;">CNPJ: ${company.cnpj}</p>
+                    </div>
+                    <div>
+                        <p><strong>Recibo Venda:</strong> #${sale.id}</p>
+                        <p><strong>Data:</strong> ${Utils.formatDate(sale.date)}</p>
+                        <p><strong>Cliente:</strong> ${client?.name || 'N/A'}</p>
+                    </div>
+                    <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Item</th>
+                                <th style="text-align: right; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td style="text-align: right; padding-top: 15px; font-size: 18px;"><strong>Total:</strong></td>
+                                <td style="text-align: right; padding-top: 15px; font-size: 18px; color: var(--accent-color);"><strong>${Utils.formatCurrency(sale.total)}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; padding-top: 5px;">Pagamento:</td>
+                                <td style="text-align: right; padding-top: 5px;">${sale.payment_method}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                     <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
+                        Obrigado pela sua compra!
+                    </div>
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                     <button id="newSaleBtn" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> Nova Venda</button>
+                     <a href="${whatsappLink}" target="_blank" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn">
+                         <i class="fab fa-whatsapp"></i> Enviar p/ Cliente
+                     </a>
+                </div>
+            `;
+
+            Modal.show(`Venda #${sale.id} Finalizada!`, modalContent);
+
+            document.getElementById('newSaleBtn').addEventListener('click', () => {
+                Modal.hide();
+                App.loadAllData(false).then(() => {
+                    this.load(); 
+                });
+            });
+
+            if (!client || !client.phone) {
+                document.getElementById('sendWhatsappBtn').addEventListener('click', (e) => {
+                    if (e.currentTarget.classList.contains('disabled')) {
+                        e.preventDefault();
+                        Notification.warning('Cliente não possui telefone cadastrado para envio.');
+                    }
+                });
+            }
+        },
         async finalizeSale() {
             if (state.cart.length === 0) return Notification.warning('O carrinho está vazio.');
             
@@ -1131,9 +1230,9 @@
                     if(receivablesError) throw receivablesError;
                 }
                 
+                // MODIFICAÇÃO: Exibir modal de recibo em vez de navegar
                 Notification.success('Venda finalizada com sucesso!');
-                this.clearSale();
-                await Navigation.navigateTo('dashboard');
+                this.showReceiptModal(newSale);
 
             } catch (error) {
                 Notification.error(`Erro ao finalizar a venda: ${error.message}`);
@@ -1152,7 +1251,8 @@
         }
     };
     
-    App.modules.Receipts = {
+    // O restante do seu JavaScript (módulos Receipts, CashFlow, Expenses, etc.) continua aqui...
+	App.modules.Receipts = {
         pageId: 'receipts',
         load() { this.render(); },
         render() {
