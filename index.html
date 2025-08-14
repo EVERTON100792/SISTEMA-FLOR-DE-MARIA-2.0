@@ -147,7 +147,7 @@
                         </div>
                         <div class="flex-between">
                             <span id="clientCount" class="text-muted">0 clientes cadastrados</span>
-                            <button class="btn btn-secondary btn-sm" id="exportClients"><i class="fas fa-download"></i> Exportar</button>
+                            <button class="btn btn-secondary btn-sm" id="exportClients"><i class="fas fa-download"></i> Exportar CSV</button>
                         </div>
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="Nome">Nome</th><th data-label="Telefone">Telefone</th><th data-label="Cadastro">Cadastro</th><th data-label="Compras">Compras</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="clientsTableBody"></tbody>
                         </table>
                     </div>
@@ -215,14 +215,14 @@
                         <div class="form-group">
                             <input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código">
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;"><i class="fas fa-download"></i> Exportar Estoque</button>
+                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;"><i class="fas fa-download"></i> Exportar Estoque (CSV)</button>
                     </div>
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="Código">Código</th><th data-label="Nome">Nome</th><th data-label="Qtd.">Qtd.</th><th data-label="P. Custo">P. Custo</th><th data-label="P. Venda">P. Venda</th><th data-label="Margem">Margem</th><th data-label="Status">Status</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="productsTableBody"></tbody>
                         </table>
                     </div>
@@ -250,7 +250,7 @@
                                  </div>
                                  <div class="table-responsive" style="max-height: 400px; overflow-y:auto;">
                                      <table class="table" id="pdvCartTable">
-                                         <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Qtd.</th><th>Subtotal</th><th>Ações</th></tr></thead>
+                                         <thead><tr><th data-label="Produto">Produto</th><th data-label="Preço Unit.">Preço Unit.</th><th data-label="Qtd.">Qtd.</th><th data-label="Subtotal">Subtotal</th><th data-label="Ações">Ações</th></tr></thead>
                                          <tbody id="cartTableBody">
                                              <tr><td colspan="5" class="text-center" style="padding: 40px;">Carrinho vazio</td></tr>
                                          </tbody>
@@ -313,7 +313,7 @@
                         </div>
                          <div class="form-group">
                             <label class="form-label">&nbsp;</label>
-                             <button id="clearReceiptFilters" class="btn btn-secondary" style="width:100%"><i class="fas fa-times"></i> Limpar Filtros</button>
+                            <button id="clearReceiptFilters" class="btn btn-secondary" style="width:100%"><i class="fas fa-times"></i> Limpar Filtros</button>
                          </div>
                     </div>
                 </div>
@@ -321,7 +321,7 @@
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Vendas</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="ID da Venda">ID da Venda</th><th data-label="Data">Data</th><th data-label="Cliente">Cliente</th><th data-label="Total">Total</th><th data-label="Pagamento">Pagamento</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="receiptsTableBody"></tbody>
                         </table>
                     </div>
@@ -383,14 +383,14 @@
                         <div class="form-group mt-3">
                             <input type="text" id="cashFlowSearch" class="form-input" placeholder="Buscar lançamento por descrição">
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;"><i class="fas fa-download"></i> Exportar Fluxo de Caixa</button>
+                        <button class="btn btn-secondary btn-sm" id="exportCashFlow" style="width: 100%;"><i class="fas fa-download"></i> Exportar Fluxo de Caixa (CSV)</button>
                     </div>
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Histórico de Lançamentos</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="Data">Data</th><th data-label="Tipo">Tipo</th><th data-label="Descrição">Descrição</th><th data-label="Valor">Valor</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="cashFlowTableBody"></tbody>
                         </table>
                     </div>
@@ -462,8 +462,8 @@
                         <div class="flex gap-2">
                             <select id="expenseFilterCategory" class="form-select">
                                 <option value="">Todas as categorias</option>
-                                </select>
-                            <button class="btn btn-secondary btn-sm" id="exportExpenses"><i class="fas fa-download"></i> Exportar</button>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" id="exportExpenses"><i class="fas fa-download"></i> Exportar (CSV)</button>
                         </div>
                     </div>
                 </div>
@@ -471,7 +471,7 @@
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Despesas</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="Data">Data</th><th data-label="Descrição">Descrição</th><th data-label="Categoria">Categoria</th><th data-label="Valor">Valor</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="expensesTableBody"></tbody>
                         </table>
                     </div>
@@ -537,7 +537,7 @@
                                 <option value="Pago">Pago</option>
                                 <option value="Vencido">Vencido</option>
                             </select>
-                            <button class="btn btn-secondary btn-sm" id="exportReceivables"><i class="fas fa-download"></i> Exportar</button>
+                            <button class="btn btn-secondary btn-sm" id="exportReceivables"><i class="fas fa-download"></i> Exportar (CSV)</button>
                         </div>
                     </div>
                 </div>
@@ -545,7 +545,7 @@
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Lista de Contas a Receber</h3></div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
+                            <thead><tr><th data-label="Cliente">Cliente</th><th data-label="Descrição">Descrição</th><th data-label="Valor">Valor</th><th data-label="Vencimento">Vencimento</th><th data-label="Status">Status</th><th data-label="Ações">Ações</th></tr></thead>
                             <tbody id="receivablesTableBody"></tbody>
                         </table>
                     </div>
