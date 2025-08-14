@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v7.5 - AJUSTES DE PDV E RECIBO */
+        /* SGI - FLOR DE MARIA v7.7 - CORREÇÃO FINAL DE SCROLL PDV E PDF WHATSAPP */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -132,7 +132,7 @@
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
-        .grid-layout-pdv { grid-template-columns: 2fr 1fr; }
+        .grid-layout-pdv { grid-template-columns: 2fr 1fr; align-items: start; }
         .mt-4 { margin-top: 24px; }
         .mb-2 { margin-bottom: 16px; }
         .text-center { text-align: center; }
@@ -140,11 +140,16 @@
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: var(--secondary-bg); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--hover-bg); border-radius: 10px; border: 2px solid var(--secondary-bg); }
-
-        /* MODIFICAÇÃO: Ajuste na lista de produtos do PDV para ser rolável */
+        
+        /* NOVA CORREÇÃO: Força o card a ter uma altura e a lista a rolar internamente */
+        #pdv-product-card {
+            height: 75vh; /* Define uma altura relativa à tela */
+            max-height: 700px; /* Limite máximo de altura */
+        }
         .product-list-pdv {
-            height: 400px; /* Força uma altura fixa */
-            overflow-y: auto; /* Adiciona scrollbar vertical apenas quando necessário */
+            flex-grow: 1; /* Faz a lista ocupar o espaço restante no card */
+            overflow-y: auto; /* Adiciona a rolagem quando necessário */
+            min-height: 0; /* Correção para bug de overflow em flexbox */
             padding-right: 10px;
         }
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
@@ -159,6 +164,7 @@
         }
 
         @media (max-width: 900px) {
+            #pdv-product-card { height: auto; max-height: 40vh; } /* Ajuste de altura para mobile */
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 80px 15px 20px; }
@@ -348,9 +354,9 @@
                     <p class="page-subtitle">Realize uma nova venda</p>
                 </div>
                 <div class="grid grid-layout-pdv">
-                    <div class="card">
+                    <div class="card" id="pdv-product-card">
                         <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> Buscar Produtos</h3></div>
-                        <div class="form-group"><input type="text" id="pdvProductSearch" class="form-input" placeholder="Digite o nome ou código do produto..."></div>
+                        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="pdvProductSearch" class="form-input" placeholder="Digite o nome ou código do produto..."></div>
                         <div id="pdvProductList" class="product-list-pdv custom-scrollbar"></div>
                     </div>
                     <div class="card">
@@ -556,7 +562,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v7.5 (Com Correção de Bugs e Melhorias) =====
+    // ===== SGI - FLOR DE MARIA v7.7 (Com Correção de Bugs e Melhorias) =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -673,7 +679,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v7.5 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v7.7 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -1077,7 +1083,44 @@
             }
             document.getElementById('pdvTotal').textContent = Utils.formatCurrency(total);
         },
-        // NOVA FUNÇÃO: Gera e exibe o modal do recibo
+        generateAndDownloadReceiptPDF(sale) {
+            if (!sale) return;
+            const client = state.clients.find(c => c.id === sale.client_id);
+            const { company } = CONFIG;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text(company.name, 105, 20, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(company.address, 105, 26, { align: 'center' });
+            doc.text(`CNPJ: ${company.cnpj} | Telefone: ${company.phone}`, 105, 32, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text(`Recibo de Venda #${sale.id}`, 105, 45, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(`Data: ${Utils.formatDate(sale.date)}`, 14, 55);
+            doc.text(`Cliente: ${client?.name || 'Não identificado'}`, 14, 62);
+            doc.text(`Telefone: ${client?.phone || 'N/A'}`, 14, 69);
+            
+            const head = [['Qtd', 'Produto', 'Preço Unit.', 'Subtotal']];
+            const body = sale.items.map(item => [
+                item.quantity,
+                item.name,
+                Utils.formatCurrency(item.price),
+                Utils.formatCurrency(item.price * item.quantity)
+            ]);
+            
+            doc.autoTable({ head, body, startY: 75, theme: 'striped' });
+
+            const finalY = doc.lastAutoTable.finalY;
+            doc.setFontSize(14);
+            doc.text('Total:', 150, finalY + 10, { align: 'right' });
+            doc.text(Utils.formatCurrency(sale.total), 200, finalY + 10, { align: 'right' });
+            doc.text('Pagamento:', 150, finalY + 17, { align: 'right' });
+            doc.text(sale.payment_method, 200, finalY + 17, { align: 'right' });
+
+            doc.save(`recibo_${sale.id}.pdf`);
+        },
         showReceiptModal(sale) {
             const client = state.clients.find(c => c.id === sale.client_id);
             const company = CONFIG.company;
@@ -1089,25 +1132,6 @@
                 </tr>
             `).join('');
 
-            let whatsappText = `*Recibo - ${company.name}*\n\n`;
-            whatsappText += `Olá, ${client?.name}! Segue o recibo da sua compra.\n\n`;
-            whatsappText += `*Venda ID:* #${sale.id}\n`;
-            whatsappText += `*Data:* ${Utils.formatDate(sale.date)}\n\n`;
-            whatsappText += `*Itens:*\n`;
-            sale.items.forEach(item => {
-                whatsappText += `- ${item.quantity}x ${item.name} (${Utils.formatCurrency(item.price * item.quantity)})\n`;
-            });
-            whatsappText += `\n*Total:* ${Utils.formatCurrency(sale.total)}\n`;
-            whatsappText += `*Pagamento:* ${sale.payment_method}\n\n`;
-            whatsappText += `Agradecemos a preferência! 😊`;
-
-            const encodedText = encodeURIComponent(whatsappText);
-            let whatsappLink = '#';
-            if (client && client.phone) {
-                const phoneNumber = `55${client.phone.replace(/\D/g, '')}`;
-                whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedText}`;
-            }
-            
             const modalContent = `
                 <div id="receipt-content" style="background: var(--primary-bg); color: var(--text-primary); padding: 25px; border-radius: 8px; font-family: 'Segoe UI', sans-serif;">
                     <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
@@ -1147,9 +1171,9 @@
                 </div>
                 <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                      <button id="newSaleBtn" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> Nova Venda</button>
-                     <a href="${whatsappLink}" target="_blank" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn">
-                         <i class="fab fa-whatsapp"></i> Enviar p/ Cliente
-                     </a>
+                     <button id="sendPdfWhatsappBtn" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}">
+                         <i class="fab fa-whatsapp"></i> Enviar PDF via WhatsApp
+                     </button>
                 </div>
             `;
 
@@ -1162,14 +1186,24 @@
                 });
             });
 
-            if (!client || !client.phone) {
-                document.getElementById('sendWhatsappBtn').addEventListener('click', (e) => {
-                    if (e.currentTarget.classList.contains('disabled')) {
-                        e.preventDefault();
-                        Notification.warning('Cliente não possui telefone cadastrado para envio.');
-                    }
-                });
-            }
+            const whatsappBtn = document.getElementById('sendPdfWhatsappBtn');
+            whatsappBtn.addEventListener('click', () => {
+                if (whatsappBtn.classList.contains('disabled')) {
+                    Notification.warning('Cliente não possui telefone cadastrado.');
+                    return;
+                }
+                
+                this.generateAndDownloadReceiptPDF(sale);
+
+                const whatsappText = `Olá, ${client?.name}! Segue em anexo o recibo em PDF da sua compra. Agradecemos a preferência! 😊`;
+                const encodedText = encodeURIComponent(whatsappText);
+                const phoneNumber = `55${client.phone.replace(/\D/g, '')}`;
+                const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedText}`;
+                
+                setTimeout(() => {
+                    window.open(whatsappLink, '_blank');
+                }, 500);
+            });
         },
         async finalizeSale() {
             if (state.cart.length === 0) return Notification.warning('O carrinho está vazio.');
@@ -1230,7 +1264,6 @@
                     if(receivablesError) throw receivablesError;
                 }
                 
-                // MODIFICAÇÃO: Exibir modal de recibo em vez de navegar
                 Notification.success('Venda finalizada com sucesso!');
                 this.showReceiptModal(newSale);
 
@@ -1251,7 +1284,6 @@
         }
     };
     
-    // O restante do seu JavaScript (módulos Receipts, CashFlow, Expenses, etc.) continua aqui...
 	App.modules.Receipts = {
         pageId: 'receipts',
         load() { this.render(); },
@@ -1280,60 +1312,13 @@
         viewDetails(saleId) {
             const sale = state.sales.find(s => s.id == saleId);
             if (!sale) return;
-            const client = state.clients.find(c => c.id === sale.client_id);
-            const content = `
-                <p><strong>Cliente:</strong> ${client?.name || 'N/A'}</p>
-                <p><strong>Data:</strong> ${Utils.formatDate(sale.date)}</p>
-                <p><strong>Pagamento:</strong> ${sale.payment_method}</p>
-                <h4 style="margin-top: 20px; margin-bottom: 10px;">Itens:</h4>
-                <ul style="padding-left: 20px;">
-                    ${sale.items.map(item => `<li>${item.quantity}x ${item.name} - ${Utils.formatCurrency(item.price)} cada</li>`).join('')}
-                </ul>
-                <hr style="margin: 15px 0; border-color: var(--border-color);">
-                <p class="text-right" style="font-size: 1.2rem;"><strong>Total: ${Utils.formatCurrency(sale.total)}</strong></p>
-            `;
-            Modal.show(`Detalhes da Venda #${sale.id}`, content);
+            // Reutiliza o modal do módulo de vendas
+            App.modules.Sales.showReceiptModal(sale);
         },
         printReceipt(saleId) {
             const sale = state.sales.find(s => s.id == saleId);
             if (!sale) return;
-            const client = state.clients.find(c => c.id === sale.client_id);
-            const { company } = CONFIG;
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.setFontSize(18);
-            doc.text(company.name, 105, 20, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(company.address, 105, 26, { align: 'center' });
-            doc.text(`CNPJ: ${company.cnpj} | Telefone: ${company.phone}`, 105, 32, { align: 'center' });
-
-            doc.setFontSize(16);
-            doc.text(`Recibo de Venda #${sale.id}`, 105, 45, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.text(`Data: ${Utils.formatDate(sale.date)}`, 14, 55);
-            doc.text(`Cliente: ${client?.name || 'Não identificado'}`, 14, 62);
-            doc.text(`Telefone: ${client?.phone || 'N/A'}`, 14, 69);
-            
-            const head = [['Qtd', 'Produto', 'Preço Unit.', 'Subtotal']];
-            const body = sale.items.map(item => [
-                item.quantity,
-                item.name,
-                Utils.formatCurrency(item.price),
-                Utils.formatCurrency(item.price * item.quantity)
-            ]);
-            
-            doc.autoTable({ head, body, startY: 75, theme: 'striped' });
-
-            const finalY = doc.lastAutoTable.finalY;
-            doc.setFontSize(14);
-            doc.text('Total:', 150, finalY + 10, { align: 'right' });
-            doc.text(Utils.formatCurrency(sale.total), 200, finalY + 10, { align: 'right' });
-            doc.text('Pagamento:', 150, finalY + 17, { align: 'right' });
-            doc.text(sale.payment_method, 200, finalY + 17, { align: 'right' });
-
-            doc.save(`recibo_${sale.id}.pdf`);
+            App.modules.Sales.generateAndDownloadReceiptPDF(sale);
         }
     };
 
