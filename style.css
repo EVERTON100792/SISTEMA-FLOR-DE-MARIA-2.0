@@ -1,4 +1,4 @@
-/* ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.4 (Correção de Rolagem) ===== */
+/* ===== SISTEMA DE GESTÃO INTEGRADO - FLOR DE MARIA v3.5 ===== */
 
 /* ===== RESET E VARIÁVEIS CSS ===== */
 * {
@@ -303,14 +303,11 @@ body::before {
 }
 .sidebar-nav-link i { width: 20px; text-align: center; }
 
-/* --- CORREÇÃO DE ROLAGEM --- */
 .main-content {
     flex: 1;
     margin-left: 260px;
     padding: 32px;
     transition: margin-left 0.3s ease-in-out;
-    /* As linhas 'height: 100vh' e 'overflow-y: auto' foram removidas */
-    /* para permitir que a rolagem principal da página funcione. */
 }
 .page-header { margin-bottom: 32px; }
 .page-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
@@ -384,7 +381,7 @@ body::before {
     background: var(--secondary-bg);
     border-radius: 12px;
     padding: 24px;
-    max-width: 700px;
+    max-width: 800px;
     width: 90%;
     max-height: 85vh;
     display: flex;
@@ -407,7 +404,7 @@ body::before {
 .stat-label { font-size: 14px; color: var(--text-muted); }
 .chart-container { position: relative; min-height: 350px; width: 100%; }
 
-#overdueAccounts > div {
+.overdue-item {
     padding: 12px;
     border-left: 4px solid var(--danger-color);
     background: rgba(239, 68, 68, 0.1);
@@ -415,35 +412,13 @@ body::before {
     border-radius: 4px;
 }
 
-/* Estilo do recibo no modal */
-.receipt-professional-container {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #ffffff;
-    color: #212529;
-    padding: 2rem;
-    border-radius: 8px;
-}
-.receipt-professional-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.receipt-logo-container { font-size: 2.5rem; color: #3b82f6; }
-.receipt-company-details { text-align: right; }
-.receipt-company-details h3 { margin: 0; font-size: 1.5rem; }
-.receipt-company-details p { margin: 2px 0; font-size: 0.9rem; color: #6c757d; }
-.receipt-sale-info { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-.receipt-items-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
-.receipt-items-table thead { background-color: #f8f9fa; }
-.receipt-items-table th, .receipt-items-table td { padding: 0.75rem; border-bottom: 1px solid #dee2e6; text-align: left; }
-.receipt-summary { display: flex; justify-content: flex-end; }
-.receipt-summary table { width: 50%; max-width: 300px; }
-.receipt-summary .total-value { font-weight: bold; font-size: 1.25rem; color: #3b82f6; }
-.receipt-footer { margin-top: 2rem; padding-top: 1rem; text-align: center; border-top: 1px solid #dee2e6; font-size: 0.85rem; color: #6c757d; }
-
-#productSuggestions div {
+#productSuggestions .suggestion-item {
     padding: 12px 16px;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
 }
-#productSuggestions div:last-child { border-bottom: none; }
-#productSuggestions div:hover { background: var(--hover-bg); }
+#productSuggestions .suggestion-item:last-child { border-bottom: none; }
+#productSuggestions .suggestion-item:hover { background: var(--hover-bg); }
 
 .sale-summary {
     border-top: 1px solid var(--border-color);
@@ -458,6 +433,34 @@ body::before {
     padding-top: 8px;
     margin-top: 8px;
 }
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.quantity-control .btn {
+    padding: 4px 8px;
+}
+
+.top-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+.top-item:last-child {
+    border-bottom: none;
+}
+.top-item-name {
+    font-weight: 500;
+}
+.top-item-value {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
 
 @media (max-width: 900px) {
     .sidebar { transform: translateX(-100%); }
@@ -482,7 +485,6 @@ body::before {
     .flex.gap-2 { flex-direction: column; align-items: stretch; }
     .flex.gap-2 .btn { width: 100%; }
 
-    /* Layout de "Card" para todas as tabelas em telas pequenas */
     .table thead {
         display: none;
     }
@@ -517,18 +519,13 @@ body::before {
         padding-right: 1rem;
     }
 
-    /* Exceção para a tabela do carrinho no PDV, que já tinha um estilo de card */
     #pdvCartTable td {
         padding: 0.5rem 0;
     }
     
-    /* Ajuste para botões de ação não ficarem muito grandes */
-    .table td[data-label="Ações"] .flex {
-        flex-direction: row;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-    .table td[data-label="Ações"] .btn {
-        width: auto;
+    .table td .flex.gap-2,
+    .table td .flex.gap-2 .btn {
+      flex-direction: row;
+      width: auto;
     }
 }
