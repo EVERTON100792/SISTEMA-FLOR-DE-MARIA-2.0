@@ -803,7 +803,18 @@
             await db.auth.signOut();
         },
         showLogin() {
-            document.body.className = 'state-login';
+        document.body.className = 'state-login';
+
+        // --- INÍCIO DA CORREÇÃO ---
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.reset(); // Reseta os campos de email e senha
+            const btn = loginForm.querySelector('button');
+            if (btn) {
+                btn.disabled = false; // Reabilita o botão
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; // Restaura o texto original do botão
+            }
+        }
         },
         async showApp() {
             await App.loadAllData();
