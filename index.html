@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO */
+        /* SGI - FLOR DE MARIA v10 - NOVA TELA DE LOGIN ANIMADA */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -21,6 +21,7 @@
             --primary-color: #3b82f6;
             --primary-color-rgb: 59, 130, 246;
             --accent-color: #10b981;
+            --accent-color-rgb: 16, 185, 129;
             --danger-color: #ef4444;
             --danger-color-rgb: 239, 68, 68;
             --warning-color: #f59e0b;
@@ -42,21 +43,152 @@
         body.state-loading #loadingOverlay { display: flex; }
         body.state-app #appLayout { display: flex; }
 
-        .login-container { align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .login-card { background: var(--secondary-bg); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
-        
-        /* NOVO ESTILO: Logo na tela de login */
-        .login-logo img {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            margin-bottom: 16px;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
+        /* ===== INÍCIO DO NOVO ESTILO DA TELA DE LOGIN ===== */
+
+        /* Container principal que cobre toda a tela */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Fundo gradiente que será a base da animação */
+            background: linear-gradient(135deg, #1e293b, #0B1120);
+            overflow: hidden; /* Garante que as formas animadas não criem barras de rolagem */
+            position: relative;
         }
-        
-        .login-title { font-size: 28px; margin-bottom: 8px; }
-        .login-subtitle { color: var(--text-muted); margin-bottom: 32px; }
+
+        /* Card de login com o efeito "vidro fosco" */
+        .login-card {
+            background: rgba(30, 41, 59, 0.4); /* Fundo semitransparente */
+            backdrop-filter: blur(15px); /* O efeito de desfoque mágico! */
+            -webkit-backdrop-filter: blur(15px); /* Suporte para Safari */
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.2); /* Borda sutil */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            z-index: 2; /* Garante que o card fique na frente da animação */
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        /* Efeito de zoom sutil ao carregar */
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .login-card {
+            animation: popIn 0.5s ease-out forwards;
+        }
+
+
+        /* Novo estilo para o container da logo */
+        .login-logo {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--primary-color), #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+            overflow: hidden;
+        }
+
+        .login-logo img {
+            width: 70%;
+            height: auto;
+            object-fit: cover; /* Mudei para cover para preencher melhor o círculo */
+            /* Resetando estilos anteriores */
+            border-radius: 50%; /* Faz a imagem em si ser redonda também */
+            border: none;
+            margin-bottom: 0;
+        }
+
+        /* Ajustes finos nos textos e botão */
+        .login-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .btn-login-animated:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.5);
+            background: #3b82f6;
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* ===== Animação de Fundo com Círculos Flutuantes ===== */
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(var(--primary-color-rgb), 0.2);
+            animation: animate-circles 25s linear infinite;
+            bottom: -150px; /* Posição inicial fora da tela */
+        }
+
+        /* Variações de tamanho, posição e duração para criar um efeito aleatório */
+        .circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .circles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; background: rgba(var(--danger-color-rgb), 0.15); }
+        .circles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .circles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .circles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .circles li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; background: rgba(var(--accent-color-rgb), 0.15); }
+
+        /* A animação que faz os círculos subirem e desaparecerem */
+        @keyframes animate-circles {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+
+        /* ===== FIM DO NOVO ESTILO DA TELA DE LOGIN ===== */
+
         .input-group { position: relative; margin-bottom: 32px; }
         .form-input, .form-select, .form-textarea {
             width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px;
@@ -65,14 +197,13 @@
         .form-textarea { resize: vertical; min-height: 80px; }
         .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3); }
         .form-label-float { position: absolute; top: 13px; left: 16px; color: var(--text-muted); pointer-events: none; transition: all 0.2s ease-out; background-color: transparent; padding: 0 4px; }
-        .form-input:focus+.form-label-float, .form-input:not(:placeholder-shown)+.form-label-float { top: -10px; font-size: 12px; color: var(--primary-color); background-color: var(--secondary-bg); }
+        .form-input:focus+.form-label-float, .form-input:not(:placeholder-shown)+.form-label-float { top: -10px; font-size: 12px; color: var(--primary-color); background-color: #1e293b; /* Cor de fundo para o label flutuante */ }
 
         .app-layout { min-height: 100vh; }
         .sidebar { width: 260px; background: var(--secondary-bg); border-right: 1px solid var(--border-color); padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease-in-out; }
         .sidebar-header { padding: 0 24px 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
         
-        /* NOVO ESTILO: Logo na barra lateral */
         .sidebar-logo img {
             width: 36px;
             height: 36px;
@@ -225,12 +356,18 @@
     </div>
 
     <div id="loginScreen" class="login-container">
+        <div class="background-animation">
+            <ul class="circles">
+                <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            </ul>
+        </div>
+
         <div class="login-card">
             <div class="login-logo">
                 <img src="Screenshot_2025-08-14-21-21-09-908_com.instagram.android-edit.jpg" alt="Flor de Maria Logo">
             </div>
-            <h1 class="login-title">Flor de Maria</h1>
-            <p class="login-subtitle">Sistema de Gestão Integrado</p>
+            <h1 class="login-title">Bem-vindo de volta!</h1>
+            <p class="login-subtitle">Faça login para continuar</p>
             
             <form id="loginForm">
                 <div class="input-group">
@@ -243,11 +380,12 @@
                     <label for="password" class="form-label-float">Senha</label>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                <button type="submit" class="btn btn-primary btn-login-animated" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
             </form>
         </div>
     </div>
-
     <div id="appLayout" class="app-layout">
         <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -319,7 +457,7 @@
             </div>
 
             <div id="clientsPage" class="page hidden">
-                 <div class="page-header">
+                <div class="page-header">
                     <h1 class="page-title">Clientes</h1>
                     <p class="page-subtitle">Gerencie seus clientes</p>
                 </div>
@@ -489,7 +627,7 @@
             </div>
 
             <div id="expensesPage" class="page hidden">
-                 <div class="page-header">
+                <div class="page-header">
                     <h1 class="page-title">Despesas</h1>
                     <p class="page-subtitle">Gerencie suas despesas e custos</p>
                 </div>
@@ -633,7 +771,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO =====
+    // ===== SGI - FLOR DE MARIA v10 - NOVA TELA DE LOGIN =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -751,7 +889,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.2 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v10 (Nova Tela de Login) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
