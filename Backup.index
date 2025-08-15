@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v7.7 - CORREÇÃO FINAL DE SCROLL PDV E PDF WHATSAPP */
+        /* SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -44,7 +44,17 @@
 
         .login-container { align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
         .login-card { background: var(--secondary-bg); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
-        .login-logo i { font-size: 48px; color: var(--primary-color); margin-bottom: 16px; }
+        
+        /* NOVO ESTILO: Logo na tela de login */
+        .login-logo img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+        
         .login-title { font-size: 28px; margin-bottom: 8px; }
         .login-subtitle { color: var(--text-muted); margin-bottom: 32px; }
         .input-group { position: relative; margin-bottom: 32px; }
@@ -61,7 +71,15 @@
         .sidebar { width: 260px; background: var(--secondary-bg); border-right: 1px solid var(--border-color); padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease-in-out; }
         .sidebar-header { padding: 0 24px 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
-        .sidebar-logo i { font-size: 24px; color: var(--primary-color); }
+        
+        /* NOVO ESTILO: Logo na barra lateral */
+        .sidebar-logo img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         .sidebar-nav { list-style: none; }
         .sidebar-nav-link { display: flex; align-items: center; gap: 16px; padding: 12px 24px; color: var(--text-muted); text-decoration: none; transition: var(--transition); border-radius: 8px; margin: 4px 12px; }
         .sidebar-nav-link:hover { background: var(--hover-bg); color: var(--text-primary); }
@@ -124,9 +142,16 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 9998; }
         .modal.show { display: flex; animation: fadeIn 0.3s; }
         .modal-content { background: var(--secondary-bg); border-radius: 12px; padding: 24px; max-width: 800px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
-        #modalBody { overflow-y: auto; }
+        #modalBody { overflow-y: auto; padding-right: 10px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
 
         .grid { display: grid; gap: 24px; }
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -141,15 +166,14 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: var(--secondary-bg); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--hover-bg); border-radius: 10px; border: 2px solid var(--secondary-bg); }
         
-        /* NOVA CORREÇÃO: Força o card a ter uma altura e a lista a rolar internamente */
         #pdv-product-card {
-            height: 75vh; /* Define uma altura relativa à tela */
-            max-height: 700px; /* Limite máximo de altura */
+            height: 75vh;
+            max-height: 700px;
         }
         .product-list-pdv {
-            flex-grow: 1; /* Faz a lista ocupar o espaço restante no card */
-            overflow-y: auto; /* Adiciona a rolagem quando necessário */
-            min-height: 0; /* Correção para bug de overflow em flexbox */
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 0;
             padding-right: 10px;
         }
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
@@ -157,6 +181,17 @@
         .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
+        
+        .pdv-client-group { display: flex; align-items: center; gap: 10px; }
+        .pdv-client-group .form-select { flex-grow: 1; }
+        #quickAddClientBtn { padding: 8px 12px; }
+
+        .date-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .date-filters .form-input { max-width: 150px; }
+
+        .dashboard-filters { margin-bottom: 1rem; }
+        .dashboard-filters .btn { background-color: var(--surface-bg); }
+        .dashboard-filters .btn.active { background-color: var(--primary-color); color: var(--text-primary); }
 
         @media (max-width: 1200px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -164,7 +199,10 @@
         }
 
         @media (max-width: 900px) {
-            #pdv-product-card { height: auto; max-height: 40vh; } /* Ajuste de altura para mobile */
+            #pdv-product-card { height: auto; max-height: 40vh; }
+            .modal-actions { flex-direction: column; }
+            .modal-actions .btn { width: 100%; }
+
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 80px 15px 20px; }
@@ -188,7 +226,9 @@
 
     <div id="loginScreen" class="login-container">
         <div class="login-card">
-            <div class="login-logo"><i class="fas fa-store"></i></div>
+            <div class="login-logo">
+                <img src="Screenshot_2025-08-14-21-21-09-908_com.instagram.android-edit.jpg" alt="Flor de Maria Logo">
+            </div>
             <h1 class="login-title">Flor de Maria</h1>
             <p class="login-subtitle">Sistema de Gestão Integrado</p>
             
@@ -213,7 +253,10 @@
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo"><i class="fas fa-store"></i><span>Flor de Maria</span></div>
+                <div class="sidebar-logo">
+                    <img src="Screenshot_2025-08-14-21-21-09-908_com.instagram.android-edit.jpg" alt="Flor de Maria Logo">
+                    <span>Flor de Maria</span>
+                </div>
             </div>
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-item"><a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
@@ -236,35 +279,40 @@
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Visão geral do seu negócio</p>
                 </div>
-                <div class="stats-grid">
+                <div class="dashboard-filters" id="dashboardDateFilters">
+                    <button class="btn btn-sm active" data-period="this_month">Este Mês</button>
+                    <button class="btn btn-sm" data-period="last_month">Mês Passado</button>
+                    <button class="btn btn-sm" data-period="today">Hoje</button>
+                </div>
+                <div class="stats-grid mt-4">
                     <div class="stat-card">
                         <div class="stat-value" id="cashBalance">R$ 0,00</div>
-                        <div class="stat-label">Saldo em Caixa</div>
+                        <div class="stat-label">Saldo em Caixa (Período)</div>
                         <i class="fas fa-wallet stat-icon"></i>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="totalReceivables">R$ 0,00</div>
-                        <div class="stat-label">Total a Receber</div>
+                        <div class="stat-label">Total a Receber (Geral)</div>
                         <i class="fas fa-clock stat-icon"></i>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="monthlyExpenses">R$ 0,00</div>
-                        <div class="stat-label">Despesas do Mês</div>
+                        <div class="stat-value" id="periodExpenses">R$ 0,00</div>
+                        <div class="stat-label">Despesas (Período)</div>
                         <i class="fas fa-credit-card stat-icon"></i>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
-                        <div class="stat-label">Vendas do Mês</div>
+                        <div class="stat-value" id="periodSales">R$ 0,00</div>
+                        <div class="stat-label">Vendas (Período)</div>
                         <i class="fas fa-chart-line stat-icon"></i>
                     </div>
                 </div>
                 <div class="grid grid-2 mt-4">
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Mês Atual)</h3></div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Período)</h3></div>
                         <div class="chart-container" style="position: relative; height:350px;"><canvas id="paymentMethodChart"></canvas></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3></div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas (Geral)</h3></div>
                         <div id="overdueAccounts" class="custom-scrollbar" style="max-height: 350px; overflow-y: auto;"></div>
                     </div>
                 </div>
@@ -300,7 +348,7 @@
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
                     <div class="table-responsive"><table class="table">
-                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead>
+                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Total Gasto</th><th>Ações</th></tr></thead>
                         <tbody id="clientsTableBody"></tbody>
                     </table></div>
                 </div>
@@ -365,7 +413,10 @@
                         <hr style="border-color: var(--border-color); margin: 20px 0;">
                         <div class="form-group">
                             <label for="pdvClient" class="form-label">Cliente</label>
-                            <select id="pdvClient" class="form-select"></select>
+                            <div class="pdv-client-group">
+                                <select id="pdvClient" class="form-select"></select>
+                                <button id="quickAddClientBtn" class="btn btn-secondary" title="Adicionar Novo Cliente"><i class="fas fa-plus"></i></button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="pdvPaymentMethod" class="form-label">Forma de Pagamento</label>
@@ -397,10 +448,18 @@
                     <p class="page-subtitle">Consulte o histórico de vendas realizadas</p>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title"><i class="fas fa-history"></i> Histórico de Vendas</h3></div>
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history"></i> Histórico de Vendas</h3>
+                    </div>
+                    <div class="date-filters">
+                        <input type="date" id="receiptsStartDate" class="form-input">
+                        <input type="date" id="receiptsEndDate" class="form-input">
+                        <button id="receiptsFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="receiptsClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table">
-                            <thead><tr><th>ID da Venda</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Recibo</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
                             <tbody id="receiptsTableBody"></tbody>
                         </table>
                     </div>
@@ -414,6 +473,12 @@
                 </div>
                 <div class="card">
                      <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Lançamentos</h3></div>
+                     <div class="date-filters">
+                        <input type="date" id="cashflowStartDate" class="form-input">
+                        <input type="date" id="cashflowEndDate" class="form-input">
+                        <button id="cashflowFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="cashflowClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                      <div class="table-responsive">
                         <table class="table">
                             <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Valor</th></tr></thead>
@@ -441,6 +506,12 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list-alt"></i> Histórico de Despesas</h3></div>
+                     <div class="date-filters">
+                        <input type="date" id="expensesStartDate" class="form-input">
+                        <input type="date" id="expensesEndDate" class="form-input">
+                        <button id="expensesFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="expensesClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                      <div class="table-responsive">
                         <table class="table">
                             <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -562,7 +633,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v7.7 (Com Correção de Bugs e Melhorias) =====
+    // ===== SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -592,6 +663,7 @@
         formatCurrency: v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v) || 0),
         formatDate: d => d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A',
         formatInputDate: d => d ? new Date(d).toISOString().split('T')[0] : '',
+        formatShortId: id => id ? id.toString().slice(-6).toUpperCase() : 'N/A',
         debounce: (func, delay = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; },
         populateSelect: (id, data, valF, textF, defTxt) => {
             const s = document.getElementById(id);
@@ -679,7 +751,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v7.7 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.2 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -759,7 +831,7 @@
             overlay.addEventListener('click', toggle);
         },
         async navigateTo(page, reloadData = true) {
-            if(reloadData) await App.loadAllData();
+            if(reloadData) await App.loadAllData(false);
 
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             const targetPage = document.getElementById(`${page}Page`);
@@ -778,34 +850,64 @@
     
     App.modules.Dashboard = {
         pageId: 'dashboard',
+        init() {
+            document.getElementById('dashboardDateFilters').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    document.querySelectorAll('#dashboardDateFilters .btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.updateDashboardForPeriod(e.target.dataset.period);
+                }
+            });
+        },
         load() {
-            this.updateStats();
-            this.renderPaymentMethodChart();
+            document.querySelector('#dashboardDateFilters .btn.active')?.classList.remove('active');
+            document.querySelector('#dashboardDateFilters .btn[data-period="this_month"]').classList.add('active');
+            this.updateDashboardForPeriod('this_month');
+        },
+        updateDashboardForPeriod(period) {
+            const now = new Date();
+            let startDate, endDate = new Date();
+
+            switch(period) {
+                case 'today':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+                    break;
+                case 'last_month':
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+                    break;
+                case 'this_month':
+                default:
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    break;
+            }
+            this.updateStats(startDate, endDate);
+            this.renderPaymentMethodChart(startDate, endDate);
             this.renderOverdueAccounts();
         },
-        updateStats() {
+        updateStats(startDate, endDate) {
             const { cashFlow, receivables, sales, expenses } = state;
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
             
-            const cashBalance = cashFlow.reduce((a, t) => a + (t.type === 'entrada' ? 1 : -1) * t.value, 0);
-            const totalReceivables = receivables.filter(r => ['Pendente', 'Vencido'].includes(r.status)).reduce((a, r) => a + r.value, 0);
-            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, s) => a + s.total, 0);
-            const monthlyExpenses = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, e) => a + e.value, 0);
+            const salesInPeriod = sales.filter(s => new Date(s.date) >= startDate && new Date(s.date) <= endDate);
+            const expensesInPeriod = expenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
+            const cashFlowInPeriod = cashFlow.filter(cf => { const d = new Date(cf.date); return d >= startDate && d <= endDate; });
+
+            const periodSales = salesInPeriod.reduce((a, s) => a + s.total, 0);
+            const periodExpenses = expensesInPeriod.reduce((a, e) => a + e.value, 0);
+            const cashBalance = cashFlowInPeriod.reduce((a, t) => a + (t.type === 'entrada' ? 1 : -1) * t.value, 0);
+            const totalReceivables = receivables.filter(r => r.status !== 'Pago').reduce((a, r) => a + r.value, 0);
             
+            document.getElementById('periodSales').textContent = Utils.formatCurrency(periodSales);
+            document.getElementById('periodExpenses').textContent = Utils.formatCurrency(periodExpenses);
             document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
             document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
-            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
-            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
         },
-        renderPaymentMethodChart() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-            const monthlySales = state.sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+        renderPaymentMethodChart(startDate, endDate) {
+            const salesInPeriod = state.sales.filter(s => new Date(s.date) >= startDate && new Date(s.date) <= endDate);
 
-            const dataByMethod = monthlySales.reduce((acc, sale) => {
+            const dataByMethod = salesInPeriod.reduce((acc, sale) => {
                 const method = sale.payment_method.split(' (')[0];
                 acc[method] = (acc[method] || 0) + sale.total;
                 return acc;
@@ -814,26 +916,9 @@
             const labels = Object.keys(dataByMethod);
             const data = Object.values(dataByMethod);
 
-            Utils.renderChart('paymentMethodChart', 'bar', {
-                labels,
-                datasets: [{
-                    label: 'Vendas por Pagamento',
-                    data,
-                    backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#64748b'],
-                    borderColor: 'var(--secondary-bg)',
-                    borderWidth: 2
-                }]
-            }, { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                indexAxis: 'y',
-                plugins: { 
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } },
-                    y: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'transparent' } }
-                }
+            Utils.renderChart('paymentMethodChart', 'bar', { labels, datasets: [{ data, backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#64748b'] }] }, 
+                { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } },
+                scales: { x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } }, y: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'transparent' } } }
             });
         },
         renderOverdueAccounts() {
@@ -841,16 +926,13 @@
             const overdue = state.receivables.filter(r => r.status === 'Pendente' && r.due_date < today);
             const container = document.getElementById('overdueAccounts');
             if (overdue.length === 0) {
-                container.innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. Ufa! ✅</p>`;
+                container.innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. ✅</p>`;
                 return;
             }
             container.innerHTML = overdue.map(r => {
                 const client = state.clients.find(c => c.id === r.client_id)?.name || 'Cliente não encontrado';
                 return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color);">
-                            <div>
-                                <p style="font-weight: bold;">${client}</p>
-                                <p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p>
-                            </div>
+                            <div><p style="font-weight: bold;">${client}</p><p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p></div>
                             <strong style="color: var(--danger-color);">${Utils.formatCurrency(r.value)}</strong>
                         </div>`;
             }).join('');
@@ -880,11 +962,23 @@
         },
         async save(e) {
             e.preventDefault();
-            const itemData = config.getFormData(e.target);
-            if (config.validate && !config.validate(itemData)) return;
-
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
+
+            const itemData = config.getFormData(e.target);
+            if (config.validate && !config.validate(itemData, state)) {
+                btn.disabled = false;
+                return;
+            }
+            if (config.beforeSaveValidation) {
+                const validationError = config.beforeSaveValidation(itemData, state);
+                if (validationError) {
+                    Notification.error(validationError);
+                    btn.disabled = false;
+                    return;
+                }
+            }
+            
             try {
                 const { data, error } = await (state.currentEditId
                     ? db.from(config.tableName).update(itemData).eq('id', state.currentEditId)
@@ -916,9 +1010,6 @@
                 const { error } = await db.from(config.tableName).delete().eq('id', id);
                 if (error) throw error;
                 
-                state[config.stateKey] = state[config.stateKey].filter(i => i.id !== id);
-                Notification.success(`${config.name} excluído.`);
-                
                 await App.loadAllData(false);
                 this.render();
                 if(config.onRemove) config.onRemove();
@@ -934,7 +1025,7 @@
             document.querySelector(`#${config.formId} button[type="submit"]`).innerHTML = `<i class="fas fa-save"></i> Salvar`;
         },
         export() {
-            Utils.exportToCSV(`${config.tableName}.csv`, this.getFiltered().map(config.mapExport));
+            Utils.exportToCSV(`${config.tableName}.csv`, this.getFiltered().map(item => config.mapExport(item, state)));
         }
     });
 
@@ -948,18 +1039,25 @@
             document.getElementById('clientName').value = c.name;
             document.getElementById('clientPhone').value = c.phone || '';
         },
-        renderRow: (c, s) => `<tr>
-            <td data-label="Nome">${c.name}</td>
-            <td data-label="Telefone">${c.phone || 'N/A'}</td>
-            <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
-            <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
-            <td data-label="Ações"><div class="table-actions">
-                <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
-            </div></td>
-        </tr>`,
-        emptyRow: `<tr><td colspan="5" class="text-center" style="padding: 20px;">Nenhum cliente encontrado.</td></tr>`,
-        mapExport: c => ({ id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at) })
+        renderRow: (c, s) => {
+            const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
+            return `<tr>
+                <td data-label="Nome">${c.name}</td>
+                <td data-label="Telefone">${c.phone || 'N/A'}</td>
+                <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
+                <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
+                <td data-label="Total Gasto">${Utils.formatCurrency(totalSpent)}</td>
+                <td data-label="Ações"><div class="table-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
+                </div></td>
+            </tr>`;
+        },
+        emptyRow: `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhum cliente encontrado.</td></tr>`,
+        mapExport: (c, s) => {
+            const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
+            return { id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at), total_gasto: totalSpent };
+        }
     })};
     
     App.modules.Products = { ...createCrudModule({
@@ -968,6 +1066,13 @@
         filterKeys: ['name', 'ref_code'],
         getFormData: f => ({ ref_code: f.productRefCode.value.trim(), name: f.productName.value.trim(), quantity: parseInt(f.productQuantity.value), cost_price: parseFloat(f.productCostPrice.value), sale_price: parseFloat(f.productSalePrice.value) }),
         validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
+        beforeSaveValidation: (itemData, s) => {
+            const codeExists = s.products.some(p => p.ref_code.toLowerCase() === itemData.ref_code.toLowerCase() && p.id !== s.currentEditId);
+            if (codeExists) {
+                return "Já existe um produto com este Código de Referência.";
+            }
+            return null;
+        },
         populateForm: p => {
             document.getElementById('productRefCode').value = p.ref_code;
             document.getElementById('productName').value = p.name;
@@ -1002,11 +1107,52 @@
             document.getElementById('pdvProductSearch').addEventListener('input', Utils.debounce(() => this.renderProductList(), 300));
             document.getElementById('finalizeSaleBtn').addEventListener('click', this.finalizeSale.bind(this));
             document.getElementById('pdvPaymentMethod').addEventListener('change', this.toggleInstallmentsField.bind(this));
+            document.getElementById('quickAddClientBtn').addEventListener('click', this.showQuickAddClientModal.bind(this));
         },
         load() {
             Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
             this.renderProductList();
             this.clearSale();
+        },
+        showQuickAddClientModal() {
+            const content = `
+                <form id="quickClientForm">
+                    <div class="form-group">
+                        <label class="form-label" for="quickClientName">Nome Completo</label>
+                        <input type="text" id="quickClientName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="quickClientPhone">Telefone</label>
+                        <input type="tel" id="quickClientPhone" class="form-input" placeholder="(00) 00000-0000">
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Cliente</button>
+                </form>
+            `;
+            Modal.show('Adicionar Novo Cliente', content);
+            document.getElementById('quickClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('quickClientName').value.trim();
+                const phone = document.getElementById('quickClientPhone').value.trim();
+                if (!name) return Notification.error("O nome é obrigatório.");
+                
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+
+                try {
+                    const { data: newClient, error } = await db.from('clients').insert({ name, phone }).select().single();
+                    if (error) throw error;
+                    
+                    Notification.success("Cliente adicionado com sucesso!");
+                    Modal.hide();
+                    await App.loadAllData(false);
+                    Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
+                    document.getElementById('pdvClient').value = newClient.id;
+                } catch (error) {
+                    Notification.error("Erro ao salvar cliente: " + error.message);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
         },
         toggleInstallmentsField() {
             const paymentMethod = document.getElementById('pdvPaymentMethod').value;
@@ -1038,7 +1184,11 @@
         },
         addToCart(productId) {
             const product = state.products.find(p => p.id === productId);
-            if (!product) return;
+            if (!product || product.quantity <= 0) {
+                Notification.error("Este produto está esgotado e não pode ser vendido.");
+                this.renderProductList();
+                return;
+            }
             const existingItem = state.cart.find(item => item.id === productId);
             if (existingItem) {
                 if (existingItem.quantity < product.quantity) existingItem.quantity++;
@@ -1096,7 +1246,7 @@
             doc.text(company.address, 105, 26, { align: 'center' });
             doc.text(`CNPJ: ${company.cnpj} | Telefone: ${company.phone}`, 105, 32, { align: 'center' });
             doc.setFontSize(16);
-            doc.text(`Recibo de Venda #${sale.id}`, 105, 45, { align: 'center' });
+            doc.text(`Recibo de Venda #${Utils.formatShortId(sale.id)}`, 105, 45, { align: 'center' });
             doc.setFontSize(12);
             doc.text(`Data: ${Utils.formatDate(sale.date)}`, 14, 55);
             doc.text(`Cliente: ${client?.name || 'Não identificado'}`, 14, 62);
@@ -1119,7 +1269,7 @@
             doc.text('Pagamento:', 150, finalY + 17, { align: 'right' });
             doc.text(sale.payment_method, 200, finalY + 17, { align: 'right' });
 
-            doc.save(`recibo_${sale.id}.pdf`);
+            doc.save(`recibo_${Utils.formatShortId(sale.id)}.pdf`);
         },
         showReceiptModal(sale) {
             const client = state.clients.find(c => c.id === sale.client_id);
@@ -1131,78 +1281,80 @@
                     <td style="text-align: right; padding: 8px 0;">${Utils.formatCurrency(item.price * item.quantity)}</td>
                 </tr>
             `).join('');
+            
+            const whatsappLink = (client && client.phone) 
+                ? `https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, ${client?.name}! Segue em anexo o recibo da sua compra.`)}`
+                : '#';
 
             const modalContent = `
                 <div id="receipt-content" style="background: var(--primary-bg); color: var(--text-primary); padding: 25px; border-radius: 8px; font-family: 'Segoe UI', sans-serif;">
-                    <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
-                        <h2 style="color: var(--primary-color); margin: 0; font-size: 24px;">${company.name}</h2>
+                    <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+                        <h2 style="color: var(--primary-color); margin: 0; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <i class="fas fa-store"></i>
+                            <span>${company.name}</span>
+                        </h2>
                         <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0;">${company.address}</p>
-                        <p style="font-size: 12px; color: var(--text-muted); margin: 5px 0 0;">CNPJ: ${company.cnpj}</p>
                     </div>
-                    <div>
-                        <p><strong>Recibo Venda:</strong> #${sale.id}</p>
-                        <p><strong>Data:</strong> ${Utils.formatDate(sale.date)}</p>
-                        <p><strong>Cliente:</strong> ${client?.name || 'N/A'}</p>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px;">
+                        <div>
+                            <strong>Cliente:</strong><br>
+                            ${client?.name || 'N/A'}
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>Recibo Nº:</strong><br>
+                            #${Utils.formatShortId(sale.id)}
+                        </div>
                     </div>
-                    <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                    <table style="width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 14px;">
                         <thead>
                             <tr>
-                                <th style="text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Item</th>
-                                <th style="text-align: right; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Subtotal</th>
+                                <th style="text-align: left; padding: 8px 0; border-bottom: 1px solid var(--border-color);">Item</th>
+                                <th style="text-align: right; padding: 8px 0; border-bottom: 1px solid var(--border-color);">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${itemsHtml}
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <td style="text-align: right; padding-top: 15px; font-size: 18px;"><strong>Total:</strong></td>
-                                <td style="text-align: right; padding-top: 15px; font-size: 18px; color: var(--accent-color);"><strong>${Utils.formatCurrency(sale.total)}</strong></td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; padding-top: 5px;">Pagamento:</td>
-                                <td style="text-align: right; padding-top: 5px;">${sale.payment_method}</td>
-                            </tr>
-                        </tfoot>
                     </table>
-                     <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
+                    <div style="margin-top: 20px; text-align: right;">
+                        <div style="margin-bottom: 5px;">
+                            <span style="color: var(--text-muted);">Pagamento:</span>
+                            <span style="font-weight: 500;">${sale.payment_method}</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 18px;">Total:</span>
+                            <span style="font-size: 22px; font-weight: bold; color: var(--accent-color);">${Utils.formatCurrency(sale.total)}</span>
+                        </div>
+                    </div>
+                     <div style="text-align: center; margin-top: 30px; font-size: 14px; color: var(--text-muted);">
                         Obrigado pela sua compra!
                     </div>
                 </div>
-                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                <div class="modal-actions">
                      <button id="newSaleBtn" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> Nova Venda</button>
-                     <button id="sendPdfWhatsappBtn" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}">
-                         <i class="fab fa-whatsapp"></i> Enviar PDF via WhatsApp
-                     </button>
+                     <button id="downloadReceiptPdfBtn" class="btn btn-primary"><i class="fas fa-download"></i> Baixar PDF</button>
+                     <a href="${whatsappLink}" target="_blank" class="btn btn-secondary ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn" style="background-color: #25D366; border-color: #25D366; color: white;">
+                         <i class="fab fa-whatsapp"></i> Enviar via WhatsApp
+                     </a>
                 </div>
             `;
 
-            Modal.show(`Venda #${sale.id} Finalizada!`, modalContent);
+            Modal.show(`Venda #${Utils.formatShortId(sale.id)} Finalizada!`, modalContent);
 
             document.getElementById('newSaleBtn').addEventListener('click', () => {
                 Modal.hide();
-                App.loadAllData(false).then(() => {
-                    this.load(); 
-                });
+                App.loadAllData(false).then(() => this.load()); 
             });
 
-            const whatsappBtn = document.getElementById('sendPdfWhatsappBtn');
-            whatsappBtn.addEventListener('click', () => {
-                if (whatsappBtn.classList.contains('disabled')) {
-                    Notification.warning('Cliente não possui telefone cadastrado.');
-                    return;
-                }
-                
+            document.getElementById('downloadReceiptPdfBtn').addEventListener('click', () => {
                 this.generateAndDownloadReceiptPDF(sale);
-
-                const whatsappText = `Olá, ${client?.name}! Segue em anexo o recibo em PDF da sua compra. Agradecemos a preferência! 😊`;
-                const encodedText = encodeURIComponent(whatsappText);
-                const phoneNumber = `55${client.phone.replace(/\D/g, '')}`;
-                const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedText}`;
-                
-                setTimeout(() => {
-                    window.open(whatsappLink, '_blank');
-                }, 500);
+            });
+            
+            document.getElementById('sendWhatsappBtn').addEventListener('click', (e) => {
+                if(e.currentTarget.classList.contains('disabled')) {
+                    e.preventDefault();
+                    Notification.warning('Cliente não possui telefone cadastrado para envio.');
+                }
             });
         },
         async finalizeSale() {
@@ -1243,7 +1395,7 @@
                 
                 if (isImmediatePayment) {
                     await db.from('cash_flow').insert({
-                        description: `Venda #${newSale.id}`, value: total, type: 'entrada', date: new Date().toISOString()
+                        description: `Venda #${Utils.formatShortId(newSale.id)}`, value: total, type: 'entrada', date: new Date().toISOString()
                     });
                 } else {
                     const installmentValue = parseFloat((total / installments).toFixed(2));
@@ -1257,7 +1409,7 @@
                             value: installmentValue,
                             due_date: dueDate.toISOString(),
                             status: 'Pendente',
-                            description: `Parcela ${i}/${installments} da Venda #${newSale.id}`
+                            description: `Parcela ${i}/${installments} da Venda #${Utils.formatShortId(newSale.id)}`
                         });
                     }
                     const { error: receivablesError } = await db.from('receivables').insert(receivablesToInsert);
@@ -1286,18 +1438,39 @@
     
 	App.modules.Receipts = {
         pageId: 'receipts',
+        init() {
+            document.getElementById('receiptsFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('receiptsClearBtn').addEventListener('click', () => {
+                document.getElementById('receiptsStartDate').value = '';
+                document.getElementById('receiptsEndDate').value = '';
+                this.render();
+            });
+        },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('receiptsTableBody');
-            const sales = [...state.sales].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('receiptsStartDate').value;
+            const endDate = document.getElementById('receiptsEndDate').value;
+
+            let sales = [...state.sales];
+
+            if (startDate && endDate) {
+                sales = sales.filter(s => {
+                    const saleDate = s.date.split('T')[0];
+                    return saleDate >= startDate && saleDate <= endDate;
+                });
+            }
+
+            sales.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(sales.length === 0){
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma venda registrada.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma venda encontrada.</td></tr>`;
                 return;
             }
             tableBody.innerHTML = sales.map(sale => {
                 const client = state.clients.find(c => c.id === sale.client_id)?.name || 'Cliente Avulso';
                 return `<tr>
-                    <td data-label="ID">#${sale.id}</td>
+                    <td data-label="Recibo">#${Utils.formatShortId(sale.id)}</td>
                     <td data-label="Data">${Utils.formatDate(sale.date)}</td>
                     <td data-label="Cliente">${client}</td>
                     <td data-label="Total">${Utils.formatCurrency(sale.total)}</td>
@@ -1312,7 +1485,6 @@
         viewDetails(saleId) {
             const sale = state.sales.find(s => s.id == saleId);
             if (!sale) return;
-            // Reutiliza o modal do módulo de vendas
             App.modules.Sales.showReceiptModal(sale);
         },
         printReceipt(saleId) {
@@ -1324,10 +1496,31 @@
 
     App.modules.CashFlow = {
         pageId: 'cashflow',
+        init() {
+            document.getElementById('cashflowFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('cashflowClearBtn').addEventListener('click', () => {
+                document.getElementById('cashflowStartDate').value = '';
+                document.getElementById('cashflowEndDate').value = '';
+                this.render();
+            });
+        },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('cashflowTableBody');
-            const flow = [...state.cashFlow].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('cashflowStartDate').value;
+            const endDate = document.getElementById('cashflowEndDate').value;
+
+            let flow = [...state.cashFlow];
+
+            if(startDate && endDate) {
+                flow = flow.filter(f => {
+                    const flowDate = f.date.split('T')[0];
+                    return flowDate >= startDate && flowDate <= endDate;
+                });
+            }
+            
+            flow.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(flow.length === 0){
                 tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhum lançamento no caixa.</td></tr>`;
                 return;
@@ -1349,11 +1542,30 @@
         pageId: 'expenses',
         init() {
             document.getElementById('expenseForm').addEventListener('submit', this.save.bind(this));
+            document.getElementById('expensesFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('expensesClearBtn').addEventListener('click', () => {
+                document.getElementById('expensesStartDate').value = '';
+                document.getElementById('expensesEndDate').value = '';
+                this.render();
+            });
         },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('expensesTableBody');
-            const expenses = [...state.expenses].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('expensesStartDate').value;
+            const endDate = document.getElementById('expensesEndDate').value;
+
+            let expenses = [...state.expenses];
+
+            if(startDate && endDate) {
+                expenses = expenses.filter(e => {
+                    const expenseDate = e.date.split('T')[0];
+                    return expenseDate >= startDate && expenseDate <= endDate;
+                });
+            }
+
+            expenses.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(expenses.length === 0){
                 tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhuma despesa registrada.</td></tr>`;
                 return;
@@ -1459,7 +1671,7 @@
                 await db.from('receivables').update({ status: 'Pago', paid_at: new Date().toISOString() }).eq('id', id);
 
                 await db.from('cash_flow').insert({
-                    description: receivable.description || `Recebimento da venda #${receivable.sale_id}`,
+                    description: receivable.description || `Recebimento da venda #${Utils.formatShortId(receivable.sale_id)}`,
                     value: receivable.value,
                     type: 'entrada',
                     date: new Date().toISOString()
@@ -1574,8 +1786,8 @@
                 }]
             }, { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'var(--text-secondary)' } }, x: { ticks: { color: 'var(--text-secondary)' } } } });
 
-            const pdfHead = [['ID', 'Data', 'Cliente', 'Total', 'Pagamento']];
-            const pdfBody = sales.map(s => [s.id, Utils.formatDate(s.date), state.clients.find(c => c.id === s.client_id)?.name || 'N/A', Utils.formatCurrency(s.total), s.payment_method]);
+            const pdfHead = [['Recibo', 'Data', 'Cliente', 'Total', 'Pagamento']];
+            const pdfBody = sales.map(s => [Utils.formatShortId(s.id), Utils.formatDate(s.date), state.clients.find(c => c.id === s.client_id)?.name || 'N/A', Utils.formatCurrency(s.total), s.payment_method]);
             this.addPdfButton(reportTitle, pdfHead, pdfBody, [reportSubtitle, `Faturamento Total: ${Utils.formatCurrency(total)}`]);
         },
         generateTopProductsReport(start, end) {
