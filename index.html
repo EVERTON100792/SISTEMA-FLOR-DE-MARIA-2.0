@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.0 - MELHORIAS DE USABILIDADE E ANÁLISE */
+        /* SGI - FLOR DE MARIA v9.1 - REGRAS DE NEGÓCIO */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -164,7 +164,6 @@
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
         
-        /* NOVAS CLASSES PARA MELHORIAS */
         .pdv-client-group { display: flex; align-items: center; gap: 10px; }
         .pdv-client-group .form-select { flex-grow: 1; }
         #quickAddClientBtn { padding: 8px 12px; }
@@ -172,6 +171,7 @@
         .date-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .date-filters .form-input { max-width: 150px; }
 
+        .dashboard-filters { margin-bottom: 1rem; }
         .dashboard-filters .btn { background-color: var(--surface-bg); }
         .dashboard-filters .btn.active { background-color: var(--primary-color); color: var(--text-primary); }
 
@@ -610,7 +610,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v9.0 - MELHORIAS DE USABILIDADE E ANÁLISE =====
+    // ===== SGI - FLOR DE MARIA v9.1 - REGRAS DE NEGÓCIO =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -728,7 +728,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.0 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.1 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -808,7 +808,7 @@
             overlay.addEventListener('click', toggle);
         },
         async navigateTo(page, reloadData = true) {
-            if(reloadData) await App.loadAllData(false); // Carrega sem overlay para transições suaves
+            if(reloadData) await App.loadAllData(false);
 
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             const targetPage = document.getElementById(`${page}Page`);
@@ -830,13 +830,14 @@
         init() {
             document.getElementById('dashboardDateFilters').addEventListener('click', (e) => {
                 if (e.target.tagName === 'BUTTON') {
-                    this.updateDashboardForPeriod(e.target.dataset.period);
                     document.querySelectorAll('#dashboardDateFilters .btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
+                    this.updateDashboardForPeriod(e.target.dataset.period);
                 }
             });
         },
         load() {
+            document.querySelector('#dashboardDateFilters .btn[data-period="this_month"]').classList.add('active');
             this.updateDashboardForPeriod('this_month');
         },
         updateDashboardForPeriod(period) {
@@ -845,8 +846,8 @@
 
             switch(period) {
                 case 'today':
-                    startDate = new Date(now.setHours(0, 0, 0, 0));
-                    endDate = new Date(now.setHours(23, 59, 59, 999));
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
                     break;
                 case 'last_month':
                     startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -860,14 +861,14 @@
             }
             this.updateStats(startDate, endDate);
             this.renderPaymentMethodChart(startDate, endDate);
-            this.renderOverdueAccounts(); // Overdue is always total
+            this.renderOverdueAccounts();
         },
         updateStats(startDate, endDate) {
             const { cashFlow, receivables, sales, expenses } = state;
             
             const salesInPeriod = sales.filter(s => new Date(s.date) >= startDate && new Date(s.date) <= endDate);
-            const expensesInPeriod = expenses.filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate);
-            const cashFlowInPeriod = cashFlow.filter(cf => new Date(cf.date) >= startDate && new Date(cf.date) <= endDate);
+            const expensesInPeriod = expenses.filter(e => { const d = new Date(e.date); return d >= startDate && d <= endDate; });
+            const cashFlowInPeriod = cashFlow.filter(cf => { const d = new Date(cf.date); return d >= startDate && d <= endDate; });
 
             const periodSales = salesInPeriod.reduce((a, s) => a + s.total, 0);
             const periodExpenses = expensesInPeriod.reduce((a, e) => a + e.value, 0);
@@ -938,8 +939,17 @@
         async save(e) {
             e.preventDefault();
             const itemData = config.getFormData(e.target);
-            if (config.validate && !config.validate(itemData)) return;
+            if (config.validate && !config.validate(itemData, state)) return;
 
+            // NOVA REGRA: Validação específica do módulo antes de salvar
+            if (config.beforeSaveValidation) {
+                const validationError = config.beforeSaveValidation(itemData, state);
+                if (validationError) {
+                    Notification.error(validationError);
+                    return;
+                }
+            }
+            
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             try {
@@ -1029,6 +1039,14 @@
         filterKeys: ['name', 'ref_code'],
         getFormData: f => ({ ref_code: f.productRefCode.value.trim(), name: f.productName.value.trim(), quantity: parseInt(f.productQuantity.value), cost_price: parseFloat(f.productCostPrice.value), sale_price: parseFloat(f.productSalePrice.value) }),
         validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
+        // NOVA REGRA: Validação de código de referência duplicado
+        beforeSaveValidation: (itemData, s) => {
+            const codeExists = s.products.some(p => p.ref_code.toLowerCase() === itemData.ref_code.toLowerCase() && p.id !== s.currentEditId);
+            if (codeExists) {
+                return "Já existe um produto com este Código de Referência.";
+            }
+            return null; // Sem erros
+        },
         populateForm: p => {
             document.getElementById('productRefCode').value = p.ref_code;
             document.getElementById('productName').value = p.name;
@@ -1089,10 +1107,8 @@
                 e.preventDefault();
                 const name = document.getElementById('quickClientName').value.trim();
                 const phone = document.getElementById('quickClientPhone').value.trim();
-                if (!name) {
-                    Notification.error("O nome é obrigatório.");
-                    return;
-                }
+                if (!name) return Notification.error("O nome é obrigatório.");
+                
                 const btn = e.target.querySelector('button[type="submit"]');
                 btn.disabled = true;
 
@@ -1102,9 +1118,9 @@
                     
                     Notification.success("Cliente adicionado com sucesso!");
                     Modal.hide();
-                    await App.loadAllData(false); // Recarrega todos os dados
+                    await App.loadAllData(false);
                     Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
-                    document.getElementById('pdvClient').value = newClient.id; // Seleciona o novo cliente
+                    document.getElementById('pdvClient').value = newClient.id;
                 } catch (error) {
                     Notification.error("Erro ao salvar cliente: " + error.message);
                 } finally {
@@ -1131,6 +1147,7 @@
         },
         renderProductList() {
             const query = document.getElementById('pdvProductSearch').value.toLowerCase();
+            // NOVA REGRA: Filtro p.quantity > 0 já impede a exibição de produtos esgotados
             const availableProducts = state.products.filter(p => p.quantity > 0 && (p.name.toLowerCase().includes(query) || p.ref_code.toLowerCase().includes(query)));
             const listEl = document.getElementById('pdvProductList');
             listEl.innerHTML = availableProducts.length > 0
@@ -1142,7 +1159,12 @@
         },
         addToCart(productId) {
             const product = state.products.find(p => p.id === productId);
-            if (!product) return;
+            // NOVA REGRA: Checagem dupla para garantir que o produto não está esgotado
+            if (!product || product.quantity <= 0) {
+                Notification.error("Este produto está esgotado e não pode ser vendido.");
+                this.renderProductList(); // Atualiza a lista para remover o item, caso ainda esteja visível
+                return;
+            }
             const existingItem = state.cart.find(item => item.id === productId);
             if (existingItem) {
                 if (existingItem.quantity < product.quantity) existingItem.quantity++;
@@ -1390,7 +1412,6 @@
         }
     };
     
-    // Módulo de Recibos com filtros
 	App.modules.Receipts = {
         pageId: 'receipts',
         init() {
@@ -1449,7 +1470,6 @@
         }
     };
 
-    // Módulo de Fluxo de Caixa com filtros
     App.modules.CashFlow = {
         pageId: 'cashflow',
         init() {
@@ -1494,7 +1514,6 @@
         }
     };
     
-    // Módulo de Despesas com filtros
     App.modules.Expenses = {
         pageId: 'expenses',
         init() {
