@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.1 - REGRAS DE NEGÓCIO */
+        /* SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -44,7 +44,17 @@
 
         .login-container { align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
         .login-card { background: var(--secondary-bg); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
-        .login-logo i { font-size: 48px; color: var(--primary-color); margin-bottom: 16px; }
+        
+        /* NOVO ESTILO: Logo na tela de login */
+        .login-logo img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+        
         .login-title { font-size: 28px; margin-bottom: 8px; }
         .login-subtitle { color: var(--text-muted); margin-bottom: 32px; }
         .input-group { position: relative; margin-bottom: 32px; }
@@ -61,7 +71,15 @@
         .sidebar { width: 260px; background: var(--secondary-bg); border-right: 1px solid var(--border-color); padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; transition: transform 0.3s ease-in-out; }
         .sidebar-header { padding: 0 24px 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
-        .sidebar-logo i { font-size: 24px; color: var(--primary-color); }
+        
+        /* NOVO ESTILO: Logo na barra lateral */
+        .sidebar-logo img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         .sidebar-nav { list-style: none; }
         .sidebar-nav-link { display: flex; align-items: center; gap: 16px; padding: 12px 24px; color: var(--text-muted); text-decoration: none; transition: var(--transition); border-radius: 8px; margin: 4px 12px; }
         .sidebar-nav-link:hover { background: var(--hover-bg); color: var(--text-primary); }
@@ -208,7 +226,9 @@
 
     <div id="loginScreen" class="login-container">
         <div class="login-card">
-            <div class="login-logo"><i class="fas fa-store"></i></div>
+            <div class="login-logo">
+                <img src="https://i.imgur.com/k6K2H5n.jpeg" alt="Flor de Maria Logo">
+            </div>
             <h1 class="login-title">Flor de Maria</h1>
             <p class="login-subtitle">Sistema de Gestão Integrado</p>
             
@@ -233,7 +253,10 @@
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo"><i class="fas fa-store"></i><span>Flor de Maria</span></div>
+                <div class="sidebar-logo">
+                    <img src="https://i.imgur.com/k6K2H5n.jpeg" alt="Flor de Maria Logo">
+                    <span>Flor de Maria</span>
+                </div>
             </div>
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-item"><a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
@@ -610,7 +633,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v9.1 - REGRAS DE NEGÓCIO =====
+    // ===== SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -728,7 +751,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.1 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.2 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -837,6 +860,7 @@
             });
         },
         load() {
+            document.querySelector('#dashboardDateFilters .btn.active')?.classList.remove('active');
             document.querySelector('#dashboardDateFilters .btn[data-period="this_month"]').classList.add('active');
             this.updateDashboardForPeriod('this_month');
         },
@@ -938,20 +962,23 @@
         },
         async save(e) {
             e.preventDefault();
-            const itemData = config.getFormData(e.target);
-            if (config.validate && !config.validate(itemData, state)) return;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
 
-            // NOVA REGRA: Validação específica do módulo antes de salvar
+            const itemData = config.getFormData(e.target);
+            if (config.validate && !config.validate(itemData, state)) {
+                btn.disabled = false;
+                return;
+            }
             if (config.beforeSaveValidation) {
                 const validationError = config.beforeSaveValidation(itemData, state);
                 if (validationError) {
                     Notification.error(validationError);
+                    btn.disabled = false;
                     return;
                 }
             }
             
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
             try {
                 const { data, error } = await (state.currentEditId
                     ? db.from(config.tableName).update(itemData).eq('id', state.currentEditId)
@@ -1039,13 +1066,12 @@
         filterKeys: ['name', 'ref_code'],
         getFormData: f => ({ ref_code: f.productRefCode.value.trim(), name: f.productName.value.trim(), quantity: parseInt(f.productQuantity.value), cost_price: parseFloat(f.productCostPrice.value), sale_price: parseFloat(f.productSalePrice.value) }),
         validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
-        // NOVA REGRA: Validação de código de referência duplicado
         beforeSaveValidation: (itemData, s) => {
             const codeExists = s.products.some(p => p.ref_code.toLowerCase() === itemData.ref_code.toLowerCase() && p.id !== s.currentEditId);
             if (codeExists) {
                 return "Já existe um produto com este Código de Referência.";
             }
-            return null; // Sem erros
+            return null;
         },
         populateForm: p => {
             document.getElementById('productRefCode').value = p.ref_code;
@@ -1147,7 +1173,6 @@
         },
         renderProductList() {
             const query = document.getElementById('pdvProductSearch').value.toLowerCase();
-            // NOVA REGRA: Filtro p.quantity > 0 já impede a exibição de produtos esgotados
             const availableProducts = state.products.filter(p => p.quantity > 0 && (p.name.toLowerCase().includes(query) || p.ref_code.toLowerCase().includes(query)));
             const listEl = document.getElementById('pdvProductList');
             listEl.innerHTML = availableProducts.length > 0
@@ -1159,10 +1184,9 @@
         },
         addToCart(productId) {
             const product = state.products.find(p => p.id === productId);
-            // NOVA REGRA: Checagem dupla para garantir que o produto não está esgotado
             if (!product || product.quantity <= 0) {
                 Notification.error("Este produto está esgotado e não pode ser vendido.");
-                this.renderProductList(); // Atualiza a lista para remover o item, caso ainda esteja visível
+                this.renderProductList();
                 return;
             }
             const existingItem = state.cart.find(item => item.id === productId);
