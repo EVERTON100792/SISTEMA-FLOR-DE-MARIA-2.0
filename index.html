@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v8.1 - CORREÇÃO DE BOTÕES RESPONSIVOS */
+        /* SGI - FLOR DE MARIA v9.0 - MELHORIAS DE USABILIDADE E ANÁLISE */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -128,12 +128,11 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
         
-        /* NOVA CLASSE PARA OS BOTÕES DO MODAL */
         .modal-actions {
             margin-top: 20px;
             display: flex;
             gap: 10px;
-            justify-content: flex-end; /* Padrão para telas grandes */
+            justify-content: flex-end;
         }
 
         .grid { display: grid; gap: 24px; }
@@ -164,6 +163,17 @@
         .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
+        
+        /* NOVAS CLASSES PARA MELHORIAS */
+        .pdv-client-group { display: flex; align-items: center; gap: 10px; }
+        .pdv-client-group .form-select { flex-grow: 1; }
+        #quickAddClientBtn { padding: 8px 12px; }
+
+        .date-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .date-filters .form-input { max-width: 150px; }
+
+        .dashboard-filters .btn { background-color: var(--surface-bg); }
+        .dashboard-filters .btn.active { background-color: var(--primary-color); color: var(--text-primary); }
 
         @media (max-width: 1200px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -172,14 +182,8 @@
 
         @media (max-width: 900px) {
             #pdv-product-card { height: auto; max-height: 40vh; }
-
-            /* NOVA REGRA: Empilha os botões do modal em telas pequenas */
-            .modal-actions {
-                flex-direction: column;
-            }
-            .modal-actions .btn {
-                width: 100%;
-            }
+            .modal-actions { flex-direction: column; }
+            .modal-actions .btn { width: 100%; }
 
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
@@ -252,35 +256,40 @@
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Visão geral do seu negócio</p>
                 </div>
-                <div class="stats-grid">
+                <div class="dashboard-filters" id="dashboardDateFilters">
+                    <button class="btn btn-sm active" data-period="this_month">Este Mês</button>
+                    <button class="btn btn-sm" data-period="last_month">Mês Passado</button>
+                    <button class="btn btn-sm" data-period="today">Hoje</button>
+                </div>
+                <div class="stats-grid mt-4">
                     <div class="stat-card">
                         <div class="stat-value" id="cashBalance">R$ 0,00</div>
-                        <div class="stat-label">Saldo em Caixa</div>
+                        <div class="stat-label">Saldo em Caixa (Período)</div>
                         <i class="fas fa-wallet stat-icon"></i>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="totalReceivables">R$ 0,00</div>
-                        <div class="stat-label">Total a Receber</div>
+                        <div class="stat-label">Total a Receber (Geral)</div>
                         <i class="fas fa-clock stat-icon"></i>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="monthlyExpenses">R$ 0,00</div>
-                        <div class="stat-label">Despesas do Mês</div>
+                        <div class="stat-value" id="periodExpenses">R$ 0,00</div>
+                        <div class="stat-label">Despesas (Período)</div>
                         <i class="fas fa-credit-card stat-icon"></i>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
-                        <div class="stat-label">Vendas do Mês</div>
+                        <div class="stat-value" id="periodSales">R$ 0,00</div>
+                        <div class="stat-label">Vendas (Período)</div>
                         <i class="fas fa-chart-line stat-icon"></i>
                     </div>
                 </div>
                 <div class="grid grid-2 mt-4">
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Mês Atual)</h3></div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> Vendas por Pagamento (Período)</h3></div>
                         <div class="chart-container" style="position: relative; height:350px;"><canvas id="paymentMethodChart"></canvas></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas</h3></div>
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Contas Vencidas (Geral)</h3></div>
                         <div id="overdueAccounts" class="custom-scrollbar" style="max-height: 350px; overflow-y: auto;"></div>
                     </div>
                 </div>
@@ -316,7 +325,7 @@
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
                     <div class="table-responsive"><table class="table">
-                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Ações</th></tr></thead>
+                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Total Gasto</th><th>Ações</th></tr></thead>
                         <tbody id="clientsTableBody"></tbody>
                     </table></div>
                 </div>
@@ -381,7 +390,10 @@
                         <hr style="border-color: var(--border-color); margin: 20px 0;">
                         <div class="form-group">
                             <label for="pdvClient" class="form-label">Cliente</label>
-                            <select id="pdvClient" class="form-select"></select>
+                            <div class="pdv-client-group">
+                                <select id="pdvClient" class="form-select"></select>
+                                <button id="quickAddClientBtn" class="btn btn-secondary" title="Adicionar Novo Cliente"><i class="fas fa-plus"></i></button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="pdvPaymentMethod" class="form-label">Forma de Pagamento</label>
@@ -413,7 +425,15 @@
                     <p class="page-subtitle">Consulte o histórico de vendas realizadas</p>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title"><i class="fas fa-history"></i> Histórico de Vendas</h3></div>
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history"></i> Histórico de Vendas</h3>
+                    </div>
+                    <div class="date-filters">
+                        <input type="date" id="receiptsStartDate" class="form-input">
+                        <input type="date" id="receiptsEndDate" class="form-input">
+                        <button id="receiptsFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="receiptsClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead><tr><th>Recibo</th><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead>
@@ -430,6 +450,12 @@
                 </div>
                 <div class="card">
                      <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Lançamentos</h3></div>
+                     <div class="date-filters">
+                        <input type="date" id="cashflowStartDate" class="form-input">
+                        <input type="date" id="cashflowEndDate" class="form-input">
+                        <button id="cashflowFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="cashflowClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                      <div class="table-responsive">
                         <table class="table">
                             <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Valor</th></tr></thead>
@@ -457,6 +483,12 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list-alt"></i> Histórico de Despesas</h3></div>
+                     <div class="date-filters">
+                        <input type="date" id="expensesStartDate" class="form-input">
+                        <input type="date" id="expensesEndDate" class="form-input">
+                        <button id="expensesFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                        <button id="expensesClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                    </div>
                      <div class="table-responsive">
                         <table class="table">
                             <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -578,7 +610,7 @@
     </div>
 
     <script>
-    // ===== SGI - FLOR DE MARIA v8.1 - CORREÇÃO DE BOTÕES RESPONSIVOS =====
+    // ===== SGI - FLOR DE MARIA v9.0 - MELHORIAS DE USABILIDADE E ANÁLISE =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -696,7 +728,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v8.1 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.0 (Bug Fixes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -776,7 +808,7 @@
             overlay.addEventListener('click', toggle);
         },
         async navigateTo(page, reloadData = true) {
-            if(reloadData) await App.loadAllData();
+            if(reloadData) await App.loadAllData(false); // Carrega sem overlay para transições suaves
 
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             const targetPage = document.getElementById(`${page}Page`);
@@ -795,34 +827,62 @@
     
     App.modules.Dashboard = {
         pageId: 'dashboard',
-        load() {
-            this.updateStats();
-            this.renderPaymentMethodChart();
-            this.renderOverdueAccounts();
+        init() {
+            document.getElementById('dashboardDateFilters').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    this.updateDashboardForPeriod(e.target.dataset.period);
+                    document.querySelectorAll('#dashboardDateFilters .btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
         },
-        updateStats() {
-            const { cashFlow, receivables, sales, expenses } = state;
+        load() {
+            this.updateDashboardForPeriod('this_month');
+        },
+        updateDashboardForPeriod(period) {
             const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
+            let startDate, endDate = new Date();
+
+            switch(period) {
+                case 'today':
+                    startDate = new Date(now.setHours(0, 0, 0, 0));
+                    endDate = new Date(now.setHours(23, 59, 59, 999));
+                    break;
+                case 'last_month':
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+                    break;
+                case 'this_month':
+                default:
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+                    break;
+            }
+            this.updateStats(startDate, endDate);
+            this.renderPaymentMethodChart(startDate, endDate);
+            this.renderOverdueAccounts(); // Overdue is always total
+        },
+        updateStats(startDate, endDate) {
+            const { cashFlow, receivables, sales, expenses } = state;
             
-            const cashBalance = cashFlow.reduce((a, t) => a + (t.type === 'entrada' ? 1 : -1) * t.value, 0);
-            const totalReceivables = receivables.filter(r => ['Pendente', 'Vencido'].includes(r.status)).reduce((a, r) => a + r.value, 0);
-            const monthlySales = sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, s) => a + s.total, 0);
-            const monthlyExpenses = expenses.filter(e => { const d = new Date(e.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }).reduce((a, e) => a + e.value, 0);
+            const salesInPeriod = sales.filter(s => new Date(s.date) >= startDate && new Date(s.date) <= endDate);
+            const expensesInPeriod = expenses.filter(e => new Date(e.date) >= startDate && new Date(e.date) <= endDate);
+            const cashFlowInPeriod = cashFlow.filter(cf => new Date(cf.date) >= startDate && new Date(cf.date) <= endDate);
+
+            const periodSales = salesInPeriod.reduce((a, s) => a + s.total, 0);
+            const periodExpenses = expensesInPeriod.reduce((a, e) => a + e.value, 0);
+            const cashBalance = cashFlowInPeriod.reduce((a, t) => a + (t.type === 'entrada' ? 1 : -1) * t.value, 0);
+            const totalReceivables = receivables.filter(r => r.status !== 'Pago').reduce((a, r) => a + r.value, 0);
             
+            document.getElementById('periodSales').textContent = Utils.formatCurrency(periodSales);
+            document.getElementById('periodExpenses').textContent = Utils.formatCurrency(periodExpenses);
             document.getElementById('cashBalance').textContent = Utils.formatCurrency(cashBalance);
             document.getElementById('totalReceivables').textContent = Utils.formatCurrency(totalReceivables);
-            document.getElementById('monthlySales').textContent = Utils.formatCurrency(monthlySales);
-            document.getElementById('monthlyExpenses').textContent = Utils.formatCurrency(monthlyExpenses);
         },
-        renderPaymentMethodChart() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-            const monthlySales = state.sales.filter(s => { const d = new Date(s.date); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+        renderPaymentMethodChart(startDate, endDate) {
+            const salesInPeriod = state.sales.filter(s => new Date(s.date) >= startDate && new Date(s.date) <= endDate);
 
-            const dataByMethod = monthlySales.reduce((acc, sale) => {
+            const dataByMethod = salesInPeriod.reduce((acc, sale) => {
                 const method = sale.payment_method.split(' (')[0];
                 acc[method] = (acc[method] || 0) + sale.total;
                 return acc;
@@ -831,26 +891,9 @@
             const labels = Object.keys(dataByMethod);
             const data = Object.values(dataByMethod);
 
-            Utils.renderChart('paymentMethodChart', 'bar', {
-                labels,
-                datasets: [{
-                    label: 'Vendas por Pagamento',
-                    data,
-                    backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#64748b'],
-                    borderColor: 'var(--secondary-bg)',
-                    borderWidth: 2
-                }]
-            }, { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                indexAxis: 'y',
-                plugins: { 
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } },
-                    y: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'transparent' } }
-                }
+            Utils.renderChart('paymentMethodChart', 'bar', { labels, datasets: [{ data, backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#64748b'] }] }, 
+                { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } },
+                scales: { x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-color)' } }, y: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'transparent' } } }
             });
         },
         renderOverdueAccounts() {
@@ -858,16 +901,13 @@
             const overdue = state.receivables.filter(r => r.status === 'Pendente' && r.due_date < today);
             const container = document.getElementById('overdueAccounts');
             if (overdue.length === 0) {
-                container.innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. Ufa! ✅</p>`;
+                container.innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Nenhuma conta vencida. ✅</p>`;
                 return;
             }
             container.innerHTML = overdue.map(r => {
                 const client = state.clients.find(c => c.id === r.client_id)?.name || 'Cliente não encontrado';
                 return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color);">
-                            <div>
-                                <p style="font-weight: bold;">${client}</p>
-                                <p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p>
-                            </div>
+                            <div><p style="font-weight: bold;">${client}</p><p style="font-size: 12px; color: var(--text-muted);">Venceu em: ${Utils.formatDate(r.due_date)}</p></div>
                             <strong style="color: var(--danger-color);">${Utils.formatCurrency(r.value)}</strong>
                         </div>`;
             }).join('');
@@ -933,9 +973,6 @@
                 const { error } = await db.from(config.tableName).delete().eq('id', id);
                 if (error) throw error;
                 
-                state[config.stateKey] = state[config.stateKey].filter(i => i.id !== id);
-                Notification.success(`${config.name} excluído.`);
-                
                 await App.loadAllData(false);
                 this.render();
                 if(config.onRemove) config.onRemove();
@@ -951,7 +988,7 @@
             document.querySelector(`#${config.formId} button[type="submit"]`).innerHTML = `<i class="fas fa-save"></i> Salvar`;
         },
         export() {
-            Utils.exportToCSV(`${config.tableName}.csv`, this.getFiltered().map(config.mapExport));
+            Utils.exportToCSV(`${config.tableName}.csv`, this.getFiltered().map(item => config.mapExport(item, state)));
         }
     });
 
@@ -965,18 +1002,25 @@
             document.getElementById('clientName').value = c.name;
             document.getElementById('clientPhone').value = c.phone || '';
         },
-        renderRow: (c, s) => `<tr>
-            <td data-label="Nome">${c.name}</td>
-            <td data-label="Telefone">${c.phone || 'N/A'}</td>
-            <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
-            <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
-            <td data-label="Ações"><div class="table-actions">
-                <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
-            </div></td>
-        </tr>`,
-        emptyRow: `<tr><td colspan="5" class="text-center" style="padding: 20px;">Nenhum cliente encontrado.</td></tr>`,
-        mapExport: c => ({ id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at) })
+        renderRow: (c, s) => {
+            const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
+            return `<tr>
+                <td data-label="Nome">${c.name}</td>
+                <td data-label="Telefone">${c.phone || 'N/A'}</td>
+                <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
+                <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
+                <td data-label="Total Gasto">${Utils.formatCurrency(totalSpent)}</td>
+                <td data-label="Ações"><div class="table-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
+                </div></td>
+            </tr>`;
+        },
+        emptyRow: `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhum cliente encontrado.</td></tr>`,
+        mapExport: (c, s) => {
+            const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
+            return { id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at), total_gasto: totalSpent };
+        }
     })};
     
     App.modules.Products = { ...createCrudModule({
@@ -1019,11 +1063,54 @@
             document.getElementById('pdvProductSearch').addEventListener('input', Utils.debounce(() => this.renderProductList(), 300));
             document.getElementById('finalizeSaleBtn').addEventListener('click', this.finalizeSale.bind(this));
             document.getElementById('pdvPaymentMethod').addEventListener('change', this.toggleInstallmentsField.bind(this));
+            document.getElementById('quickAddClientBtn').addEventListener('click', this.showQuickAddClientModal.bind(this));
         },
         load() {
             Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
             this.renderProductList();
             this.clearSale();
+        },
+        showQuickAddClientModal() {
+            const content = `
+                <form id="quickClientForm">
+                    <div class="form-group">
+                        <label class="form-label" for="quickClientName">Nome Completo</label>
+                        <input type="text" id="quickClientName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="quickClientPhone">Telefone</label>
+                        <input type="tel" id="quickClientPhone" class="form-input" placeholder="(00) 00000-0000">
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Cliente</button>
+                </form>
+            `;
+            Modal.show('Adicionar Novo Cliente', content);
+            document.getElementById('quickClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('quickClientName').value.trim();
+                const phone = document.getElementById('quickClientPhone').value.trim();
+                if (!name) {
+                    Notification.error("O nome é obrigatório.");
+                    return;
+                }
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+
+                try {
+                    const { data: newClient, error } = await db.from('clients').insert({ name, phone }).select().single();
+                    if (error) throw error;
+                    
+                    Notification.success("Cliente adicionado com sucesso!");
+                    Modal.hide();
+                    await App.loadAllData(false); // Recarrega todos os dados
+                    Utils.populateSelect('pdvClient', state.clients, 'id', 'name', 'Selecione um cliente');
+                    document.getElementById('pdvClient').value = newClient.id; // Seleciona o novo cliente
+                } catch (error) {
+                    Notification.error("Erro ao salvar cliente: " + error.message);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
         },
         toggleInstallmentsField() {
             const paymentMethod = document.getElementById('pdvPaymentMethod').value;
@@ -1153,7 +1240,6 @@
                 ? `https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, ${client?.name}! Segue em anexo o recibo da sua compra.`)}`
                 : '#';
 
-            // ATUALIZAÇÃO: Novo layout do recibo e botões com classe
             const modalContent = `
                 <div id="receipt-content" style="background: var(--primary-bg); color: var(--text-primary); padding: 25px; border-radius: 8px; font-family: 'Segoe UI', sans-serif;">
                     <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
@@ -1201,7 +1287,7 @@
                 <div class="modal-actions">
                      <button id="newSaleBtn" class="btn btn-secondary"><i class="fas fa-plus-circle"></i> Nova Venda</button>
                      <button id="downloadReceiptPdfBtn" class="btn btn-primary"><i class="fas fa-download"></i> Baixar PDF</button>
-                     <a href="${whatsappLink}" target="_blank" class="btn btn-accent ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn" style="background-color: #25D366;">
+                     <a href="${whatsappLink}" target="_blank" class="btn btn-secondary ${(!client || !client.phone) ? 'disabled' : ''}" id="sendWhatsappBtn" style="background-color: #25D366; border-color: #25D366; color: white;">
                          <i class="fab fa-whatsapp"></i> Enviar via WhatsApp
                      </a>
                 </div>
@@ -1304,14 +1390,36 @@
         }
     };
     
+    // Módulo de Recibos com filtros
 	App.modules.Receipts = {
         pageId: 'receipts',
+        init() {
+            document.getElementById('receiptsFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('receiptsClearBtn').addEventListener('click', () => {
+                document.getElementById('receiptsStartDate').value = '';
+                document.getElementById('receiptsEndDate').value = '';
+                this.render();
+            });
+        },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('receiptsTableBody');
-            const sales = [...state.sales].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('receiptsStartDate').value;
+            const endDate = document.getElementById('receiptsEndDate').value;
+
+            let sales = [...state.sales];
+
+            if (startDate && endDate) {
+                sales = sales.filter(s => {
+                    const saleDate = s.date.split('T')[0];
+                    return saleDate >= startDate && saleDate <= endDate;
+                });
+            }
+
+            sales.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(sales.length === 0){
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma venda registrada.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 20px;">Nenhuma venda encontrada.</td></tr>`;
                 return;
             }
             tableBody.innerHTML = sales.map(sale => {
@@ -1341,12 +1449,34 @@
         }
     };
 
+    // Módulo de Fluxo de Caixa com filtros
     App.modules.CashFlow = {
         pageId: 'cashflow',
+        init() {
+            document.getElementById('cashflowFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('cashflowClearBtn').addEventListener('click', () => {
+                document.getElementById('cashflowStartDate').value = '';
+                document.getElementById('cashflowEndDate').value = '';
+                this.render();
+            });
+        },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('cashflowTableBody');
-            const flow = [...state.cashFlow].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('cashflowStartDate').value;
+            const endDate = document.getElementById('cashflowEndDate').value;
+
+            let flow = [...state.cashFlow];
+
+            if(startDate && endDate) {
+                flow = flow.filter(f => {
+                    const flowDate = f.date.split('T')[0];
+                    return flowDate >= startDate && flowDate <= endDate;
+                });
+            }
+            
+            flow.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(flow.length === 0){
                 tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhum lançamento no caixa.</td></tr>`;
                 return;
@@ -1364,15 +1494,35 @@
         }
     };
     
+    // Módulo de Despesas com filtros
     App.modules.Expenses = {
         pageId: 'expenses',
         init() {
             document.getElementById('expenseForm').addEventListener('submit', this.save.bind(this));
+            document.getElementById('expensesFilterBtn').addEventListener('click', () => this.render());
+            document.getElementById('expensesClearBtn').addEventListener('click', () => {
+                document.getElementById('expensesStartDate').value = '';
+                document.getElementById('expensesEndDate').value = '';
+                this.render();
+            });
         },
         load() { this.render(); },
         render() {
             const tableBody = document.getElementById('expensesTableBody');
-            const expenses = [...state.expenses].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const startDate = document.getElementById('expensesStartDate').value;
+            const endDate = document.getElementById('expensesEndDate').value;
+
+            let expenses = [...state.expenses];
+
+            if(startDate && endDate) {
+                expenses = expenses.filter(e => {
+                    const expenseDate = e.date.split('T')[0];
+                    return expenseDate >= startDate && expenseDate <= endDate;
+                });
+            }
+
+            expenses.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             if(expenses.length === 0){
                 tableBody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding: 20px;">Nenhuma despesa registrada.</td></tr>`;
                 return;
