@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.5 - SCROLL EM LISTAS */
+        /* SGI - FLOR DE MARIA v9.6 - REDESIGN RELATÓRIOS */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -122,9 +122,8 @@
         .table tbody tr:hover { background-color: var(--hover-bg); }
         .table-actions { display: flex; gap: 8px; }
         
-        /* NOVO ESTILO: Container de tabela com rolagem */
         .table-container-scrollable {
-            max-height: 500px; /* Você pode ajustar esta altura como preferir */
+            max-height: 500px;
             overflow-y: auto;
         }
 
@@ -210,6 +209,59 @@
             width: 100%;
         }
 
+        .reports-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        .report-menu {
+            flex: 0 0 280px;
+        }
+        .report-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .report-menu-item:hover {
+            background-color: var(--hover-bg);
+        }
+        .report-menu-item.active {
+            background-color: var(--primary-color);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .report-menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .report-content {
+            flex: 1;
+        }
+        #reportControls {
+            background-color: var(--secondary-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        #reportControls .form-group {
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+        #reportOutput {
+            min-height: 400px;
+        }
+
 
         @media (max-width: 1200px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -228,6 +280,10 @@
             .sidebar-overlay { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
             .sidebar-overlay.active { opacity: 1; pointer-events: all; }
             .stats-grid, .grid, .grid-2, .grid-3, .grid-4, .grid-layout-pdv { grid-template-columns: 1fr !important; }
+            
+            .reports-layout { flex-direction: column; }
+            .report-menu { flex-basis: auto; width: 100%; }
+
             .table thead { display: none; }
             .table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
             .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); text-align: right; white-space: normal; }
@@ -561,38 +617,42 @@
                     </div>
                 </div>
             </div>
-
+            
             <div id="reportsPage" class="page hidden">
                 <div class="page-header">
                     <h1 class="page-title">Relatórios</h1>
-                    <p class="page-subtitle">Gere relatórios para análise do seu negócio</p>
+                    <p class="page-subtitle">Analise os dados do seu negócio</p>
                 </div>
-                <div class="grid grid-4">
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-file-invoice-dollar"></i> Relatório de Vendas</h3></div>
-                        <p class="text-muted" style="margin-bottom: 20px;">Gere um relatório de vendas por período.</p>
-                        <button class="btn btn-primary" id="generateSalesReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
+
+                <div class="reports-layout">
+                    <div class="report-menu card">
+                        <h3 class="card-title" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">Tipos de Relatório</h3>
+                        <div id="reportMenuList">
+                            <a class="report-menu-item" data-report="sales">
+                                <i class="fas fa-file-invoice-dollar"></i><span>Relatório de Vendas</span>
+                            </a>
+                            <a class="report-menu-item" data-report="topProducts">
+                                <i class="fas fa-star"></i><span>Produtos Mais Vendidos</span>
+                            </a>
+                            <a class="report-menu-item" data-report="clientSales">
+                                <i class="fas fa-user-tag"></i><span>Compras por Cliente</span>
+                            </a>
+                            <a class="report-menu-item" data-report="clientReceivables">
+                                <i class="fas fa-user-check"></i><span>Análise de Cliente</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-star"></i> Produtos Mais Vendidos</h3></div>
-                        <p class="text-muted" style="margin-bottom: 20px;">Veja um ranking dos produtos mais vendidos.</p>
-                        <button class="btn btn-primary" id="generateTopProductsReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
-                    </div>
-                     <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user-tag"></i> Compras por Cliente</h3></div>
-                        <p class="text-muted" style="margin-bottom: 20px;">Relatório de compras detalhado por cliente.</p>
-                        <button class="btn btn-primary" id="generateClientSalesReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title"><i class="fas fa-user-check"></i> Análise de Cliente</h3></div>
-                        <p class="text-muted" style="margin-bottom: 20px;">Verificar contas pagas e pendentes por cliente.</p>
-                        <button class="btn btn-primary" id="generateClientReceivablesReportBtn"><i class="fas fa-cogs"></i> Gerar Relatório</button>
-                    </div>
-                </div>
-                 <div class="card mt-4">
-                    <div class="card-header" id="reportOutputHeader"><h3 class="card-title"><i class="fas fa-chart-pie"></i> Visualização de Relatório</h3></div>
-                    <div id="reportOutput" class="text-center" style="min-height: 200px; padding: 20px; color: var(--text-muted);">
-                        Selecione um relatório para visualizar os dados aqui.
+
+                    <div class="report-content">
+                        <div id="reportControlsContainer">
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="reportOutputHeader">
+                                <h3 class="card-title"><i class="fas fa-chart-pie"></i> Visualização de Relatório</h3>
+                            </div>
+                            <div id="reportOutput" class="text-center" style="min-height: 400px; padding: 20px; display: flex; align-items: center; justify-content: center;">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -658,7 +718,7 @@
     </div>
 
 <script>
-    // ===== SGI - FLOR DE MARIA v9.5 - SCROLL EM LISTAS =====
+    // ===== SGI - FLOR DE MARIA v9.6 - CÓDIGO COMPLETO E CORRIGIDO =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -681,7 +741,8 @@
     
     const state = {
         clients: [], products: [], sales: [], cashFlow: [], expenses: [], receivables: [],
-        cart: [], currentEditId: null, chartInstances: {}
+        cart: [], currentEditId: null, chartInstances: {},
+        activeReport: null
     };
     
     const Utils = {
@@ -776,7 +837,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.5 (Scroll em Listas) Iniciado.');
+            console.log('SGI - Flor de Maria v9.6 (Redesign Relatórios) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -1587,11 +1648,9 @@
                 const sale = state.sales.find(s => s.id === saleId);
                 if (!sale) throw new Error("Venda não encontrada.");
 
-                // 1. Restaurar o estoque usando a função RPC
                 const { error: rpcError } = await db.rpc('restore_stock_from_sale', { sale_id_to_cancel: saleId });
                 if (rpcError) throw new Error(`Erro ao restaurar estoque: ${rpcError.message}`);
 
-                // 2. Remover lançamentos financeiros
                 const paymentMethod = sale.payment_method.split(' (')[0];
                 const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito', 'Cartão de Crédito'].includes(paymentMethod);
 
@@ -1601,7 +1660,6 @@
                     await db.from('receivables').delete().match({ sale_id: saleId });
                 }
 
-                // 3. Remover a venda
                 const { error: deleteSaleError } = await db.from('sales').delete().eq('id', saleId);
                 if (deleteSaleError) throw deleteSaleError;
 
@@ -1811,17 +1869,80 @@
     App.modules.Reports = {
         pageId: 'reports',
         init() {
-            document.getElementById('generateSalesReportBtn').addEventListener('click', () => this.showDateRangeModal('sales'));
-            document.getElementById('generateTopProductsReportBtn').addEventListener('click', () => this.showDateRangeModal('topProducts'));
-            document.getElementById('generateClientSalesReportBtn').addEventListener('click', () => this.showClientSelectModal('clientSales'));
-            document.getElementById('generateClientReceivablesReportBtn').addEventListener('click', () => this.showClientSelectModal('clientReceivables'));
+            document.getElementById('reportMenuList').addEventListener('click', (e) => {
+                const target = e.target.closest('.report-menu-item');
+                if (target) {
+                    const reportType = target.dataset.report;
+                    this.setActiveReport(reportType);
+                }
+            });
         },
         load() {
-            this.clearReportOutput();
+            this.clearReportUI();
         },
-        clearReportOutput() {
-             document.getElementById('reportOutputHeader').innerHTML = `<h3 class="card-title"><i class="fas fa-chart-pie"></i> Visualização de Relatório</h3>`;
-             document.getElementById('reportOutput').innerHTML = `<p class="text-center" style="color: var(--text-muted); padding: 20px;">Selecione um relatório para visualizar os dados aqui.</p>`;
+        setActiveReport(reportType) {
+            state.activeReport = reportType;
+            document.querySelectorAll('#reportMenuList .report-menu-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.report === reportType);
+            });
+            this.renderReportUI(reportType);
+        },
+        clearReportUI() {
+            state.activeReport = null;
+            document.querySelectorAll('#reportMenuList .report-menu-item').forEach(item => item.classList.remove('active'));
+            document.getElementById('reportControlsContainer').innerHTML = '';
+            document.getElementById('reportOutputHeader').innerHTML = `<h3 class="card-title"><i class="fas fa-chart-pie"></i> Visualização de Relatório</h3>`;
+            document.getElementById('reportOutput').innerHTML = `<p class="text-center text-muted">Selecione um tipo de relatório no menu ao lado para começar.</p>`;
+        },
+        renderReportUI(reportType) {
+            const controlsContainer = document.getElementById('reportControlsContainer');
+            let controlsHtml = '';
+
+            if (reportType === 'sales' || reportType === 'topProducts') {
+                controlsHtml = `
+                    <div id="reportControls" class="card">
+                        <div class="form-group">
+                            <label class="form-label" for="reportStartDate">Data de Início</label>
+                            <input type="date" id="reportStartDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="reportEndDate">Data de Fim</label>
+                            <input type="date" id="reportEndDate" class="form-input" required>
+                        </div>
+                        <button id="runReportBtn" class="btn btn-primary">Gerar Relatório</button>
+                    </div>
+                `;
+                controlsContainer.innerHTML = controlsHtml;
+                document.getElementById('runReportBtn').onclick = () => {
+                    const start = document.getElementById('reportStartDate').value;
+                    const end = document.getElementById('reportEndDate').value;
+                    if (!start || !end) return Notification.error('Selecione as datas de início e fim.');
+                    if (reportType === 'sales') this.generateSalesReport(start, end);
+                    if (reportType === 'topProducts') this.generateTopProductsReport(start, end);
+                };
+            } else if (reportType === 'clientSales' || reportType === 'clientReceivables') {
+                const clientOptions = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                controlsHtml = `
+                    <div id="reportControls" class="card">
+                        <div class="form-group">
+                            <label class="form-label" for="reportClientSelect">Selecione o Cliente</label>
+                            <select id="reportClientSelect" class="form-select">${clientOptions}</select>
+                        </div>
+                        <button id="runReportBtn" class="btn btn-primary">Gerar Relatório</button>
+                    </div>
+                `;
+                controlsContainer.innerHTML = controlsHtml;
+                 document.getElementById('runReportBtn').onclick = () => {
+                    const clientId = document.getElementById('reportClientSelect').value;
+                    if (!clientId) return Notification.error('Selecione um cliente.');
+                    if (reportType === 'clientSales') this.generateClientSalesReport(clientId);
+                    if (reportType === 'clientReceivables') this.generateClientReceivablesReport(clientId);
+                };
+            } else {
+                 controlsContainer.innerHTML = '';
+            }
+
+            document.getElementById('reportOutput').innerHTML = `<p class="text-center text-muted">Preencha os filtros acima e clique em "Gerar Relatório".</p>`;
         },
         addPdfButton(reportTitle, pdfHead, pdfBody, extraContent = null) {
             const header = document.getElementById('reportOutputHeader');
@@ -1832,48 +1953,6 @@
             document.getElementById('exportReportPdf').onclick = () => {
                 Utils.exportToPDF(reportTitle, pdfHead, pdfBody, extraContent);
             };
-        },
-        showDateRangeModal(reportType) {
-            const content = `
-                <div class="grid grid-2">
-                    <div class="form-group">
-                        <label class="form-label" for="reportStartDate">Data de Início</label>
-                        <input type="date" id="reportStartDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="reportEndDate">Data de Fim</label>
-                        <input type="date" id="reportEndDate" class="form-input" required>
-                    </div>
-                </div>
-                <button id="runReportBtn" class="btn btn-primary mt-4">Gerar Relatório</button>
-            `;
-            Modal.show('Selecione o Período', content);
-            document.getElementById('runReportBtn').onclick = () => {
-                const start = document.getElementById('reportStartDate').value;
-                const end = document.getElementById('reportEndDate').value;
-                if (!start || !end) return Notification.error('Selecione as datas de início e fim.');
-                if (reportType === 'sales') this.generateSalesReport(start, end);
-                if (reportType === 'topProducts') this.generateTopProductsReport(start, end);
-                Modal.hide();
-            };
-        },
-        showClientSelectModal(reportType) {
-            let options = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            const content = `
-                <div class="form-group">
-                    <label class="form-label" for="reportClientSelect">Selecione o Cliente</label>
-                    <select id="reportClientSelect" class="form-select">${options}</select>
-                </div>
-                <button id="runClientReportBtn" class="btn btn-primary mt-4">Gerar Relatório</button>
-            `;
-            Modal.show('Selecione o Cliente', content);
-            document.getElementById('runClientReportBtn').onclick = () => {
-                const clientId = document.getElementById('reportClientSelect').value;
-                if (!clientId) return Notification.error('Selecione um cliente.');
-                if (reportType === 'clientSales') this.generateClientSalesReport(clientId);
-                if (reportType === 'clientReceivables') this.generateClientReceivablesReport(clientId);
-                Modal.hide();
-            }
         },
         generateSalesReport(start, end) {
             const sales = state.sales.filter(s => s.date >= start && s.date <= end + 'T23:59:59');
@@ -1887,9 +1966,13 @@
             const total = sales.reduce((sum, s) => sum + s.total, 0);
             
             let html = `
-                <p><strong>Total de Vendas:</strong> ${sales.length}</p>
-                <p><strong>Faturamento Total:</strong> ${Utils.formatCurrency(total)}</p>
-                <canvas id="salesReportChart" style="margin-top:20px; max-height: 300px;"></canvas>
+                <div style="width: 100%; text-align: left;">
+                    <p><strong>Total de Vendas:</strong> ${sales.length}</p>
+                    <p><strong>Faturamento Total:</strong> ${Utils.formatCurrency(total)}</p>
+                    <div style="position: relative; height: 300px; margin-top: 20px;">
+                        <canvas id="salesReportChart"></canvas>
+                    </div>
+                </div>
             `;
             document.getElementById('reportOutput').innerHTML = html;
             
@@ -1928,7 +2011,7 @@
                 document.getElementById('reportOutput').innerHTML = '<p class="text-center text-muted">Nenhum produto vendido no período.</p>';
                 return;
             }
-            let html = `<canvas id="topProductsChart" style="margin-top:20px; max-height: 300px;"></canvas>`;
+            let html = `<div style="position: relative; height: 300px; width: 100%;"><canvas id="topProductsChart"></canvas></div>`;
             document.getElementById('reportOutput').innerHTML = html;
 
              Utils.renderChart('topProductsChart', 'bar', {
@@ -1953,12 +2036,14 @@
             }
             const totalSpent = sales.reduce((sum, s) => sum + s.total, 0);
             let html = `
-                <p><strong>Total de Compras:</strong> ${sales.length}</p>
-                <p><strong>Valor Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)}</p>
-                <div class="table-responsive mt-4"><table class="table">
-                <thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead>
-                <tbody>${sales.map(s => `<tr><td>${Utils.formatDate(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.payment_method}</td></tr>`).join('')}</tbody>
-                </table></div>`;
+                <div style="width: 100%; text-align: left;">
+                    <p><strong>Total de Compras:</strong> ${sales.length}</p>
+                    <p><strong>Valor Total Gasto:</strong> ${Utils.formatCurrency(totalSpent)}</p>
+                    <div class="table-responsive mt-4"><table class="table">
+                    <thead><tr><th>Data</th><th>Total</th><th>Pagamento</th></tr></thead>
+                    <tbody>${sales.map(s => `<tr><td>${Utils.formatDate(s.date)}</td><td>${Utils.formatCurrency(s.total)}</td><td>${s.payment_method}</td></tr>`).join('')}</tbody>
+                    </table></div>
+                </div>`;
             document.getElementById('reportOutput').innerHTML = html;
 
             const pdfHead = [['Data', 'Total', 'Pagamento']];
@@ -1976,20 +2061,22 @@
             const totalOwed = unpaid.reduce((sum, r) => sum + r.value, 0);
 
             let html = `
-                <div class="grid grid-2">
-                    <div class="stat-card"><div class="stat-value" style="color:var(--accent-color)">${Utils.formatCurrency(totalPaid)}</div><div class="stat-label">Total Pago</div></div>
-                    <div class="stat-card"><div class="stat-value" style="color:var(--danger-color)">${Utils.formatCurrency(totalOwed)}</div><div class="stat-label">Total a Pagar</div></div>
+                <div style="width: 100%; text-align: left;">
+                    <div class="grid grid-2">
+                        <div class="stat-card"><div class="stat-value" style="color:var(--accent-color)">${Utils.formatCurrency(totalPaid)}</div><div class="stat-label">Total Pago</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:var(--danger-color)">${Utils.formatCurrency(totalOwed)}</div><div class="stat-label">Total a Pagar</div></div>
+                    </div>
+                    <h4 class="mt-4">Contas Pendentes/Vencidas (${unpaid.length})</h4>
+                    <div class="table-responsive mt-4"><table class="table">
+                        <thead><tr><th>Descrição</th><th>Vencimento</th><th>Valor</th></tr></thead>
+                        <tbody>${unpaid.length > 0 ? unpaid.map(r => `<tr><td>${r.description}</td><td>${Utils.formatDate(r.due_date)}</td><td>${Utils.formatCurrency(r.value)}</td></tr>`).join('') : '<tr><td colspan=3 class=text-center>Nenhuma conta pendente.</td></tr>'}</tbody>
+                    </table></div>
+                    <h4 class="mt-4">Contas Pagas (${paid.length})</h4>
+                    <div class="table-responsive mt-4"><table class="table">
+                        <thead><tr><th>Descrição</th><th>Data Pgto.</th><th>Valor</th></tr></thead>
+                        <tbody>${paid.length > 0 ? paid.map(r => `<tr><td>${r.description}</td><td>${Utils.formatDate(r.paid_at)}</td><td>${Utils.formatCurrency(r.value)}</td></tr>`).join('') : '<tr><td colspan=3 class=text-center>Nenhuma conta paga.</td></tr>'}</tbody>
+                    </table></div>
                 </div>
-                <h4 class="mt-4">Contas Pendentes/Vencidas (${unpaid.length})</h4>
-                <div class="table-responsive mt-4"><table class="table">
-                    <thead><tr><th>Descrição</th><th>Vencimento</th><th>Valor</th></tr></thead>
-                    <tbody>${unpaid.length > 0 ? unpaid.map(r => `<tr><td>${r.description}</td><td>${Utils.formatDate(r.due_date)}</td><td>${Utils.formatCurrency(r.value)}</td></tr>`).join('') : '<tr><td colspan=3 class=text-center>Nenhuma conta pendente.</td></tr>'}</tbody>
-                </table></div>
-                <h4 class="mt-4">Contas Pagas (${paid.length})</h4>
-                <div class="table-responsive mt-4"><table class="table">
-                    <thead><tr><th>Descrição</th><th>Data Pgto.</th><th>Valor</th></tr></thead>
-                    <tbody>${paid.length > 0 ? paid.map(r => `<tr><td>${r.description}</td><td>${Utils.formatDate(r.paid_at)}</td><td>${Utils.formatCurrency(r.value)}</td></tr>`).join('') : '<tr><td colspan=3 class=text-center>Nenhuma conta paga.</td></tr>'}</tbody>
-                </table></div>
             `;
             document.getElementById('reportOutput').innerHTML = html;
             
@@ -1998,7 +2085,7 @@
             this.addPdfButton(reportTitle, pdfHead, pdfBody, [`Total Pago: ${Utils.formatCurrency(totalPaid)}`, `Total a Pagar: ${Utils.formatCurrency(totalOwed)}`]);
         }
     };
-
+    
     App.modules.Settings = {
         pageId: 'settings',
         init() {
@@ -2040,7 +2127,6 @@
             }
             document.body.className = 'state-loading';
             try {
-                // 1. Restaurar estoque de todas as vendas antes de apagá-las
                 const { data: allSales, error: fetchError } = await db.from('sales').select('id');
                 if(fetchError) throw fetchError;
 
@@ -2048,7 +2134,6 @@
                     await db.rpc('restore_stock_from_sale', { sale_id_to_cancel: sale.id });
                 }
 
-                // 2. Limpar as tabelas financeiras
                 const tablesToClear = ['sales', 'cash_flow', 'expenses', 'receivables'];
                 const promises = tablesToClear.map(tableName => db.from(tableName).delete().neq('id', '00000000-0000-0000-0000-000000000000'));
                 await Promise.all(promises);
