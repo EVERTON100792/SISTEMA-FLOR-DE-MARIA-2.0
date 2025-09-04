@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO */
+        /* SGI - FLOR DE MARIA v9.4 - CANCELAMENTO DE VENDA E AJUSTES */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -45,7 +45,6 @@
         .login-container { align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
         .login-card { background: var(--secondary-bg); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
         
-        /* NOVO ESTILO: Logo na tela de login */
         .login-logo img {
             width: 90px;
             height: 90px;
@@ -72,7 +71,6 @@
         .sidebar-header { padding: 0 24px 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; }
         
-        /* NOVO ESTILO: Logo na barra lateral */
         .sidebar-logo img {
             width: 36px;
             height: 36px;
@@ -179,7 +177,8 @@
         .product-item-pdv { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); }
         .product-item-pdv:hover { background-color: var(--hover-bg); }
         .cart-items { max-height: 300px; overflow-y: auto; padding-right: 10px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color); }
+        .cart-item:last-child { border-bottom: none; }
         .cart-total { font-size: 24px; font-weight: bold; color: var(--accent-color); }
         
         .pdv-client-group { display: flex; align-items: center; gap: 10px; }
@@ -192,6 +191,18 @@
         .dashboard-filters { margin-bottom: 1rem; }
         .dashboard-filters .btn { background-color: var(--surface-bg); }
         .dashboard-filters .btn.active { background-color: var(--primary-color); color: var(--text-primary); }
+        
+        .price-selector {
+            font-size: 12px;
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin-top: 5px;
+            width: 100%;
+        }
+
 
         @media (max-width: 1200px) {
             .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -366,10 +377,13 @@
                             <input type="hidden" id="productId">
                             <div class="form-group"><label class="form-label" for="productRefCode">Código de Referência</label><input type="text" id="productRefCode" class="form-input" required></div>
                             <div class="form-group"><label class="form-label" for="productName">Nome do Produto</label><input type="text" id="productName" class="form-input" required></div>
-                            <div class="grid grid-3">
+                            <div class="grid grid-2">
                                 <div class="form-group"><label class="form-label" for="productQuantity">Quantidade</label><input type="number" id="productQuantity" class="form-input" min="0" required></div>
                                 <div class="form-group"><label class="form-label" for="productCostPrice">Preço de Custo</label><input type="number" id="productCostPrice" class="form-input" min="0" step="0.01" required></div>
-                                <div class="form-group"><label class="form-label" for="productSalePrice">Preço de Venda</label><input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" required></div>
+                            </div>
+                             <div class="grid grid-2">
+                                <div class="form-group"><label class="form-label" for="productSalePrice">Preço à Vista</label><input type="number" id="productSalePrice" class="form-input" min="0" step="0.01" required></div>
+                                <div class="form-group"><label class="form-label" for="productPrazoPrice">Preço a Prazo</label><input type="number" id="productPrazoPrice" class="form-input" min="0" step="0.01" required></div>
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Produto</button>
@@ -390,7 +404,7 @@
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div>
                     <div class="table-responsive"><table class="table">
-                        <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. Venda</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
+                        <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. à Vista</th><th>P. a Prazo</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table></div>
                 </div>
@@ -474,10 +488,10 @@
                 <div class="card">
                      <div class="card-header"><h3 class="card-title"><i class="fas fa-exchange-alt"></i> Lançamentos</h3></div>
                      <div class="date-filters">
-                        <input type="date" id="cashflowStartDate" class="form-input">
-                        <input type="date" id="cashflowEndDate" class="form-input">
-                        <button id="cashflowFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
-                        <button id="cashflowClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                         <input type="date" id="cashflowStartDate" class="form-input">
+                         <input type="date" id="cashflowEndDate" class="form-input">
+                         <button id="cashflowFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                         <button id="cashflowClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
                     </div>
                      <div class="table-responsive">
                         <table class="table">
@@ -507,10 +521,10 @@
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-list-alt"></i> Histórico de Despesas</h3></div>
                      <div class="date-filters">
-                        <input type="date" id="expensesStartDate" class="form-input">
-                        <input type="date" id="expensesEndDate" class="form-input">
-                        <button id="expensesFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
-                        <button id="expensesClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
+                         <input type="date" id="expensesStartDate" class="form-input">
+                         <input type="date" id="expensesEndDate" class="form-input">
+                         <button id="expensesFilterBtn" class="btn btn-primary btn-sm">Filtrar</button>
+                         <button id="expensesClearBtn" class="btn btn-secondary btn-sm">Limpar</button>
                     </div>
                      <div class="table-responsive">
                         <table class="table">
@@ -596,7 +610,7 @@
                         <div class="mb-2" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
                             <div>
                                 <strong>Zerar Lançamentos Financeiros</strong>
-                                <p class="text-muted" style="font-size: 14px;">Apaga todas as vendas, despesas, contas a receber e fluxo de caixa. Clientes e produtos não são afetados. Ideal para testes.</p>
+                                <p class="text-muted" style="font-size: 14px;">Apaga todas as vendas, despesas, etc., e RESTAURA o estoque dos produtos vendidos.</p>
                             </div>
                             <button id="resetFinancialDataBtn" class="btn btn-danger"><i class="fas fa-bomb"></i> Zerar Dados</button>
                         </div>
@@ -632,8 +646,8 @@
         </div>
     </div>
 
-    <script>
-    // ===== SGI - FLOR DE MARIA v9.2 - IMPLEMENTAÇÃO DE LOGO =====
+<script>
+    // ===== SGI - FLOR DE MARIA v9.4 - CANCELAMENTO DE VENDA E AJUSTES =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -751,7 +765,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.2 (Bug Fixes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.4 (Cancelamento de Venda e Ajustes) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -803,18 +817,16 @@
             await db.auth.signOut();
         },
         showLogin() {
-        document.body.className = 'state-login';
-
-        // --- INÍCIO DA CORREÇÃO ---
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.reset(); // Reseta os campos de email e senha
-            const btn = loginForm.querySelector('button');
-            if (btn) {
-                btn.disabled = false; // Reabilita o botão
-                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; // Restaura o texto original do botão
+            document.body.className = 'state-login';
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.reset();
+                const btn = loginForm.querySelector('button');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                }
             }
-        }
         },
         async showApp() {
             await App.loadAllData();
@@ -1075,12 +1087,22 @@
         pageId: 'products', name: 'Produto', stateKey: 'products', tableName: 'products', formId: 'productForm', tableBodyId: 'productsTableBody',
         searchId: 'productSearch', clearBtnId: 'clearProductForm', exportBtnId: 'exportProducts', focusFieldId: 'productRefCode',
         filterKeys: ['name', 'ref_code'],
-        getFormData: f => ({ ref_code: f.productRefCode.value.trim(), name: f.productName.value.trim(), quantity: parseInt(f.productQuantity.value), cost_price: parseFloat(f.productCostPrice.value), sale_price: parseFloat(f.productSalePrice.value) }),
-        validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
+        getFormData: f => ({ 
+            ref_code: f.productRefCode.value.trim(), 
+            name: f.productName.value.trim(), 
+            quantity: parseInt(f.productQuantity.value), 
+            cost_price: parseFloat(f.productCostPrice.value), 
+            sale_price: parseFloat(f.productSalePrice.value),
+            prazo_price: parseFloat(f.productPrazoPrice.value)
+        }),
+        validate: d => (d.ref_code && d.name && !isNaN(d.quantity) && !isNaN(d.cost_price) && !isNaN(d.sale_price) && !isNaN(d.prazo_price)) ? true : (Notification.error('Preencha todos os campos corretamente.'), false),
         beforeSaveValidation: (itemData, s) => {
             const codeExists = s.products.some(p => p.ref_code.toLowerCase() === itemData.ref_code.toLowerCase() && p.id !== s.currentEditId);
             if (codeExists) {
                 return "Já existe um produto com este Código de Referência.";
+            }
+            if (itemData.prazo_price < itemData.sale_price) {
+                return "O preço a prazo não pode ser menor que o preço à vista.";
             }
             return null;
         },
@@ -1090,22 +1112,28 @@
             document.getElementById('productQuantity').value = p.quantity;
             document.getElementById('productCostPrice').value = p.cost_price;
             document.getElementById('productSalePrice').value = p.sale_price;
+            document.getElementById('productPrazoPrice').value = p.prazo_price || p.sale_price;
         },
         renderRow: p => {
             const margin = p.cost_price > 0 && p.sale_price > 0 ? (((p.sale_price - p.cost_price) / p.sale_price) * 100).toFixed(2) + '%' : 'N/A';
             const status = p.quantity > 5 ? `<span class="badge badge-success">Em Estoque</span>` : (p.quantity > 0 ? `<span class="badge badge-warning">Estoque Baixo</span>` : `<span class="badge badge-danger">Esgotado</span>`);
             return `<tr>
-                <td data-label="Código">${p.ref_code}</td><td data-label="Nome">${p.name}</td><td data-label="Qtd.">${p.quantity}</td>
-                <td data-label="P. Custo">${Utils.formatCurrency(p.cost_price)}</td><td data-label="P. Venda">${Utils.formatCurrency(p.sale_price)}</td>
-                <td data-label="Margem">${margin}</td><td data-label="Status">${status}</td>
+                <td data-label="Código">${p.ref_code}</td>
+                <td data-label="Nome">${p.name}</td>
+                <td data-label="Qtd.">${p.quantity}</td>
+                <td data-label="P. Custo">${Utils.formatCurrency(p.cost_price)}</td>
+                <td data-label="P. à Vista">${Utils.formatCurrency(p.sale_price)}</td>
+                <td data-label="P. a Prazo">${Utils.formatCurrency(p.prazo_price)}</td>
+                <td data-label="Margem">${margin}</td>
+                <td data-label="Status">${status}</td>
                 <td data-label="Ações"><div class="table-actions">
                     <button class="btn btn-secondary btn-sm" onclick="App.modules.Products.edit('${p.id}')"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-danger btn-sm" onclick="App.modules.Products.remove('${p.id}')"><i class="fas fa-trash"></i></button>
                 </div></td>
             </tr>`;
         },
-        emptyRow: `<tr><td colspan="8" class="text-center" style="padding:20px;">Nenhum produto encontrado.</td></tr>`,
-        mapExport: p => ({ codigo: p.ref_code, nome: p.name, quantidade: p.quantity, preco_custo: p.cost_price, preco_venda: p.sale_price }),
+        emptyRow: `<tr><td colspan="9" class="text-center" style="padding:20px;">Nenhum produto encontrado.</td></tr>`,
+        mapExport: p => ({ codigo: p.ref_code, nome: p.name, quantidade: p.quantity, preco_custo: p.cost_price, preco_a_vista: p.sale_price, preco_a_prazo: p.prazo_price }),
         updateStats() {
             document.getElementById('totalProducts').textContent = state.products.length;
             document.getElementById('outOfStockProducts').textContent = state.products.filter(p => p.quantity <= 0).length;
@@ -1117,7 +1145,10 @@
         init() {
             document.getElementById('pdvProductSearch').addEventListener('input', Utils.debounce(() => this.renderProductList(), 300));
             document.getElementById('finalizeSaleBtn').addEventListener('click', this.finalizeSale.bind(this));
-            document.getElementById('pdvPaymentMethod').addEventListener('change', this.toggleInstallmentsField.bind(this));
+            document.getElementById('pdvPaymentMethod').addEventListener('change', () => {
+                this.toggleInstallmentsField();
+                this.renderCart(); 
+            });
             document.getElementById('quickAddClientBtn').addEventListener('click', this.showQuickAddClientModal.bind(this));
         },
         load() {
@@ -1205,7 +1236,7 @@
                 if (existingItem.quantity < product.quantity) existingItem.quantity++;
                 else Notification.warning(`Estoque máximo para ${product.name} atingido.`);
             } else {
-                state.cart.push({ ...product, quantity: 1, stock_quantity: product.quantity });
+                state.cart.push({ ...product, quantity: 1, stock_quantity: product.quantity, price_type: 'vista' });
             }
             this.renderCart();
         },
@@ -1218,25 +1249,45 @@
             newQuantity = parseInt(newQuantity);
             if (item && newQuantity > 0 && newQuantity <= item.stock_quantity) {
                 item.quantity = newQuantity;
-            } else if (item) {
-                this.renderCart();
             }
+            this.renderCart();
+        },
+        updatePriceType(productId, priceType) {
+            const item = state.cart.find(i => i.id === productId);
+            if (item) {
+                item.price_type = priceType;
+            }
+            this.renderCart();
         },
         renderCart() {
             const cartEl = document.getElementById('pdvCartItems');
+            const paymentMethod = document.getElementById('pdvPaymentMethod').value;
+            const isInstallmentPayment = !['Dinheiro', 'Pix', 'Cartão de Débito'].includes(paymentMethod);
+            
             let total = 0;
+            
             if (state.cart.length === 0) {
                 cartEl.innerHTML = `<p class="text-center text-muted">Carrinho vazio</p>`;
             } else {
                 cartEl.innerHTML = state.cart.map(item => {
-                    total += item.sale_price * item.quantity;
+                    const currentPrice = (isInstallmentPayment && item.price_type === 'prazo') ? (item.prazo_price || item.sale_price) : item.sale_price;
+                    total += currentPrice * item.quantity;
+
+                    const priceSelectorHtml = isInstallmentPayment && item.prazo_price > item.sale_price
+                        ? `<select class="price-selector" onchange="App.modules.Sales.updatePriceType('${item.id}', this.value)">
+                                <option value="vista" ${item.price_type === 'vista' ? 'selected' : ''}>À Vista: ${Utils.formatCurrency(item.sale_price)}</option>
+                                <option value="prazo" ${item.price_type === 'prazo' ? 'selected' : ''}>A Prazo: ${Utils.formatCurrency(item.prazo_price)}</option>
+                           </select>`
+                        : '';
+                        
                     return `<div class="cart-item">
-                        <div>
+                        <div style="flex-grow: 1;">
                             <p style="font-size: 14px; margin-bottom: 5px;">${item.name}</p>
                             <input type="number" value="${item.quantity}" min="1" max="${item.stock_quantity}" onchange="App.modules.Sales.updateCartQuantity('${item.id}', this.value)" style="width: 60px; background: var(--primary-bg); border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 2px 5px;">
+                            ${priceSelectorHtml}
                         </div>
                         <div class="text-right">
-                           <p>${Utils.formatCurrency(item.sale_price * item.quantity)}</p>
+                           <p>${Utils.formatCurrency(currentPrice * item.quantity)}</p>
                            <button onclick="App.modules.Sales.removeFromCart('${item.id}')" style="background:none; border:none; color: var(--danger-color); cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>`;
@@ -1377,19 +1428,29 @@
             const paymentMethod = document.getElementById('pdvPaymentMethod').value;
             const installmentsSelect = document.getElementById('pdvInstallments');
             const installments = ['Cartão de Crédito', 'Crediário'].includes(paymentMethod) ? parseInt(installmentsSelect.value) : 1;
-            
+            const isInstallmentPayment = !['Dinheiro', 'Pix', 'Cartão de Débito'].includes(paymentMethod);
+
             const btn = document.getElementById('finalizeSaleBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
 
-            const total = state.cart.reduce((sum, item) => sum + item.sale_price * item.quantity, 0);
+            const total = state.cart.reduce((sum, item) => {
+                const price = (isInstallmentPayment && item.price_type === 'prazo') ? (item.prazo_price || item.sale_price) : item.sale_price;
+                return sum + price * item.quantity;
+            }, 0);
+
             const paymentMethodDesc = installments > 1 ? `${paymentMethod} (${installments}x)` : paymentMethod;
 
             const saleData = {
                 client_id: clientId,
                 total: total,
                 payment_method: paymentMethodDesc,
-                items: state.cart.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.sale_price })),
+                items: state.cart.map(item => ({ 
+                    id: item.id, 
+                    name: item.name, 
+                    quantity: item.quantity, 
+                    price: (isInstallmentPayment && item.price_type === 'prazo') ? (item.prazo_price || item.sale_price) : item.sale_price
+                })),
                 date: new Date().toISOString()
             };
 
@@ -1402,13 +1463,14 @@
                     if (error) throw new Error(`Erro ao atualizar estoque para ${item.name}: ${error.message}`);
                 }
                 
-                const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito'].includes(paymentMethod) || (paymentMethod === 'Cartão de Crédito' && installments === 1);
+                // AJUSTE: Cartão de Crédito agora é pagamento imediato
+                const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito', 'Cartão de Crédito'].includes(paymentMethod);
                 
                 if (isImmediatePayment) {
                     await db.from('cash_flow').insert({
                         description: `Venda #${Utils.formatShortId(newSale.id)}`, value: total, type: 'entrada', date: new Date().toISOString()
                     });
-                } else {
+                } else { // Crediário e A Prazo
                     const installmentValue = parseFloat((total / installments).toFixed(2));
                     const receivablesToInsert = [];
                     for (let i = 1; i <= installments; i++) {
@@ -1487,8 +1549,9 @@
                     <td data-label="Total">${Utils.formatCurrency(sale.total)}</td>
                     <td data-label="Pagamento"><span class="badge badge-info">${sale.payment_method}</span></td>
                     <td data-label="Ações"><div class="table-actions">
-                        <button class="btn btn-secondary btn-sm" onclick="App.modules.Receipts.viewDetails('${sale.id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-primary btn-sm" onclick="App.modules.Receipts.printReceipt('${sale.id}')"><i class="fas fa-print"></i></button>
+                        <button class="btn btn-secondary btn-sm" onclick="App.modules.Receipts.viewDetails('${sale.id}')" title="Ver Detalhes"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-primary btn-sm" onclick="App.modules.Receipts.printReceipt('${sale.id}')" title="Imprimir Recibo"><i class="fas fa-print"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="App.modules.Receipts.cancelSale('${sale.id}')" title="Cancelar Venda"><i class="fas fa-times-circle"></i></button>
                     </div></td>
                 </tr>`;
             }).join('');
@@ -1502,6 +1565,45 @@
             const sale = state.sales.find(s => s.id == saleId);
             if (!sale) return;
             App.modules.Sales.generateAndDownloadReceiptPDF(sale);
+        },
+        async cancelSale(saleId) {
+            if (!confirm('Tem certeza que deseja cancelar esta venda? O estoque será restaurado e os lançamentos financeiros serão removidos. Esta ação é irreversível.')) {
+                return;
+            }
+            
+            document.body.className = 'state-loading';
+            
+            try {
+                const sale = state.sales.find(s => s.id === saleId);
+                if (!sale) throw new Error("Venda não encontrada.");
+
+                // 1. Restaurar o estoque usando a função RPC
+                const { error: rpcError } = await db.rpc('restore_stock_from_sale', { sale_id_to_cancel: saleId });
+                if (rpcError) throw new Error(`Erro ao restaurar estoque: ${rpcError.message}`);
+
+                // 2. Remover lançamentos financeiros
+                const paymentMethod = sale.payment_method.split(' (')[0];
+                const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito', 'Cartão de Crédito'].includes(paymentMethod);
+
+                if (isImmediatePayment) {
+                    await db.from('cash_flow').delete().match({ description: `Venda #${Utils.formatShortId(sale.id)}` });
+                } else {
+                    await db.from('receivables').delete().match({ sale_id: saleId });
+                }
+
+                // 3. Remover a venda
+                const { error: deleteSaleError } = await db.from('sales').delete().eq('id', saleId);
+                if (deleteSaleError) throw deleteSaleError;
+
+                Notification.success('Venda cancelada com sucesso!');
+                await Navigation.navigateTo('receipts');
+
+            } catch (error) {
+                console.error("Erro ao cancelar venda:", error);
+                Notification.error(`Falha ao cancelar a venda: ${error.message}`);
+            } finally {
+                document.body.className = 'state-app';
+            }
         }
     };
 
@@ -1922,23 +2024,34 @@
             Notification.success('Configurações salvas com sucesso!');
         },
         async handleResetFinancialData() {
-            const confirmation = prompt('Atenção! Esta ação é irreversível e irá apagar TODOS os dados de vendas, fluxo de caixa, despesas e contas a receber.\n\nPara confirmar, digite ZERAR DADOS em maiúsculas.');
+            const confirmation = prompt('Atenção! Esta ação é IRREVERSÍVEL. O estoque dos produtos será restaurado e todas as vendas, fluxo de caixa, despesas e contas a receber serão apagados.\n\nPara confirmar, digite ZERAR DADOS em maiúsculas.');
             if (confirmation !== 'ZERAR DADOS') {
                 return Notification.warning('Ação cancelada.');
             }
             try {
                 document.body.className = 'state-loading';
+                
+                // 1. Restaurar estoque de todas as vendas antes de apagá-las
+                const { data: allSales, error: fetchError } = await db.from('sales').select('id');
+                if(fetchError) throw fetchError;
+
+                for (const sale of allSales) {
+                    await db.rpc('restore_stock_from_sale', { sale_id_to_cancel: sale.id });
+                }
+
+                // 2. Limpar as tabelas financeiras
                 const tablesToClear = ['sales', 'cash_flow', 'expenses', 'receivables'];
                 const promises = tablesToClear.map(tableName => db.from(tableName).delete().neq('id', '00000000-0000-0000-0000-000000000000'));
                 await Promise.all(promises);
                 
-                Notification.success('Todos os dados financeiros foram zerados com sucesso!');
+                Notification.success('Todos os dados financeiros foram zerados e o estoque foi restaurado!');
                 await Navigation.navigateTo('dashboard');
 
             } catch (error) {
                 console.error('Erro ao zerar dados financeiros:', error);
                 Notification.error('Ocorreu um erro ao zerar os dados: ' + error.message);
-                document.body.className = 'state-app';
+            } finally {
+                 document.body.className = 'state-app';
             }
         },
         async handleClearTable(tableName, displayName, confirmationKeyword) {
@@ -1954,12 +2067,13 @@
             } catch (error) {
                 console.error(`Erro ao limpar ${displayName}:`, error);
                 Notification.error(`Ocorreu um erro ao limpar os ${displayName}: ` + error.message);
+            } finally {
                 document.body.className = 'state-app';
             }
         }
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
-    </script>
+</script>
 </body>
 </html>
