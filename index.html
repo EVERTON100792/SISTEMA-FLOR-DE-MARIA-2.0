@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.4 - CANCELAMENTO DE VENDA E AJUSTES */
+        /* SGI - FLOR DE MARIA v9.5 - SCROLL EM LISTAS */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -121,6 +121,13 @@
         .table th { font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
         .table tbody tr:hover { background-color: var(--hover-bg); }
         .table-actions { display: flex; gap: 8px; }
+        
+        /* NOVO ESTILO: Container de tabela com rolagem */
+        .table-container-scrollable {
+            max-height: 500px; /* Você pode ajustar esta altura como preferir */
+            overflow-y: auto;
+        }
+
         .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
         .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
@@ -358,10 +365,12 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-users"></i> Lista de Clientes</h3></div>
-                    <div class="table-responsive"><table class="table">
-                        <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Total Gasto</th><th>Ações</th></tr></thead>
-                        <tbody id="clientsTableBody"></tbody>
-                    </table></div>
+                    <div class="table-responsive table-container-scrollable">
+                        <table class="table">
+                            <thead><tr><th>Nome</th><th>Telefone</th><th>Cadastro</th><th>Compras</th><th>Total Gasto</th><th>Ações</th></tr></thead>
+                            <tbody id="clientsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
@@ -403,10 +412,12 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> Lista de Produtos</h3></div>
-                    <div class="table-responsive"><table class="table">
-                        <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. à Vista</th><th>P. a Prazo</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
-                        <tbody id="productsTableBody"></tbody>
-                    </table></div>
+                    <div class="table-responsive table-container-scrollable">
+                        <table class="table">
+                            <thead><tr><th>Código</th><th>Nome</th><th>Qtd.</th><th>P. Custo</th><th>P. à Vista</th><th>P. a Prazo</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="productsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -647,7 +658,7 @@
     </div>
 
 <script>
-    // ===== SGI - FLOR DE MARIA v9.4 - CANCELAMENTO DE VENDA E AJUSTES =====
+    // ===== SGI - FLOR DE MARIA v9.5 - SCROLL EM LISTAS =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -765,7 +776,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.4 (Cancelamento de Venda e Ajustes) Iniciado.');
+            console.log('SGI - Flor de Maria v9.5 (Scroll em Listas) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
@@ -1463,14 +1474,13 @@
                     if (error) throw new Error(`Erro ao atualizar estoque para ${item.name}: ${error.message}`);
                 }
                 
-                // AJUSTE: Cartão de Crédito agora é pagamento imediato
                 const isImmediatePayment = ['Dinheiro', 'Pix', 'Cartão de Débito', 'Cartão de Crédito'].includes(paymentMethod);
                 
                 if (isImmediatePayment) {
                     await db.from('cash_flow').insert({
                         description: `Venda #${Utils.formatShortId(newSale.id)}`, value: total, type: 'entrada', date: new Date().toISOString()
                     });
-                } else { // Crediário e A Prazo
+                } else {
                     const installmentValue = parseFloat((total / installments).toFixed(2));
                     const receivablesToInsert = [];
                     for (let i = 1; i <= installments; i++) {
@@ -2028,9 +2038,8 @@
             if (confirmation !== 'ZERAR DADOS') {
                 return Notification.warning('Ação cancelada.');
             }
+            document.body.className = 'state-loading';
             try {
-                document.body.className = 'state-loading';
-                
                 // 1. Restaurar estoque de todas as vendas antes de apagá-las
                 const { data: allSales, error: fetchError } = await db.from('sales').select('id');
                 if(fetchError) throw fetchError;
