@@ -288,8 +288,26 @@
             .table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
             .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); text-align: right; white-space: normal; }
             .table tr td:last-child { border-bottom: none; }
-            .table td::before { content: attr(data-label); font-weight: bold; text-align: left; padding-right: 1rem; color: var(--text-secondary); white-space: nowrap; }
-        }
+			
+			.table td::before { content: attr(data-label); font-weight: bold; text-align: left; padding-right: 1rem; color: var(--text-secondary); white-space: nowrap; }
+       #reportControls {
+        flex-direction: column; /* Empilha os filtros verticalmente no celular */
+        align-items: stretch;   /* Faz com que os itens preencham a largura */
+    }
+
+    #reportControls .form-group {
+        width: 100%; /* Garante que o grupo do formulário ocupe todo o espaço */
+    }
+
+    #reportControls .btn {
+        width: 100%; /* Faz o botão "Gerar Relatório" ocupar a largura total */
+        margin-top: 10px; /* Adiciona um espaçamento acima do botão */
+    }
+    /* ===== FIM DA CORREÇÃO ===== */
+}
+		
+		}
+		
     </style>
 </head>
 <body>
