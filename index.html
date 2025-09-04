@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* SGI - FLOR DE MARIA v9.6 - REDESIGN RELATÓRIOS */
+        /* SGI - FLOR DE MARIA v9.7 - VERSÃO COMPLETA E ESTÁVEL */
         :root {
             --primary-bg: #0B1120;
             --secondary-bg: #131a2b;
@@ -718,7 +718,7 @@
     </div>
 
 <script>
-    // ===== SGI - FLOR DE MARIA v9.6 - CÓDIGO COMPLETO E CORRIGIDO =====
+    // ===== SGI - FLOR DE MARIA v9.7 - VERSÃO COMPLETA E ESTÁVEL =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -837,7 +837,7 @@
             const { data: { session } } = await db.auth.getSession();
             if (session) await Auth.showApp();
             else Auth.showLogin();
-            console.log('SGI - Flor de Maria v9.6 (Redesign Relatórios) Iniciado.');
+            console.log('SGI - Flor de Maria v9.7 (Versão Completa e Estável) Iniciado.');
         },
         async loadAllData(showLoading = true) {
             if(showLoading) document.body.className = 'state-loading';
