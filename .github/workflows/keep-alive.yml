@@ -1,0 +1,20 @@
+name: Supabase Keep-Alive Ping
+
+# Configura o robô para rodar automaticamente:
+on:
+  schedule:
+    # Roda às 5 da manhã (UTC) a cada 3 dias. Você pode deixar assim.
+    - cron: '0 5 */3 * *'
+  # Isso também adiciona um botão para você rodar manualmente se quiser.
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GET request to a Supabase table
+        run: |
+          curl -X GET \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/products?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
