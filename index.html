@@ -1885,30 +1885,115 @@
                     <td data-label="Vencimento">${Utils.formatDate(r.due_date)}</td>
                     <td data-label="Status">${statusBadge}</td>
                     <td data-label="Ações"><div class="table-actions">
-                        <button class="btn btn-accent btn-sm" onclick="App.modules.Receivables.markAsPaid('${r.id}')"><i class="fas fa-check-circle"></i> Marcar como Pago</button>
+                        <button class="btn btn-accent btn-sm" onclick="App.modules.Receivables.showPaymentModal('${r.id}')"><i class="fas fa-dollar-sign"></i> Realizar Pagamento</button>
                     </div></td>
                 </tr>`;
             }).join('');
         },
-        async markAsPaid(id) {
-            if(!confirm('Confirmar o recebimento desta conta?')) return;
+        showPaymentModal(id) {
             const receivable = state.receivables.find(r => r.id == id);
-            if(!receivable) return;
+            if (!receivable) return;
+
+            const clientName = state.clients.find(c => c.id === receivable.client_id)?.name || 'N/A';
+
+            const modalContent = `
+                <p><strong>Cliente:</strong> ${clientName}</p>
+                <p><strong>Valor da Dívida:</strong> ${Utils.formatCurrency(receivable.value)}</p>
+                <div class="form-group mt-4">
+                    <label class="form-label" for="paymentAmount">Valor a Pagar</label>
+                    <input type="number" id="paymentAmount" class="form-input" step="0.01" min="0.01" value="${receivable.value.toFixed(2)}" placeholder="0,00">
+                </div>
+                <div class="modal-actions">
+                    <button id="confirmPaymentBtn" class="btn btn-primary"><i class="fas fa-check"></i> Confirmar Pagamento</button>
+                </div>
+            `;
+            Modal.show(`Realizar Pagamento`, modalContent);
+
+            document.getElementById('confirmPaymentBtn').addEventListener('click', () => {
+                const amount = document.getElementById('paymentAmount').value;
+                this.processPayment(id, amount);
+            });
+        },
+        async processPayment(id, amountPaid) {
+            const receivable = state.receivables.find(r => r.id == id);
+            if (!receivable) return;
+
+            amountPaid = parseFloat(amountPaid);
+            if (isNaN(amountPaid) || amountPaid <= 0) {
+                return Notification.error('O valor do pagamento é inválido.');
+            }
+
+            const btn = document.getElementById('confirmPaymentBtn');
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            }
 
             try {
-                await db.from('receivables').update({ status: 'Pago', paid_at: new Date().toISOString() }).eq('id', id);
-
+                // Registrar a entrada no fluxo de caixa primeiro
                 await db.from('cash_flow').insert({
-                    description: receivable.description || `Recebimento da venda #${Utils.formatShortId(receivable.sale_id)}`,
-                    value: receivable.value,
+                    description: `Pagamento da conta de ${receivable.description || `Venda #${Utils.formatShortId(receivable.sale_id)}`}`,
+                    value: amountPaid,
                     type: 'entrada',
                     date: new Date().toISOString()
                 });
-                
-                Notification.success('Conta marcada como paga!');
+
+                if (amountPaid >= receivable.value) {
+                    // Pagamento integral ou com valor excedente
+                    const overpayment = amountPaid - receivable.value;
+
+                    await db.from('receivables').update({ status: 'Pago', paid_at: new Date().toISOString(), value: 0 }).eq('id', id);
+                    Notification.success('Conta paga integralmente!');
+
+                    if (overpayment > 0) {
+                        Notification.warning(`Valor excedente de ${Utils.formatCurrency(overpayment)} será aplicado a outras dívidas do cliente.`);
+                        await this.applyOverpayment(receivable.client_id, overpayment);
+                    }
+                } else {
+                    // Pagamento parcial
+                    const newValue = receivable.value - amountPaid;
+                    await db.from('receivables').update({ value: newValue }).eq('id', id);
+                    Notification.success(`Pagamento parcial de ${Utils.formatCurrency(amountPaid)} registrado. Restam ${Utils.formatCurrency(newValue)}.`);
+                }
+
+                Modal.hide();
                 await Navigation.navigateTo('receivables');
-            } catch(error) {
+
+            } catch (error) {
                 Notification.error('Erro ao processar pagamento: ' + error.message);
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Confirmar Pagamento';
+                }
+            }
+        },
+        async applyOverpayment(clientId, amount) {
+            let remainingOverpayment = amount;
+            const otherReceivables = state.receivables
+                .filter(r => r.client_id === clientId && r.status === 'Pendente')
+                .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+
+            for (const other of otherReceivables) {
+                if (remainingOverpayment <= 0) break;
+
+                if (remainingOverpayment >= other.value) {
+                    // Paga a outra conta integralmente
+                    await db.from('receivables').update({ status: 'Pago', paid_at: new Date().toISOString(), value: 0 }).eq('id', other.id);
+                    Notification.success(`Conta com vencimento em ${Utils.formatDate(other.due_date)} foi paga com o valor excedente.`);
+                    remainingOverpayment -= other.value;
+                } else {
+                    // Paga a outra conta parcialmente
+                    const newValue = other.value - remainingOverpayment;
+                    await db.from('receivables').update({ value: newValue }).eq('id', other.id);
+                    Notification.success(`Pagamento parcial de ${Utils.formatCurrency(remainingOverpayment)} em conta com vencimento em ${Utils.formatDate(other.due_date)}.`);
+                    remainingOverpayment = 0;
+                }
+            }
+            // Se ainda sobrar dinheiro, o ideal seria criar um crédito para o cliente.
+            // Por enquanto, apenas notificamos.
+            if (remainingOverpayment > 0) {
+                 Notification.info(`O cliente agora possui um crédito de ${Utils.formatCurrency(remainingOverpayment)}.`);
+                 // Opcional: criar uma entrada de crédito na base de dados.
             }
         }
     };
