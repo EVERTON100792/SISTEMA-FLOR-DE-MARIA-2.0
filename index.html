@@ -100,6 +100,7 @@
         .btn-secondary { background: var(--surface-bg); color: var(--text-primary); border-color: var(--border-color); }
         .btn-danger { background: var(--danger-color); color: var(--text-primary); }
         .btn-accent { background: var(--accent-color); color: var(--text-primary); }
+        .btn-info { background: var(--primary-color); color: var(--text-primary); } /* Reutilizando a cor primária para o botão de info/histórico */
         .btn-sm { padding: 8px 16px; font-size: 12px; }
         
         .card { background: var(--surface-bg); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
@@ -763,7 +764,7 @@
     </div>
 
 <script>
-    // ===== SGI - FLOR DE MARIA v9.8 - VERSÃO COM MÓDULO DE CONDICIONAL =====
+    // ===== SGI - FLOR DE MARIA v9.9 - VERSÃO COM MÓDULO DE CONDICIONAL =====
     
     const SUPABASE_URL = 'https://pjbmcwefqsfqnlfvledz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqYm1jd2VmcXNmcW5sZnZsZWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzUwMTIsImV4cCI6MjA3MDcxMTAxMn0.f1V4yZ01eOt_ols8Cg5ATvtvz-GEomU6K6SzHg8kKIQ';
@@ -1181,15 +1182,15 @@
         },
         renderRow: (c, s) => {
             const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
-            return `<tr>
+            return `<tr onclick="App.modules.Clients.showHistory('${c.id}', event)" style="cursor: pointer;">
                 <td data-label="Nome">${c.name}</td>
                 <td data-label="Telefone">${c.phone || 'N/A'}</td>
                 <td data-label="Cadastro">${Utils.formatDate(c.created_at)}</td>
                 <td data-label="Compras">${s.sales.filter(sl => sl.client_id === c.id).length}</td>
                 <td data-label="Total Gasto">${Utils.formatCurrency(totalSpent)}</td>
                 <td data-label="Ações"><div class="table-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-secondary btn-sm" onclick="App.modules.Clients.edit('${c.id}')" title="Editar Cliente"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="App.modules.Clients.remove('${c.id}')" title="Remover Cliente"><i class="fas fa-trash"></i></button>
                 </div></td>
             </tr>`;
         },
@@ -1198,7 +1199,38 @@
             const totalSpent = s.sales.filter(sl => sl.client_id === c.id).reduce((sum, sale) => sum + sale.total, 0);
             return { id: c.id, nome: c.name, telefone: c.phone, data_cadastro: Utils.formatDate(c.created_at), total_gasto: totalSpent };
         }
-    })};
+    }),
+    showHistory(clientId, event) {
+        if (event.target.closest('button')) {
+            return;
+        }
+        const client = state.clients.find(c => c.id === clientId);
+        if (!client) return;
+        const clientSales = state.sales.filter(s => s.client_id === clientId).sort((a, b) => new Date(b.date) - new Date(a.date));
+        let content = '';
+        if (clientSales.length === 0) {
+            content = '<p class="text-center text-muted">Este cliente ainda não realizou nenhuma compra.</p>';
+        } else {
+            content = clientSales.map(sale => {
+                const itemsHtml = sale.items.map(item => {
+                    // Se o item da venda não tiver o código, busca no estado de produtos.
+                    const refCode = item.ref_code || state.products.find(p => p.id === item.id)?.ref_code;
+                    const codeDisplay = refCode ? `(${refCode})` : '';
+
+                    return `<li>${item.quantity}x ${item.name} ${codeDisplay} - ${Utils.formatCurrency(item.price)} (un.)</li>`;
+                }).join('');
+                return `<div class="card mb-2">
+                            <div class="card-header" style="padding: 10px 15px; margin-bottom: 0; display: flex; justify-content: space-between;">
+                                <strong>Venda #${Utils.formatShortId(sale.id)} - ${Utils.formatDate(sale.date)}</strong>
+                                <strong style="color: var(--accent-color);">${Utils.formatCurrency(sale.total)}</strong>
+                            </div>
+                            <ul style="padding: 10px 15px 10px 35px; font-size: 14px; list-style-type: disc;">${itemsHtml}</ul>
+                        </div>`;
+            }).join('');
+        }
+        Modal.show(`Histórico de Compras - ${client.name}`, content);
+    },
+};
     
     App.modules.Products = { 
         ...createCrudModule({
@@ -1355,7 +1387,7 @@
                 if (existingItem.quantity < product.quantity) existingItem.quantity++;
                 else Notification.warning(`Estoque máximo para ${product.name} atingido.`);
             } else {
-                state.cart.push({ ...product, quantity: 1, stock_quantity: product.quantity, price_type: 'vista' });
+                state.cart.push({ ...product, ref_code: product.ref_code, quantity: 1, stock_quantity: product.quantity, price_type: 'vista' });
             }
             this.renderCart();
         },
@@ -1567,6 +1599,7 @@
                 items: state.cart.map(item => ({ 
                     id: item.id, 
                     name: item.name, 
+                    ref_code: item.ref_code,
                     quantity: item.quantity, 
                     price: (isInstallmentPayment && item.price_type === 'prazo') ? (item.prazo_price || item.sale_price) : item.sale_price
                 })),
