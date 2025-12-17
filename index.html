@@ -305,6 +305,21 @@
                 margin-top: 10px;
             }
         }
+
+        /* CORREÇÃO DE RESPONSIVIDADE - TABELA DE ESTOQUE (NOTEBOOKS) */
+        @media (min-width: 901px) and (max-width: 1450px) {
+            #productsPage .table th, 
+            #productsPage .table td {
+                padding: 10px 5px; /* Reduz o espaçamento interno para caber na tela */
+                font-size: 13px;   /* Reduz levemente a fonte */
+            }
+            #productsPage .table td:nth-child(2) { /* Coluna Nome do Produto */
+                white-space: normal; /* Permite quebra de linha no nome */
+                min-width: 140px;
+                max-width: 220px;
+                line-height: 1.2;
+            }
+        }
         
     </style>
 </head>
