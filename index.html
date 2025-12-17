@@ -480,7 +480,10 @@
                             <div class="text-center"><div class="stat-value" id="outOfStockProducts">0</div><div class="stat-label">Produtos Esgotados</div></div>
                         </div>
                         <div class="form-group"><input type="text" id="productSearch" class="form-input" placeholder="Buscar produto por nome ou código"></div>
-                        <button class="btn btn-secondary btn-sm" id="exportProducts" style="width: 100%;"><i class="fas fa-download"></i> Exportar Estoque (CSV)</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary btn-sm" id="exportProducts" style="flex: 1;"><i class="fas fa-file-csv"></i> Excel (CSV)</button>
+                            <button class="btn btn-secondary btn-sm" id="exportProductsPdf" style="flex: 1;"><i class="fas fa-file-pdf"></i> PDF</button>
+                        </div>
                     </div>
                 </div>
                 <div class="card mt-4">
@@ -820,7 +823,7 @@
             URL.revokeObjectURL(link.href);
             Notification.success("Dados exportados com sucesso!");
         },
-        exportToPDF: (title, head, body, extraContent = null) => {
+        exportToPDF: (title, head, body, extraContent = null, tableOptions = {}) => {
             if (!body || body.length === 0) return Notification.warning("Não há dados para gerar PDF.");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -834,7 +837,7 @@
                 });
             }
             const startY = extraContent ? extraContent.length * 6 + 25 : 25;
-            doc.autoTable({ head, body, startY: startY, theme: 'grid', headStyles: { fillColor: [59, 130, 246] } });
+            doc.autoTable({ head, body, startY: startY, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, ...tableOptions });
             doc.save(`${title.replace(/\s+/g, '_').toLowerCase()}.pdf`);
             Notification.success("PDF gerado com sucesso!");
         },
@@ -1095,7 +1098,12 @@
             return query ? state[config.stateKey].filter(item => config.filterKeys.some(key => (item[key] || '').toString().toLowerCase().includes(query))) : state[config.stateKey];
         },
         render() {
-            const data = this.getFiltered().sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+            let data = this.getFiltered();
+            if (config.sort) {
+                data = data.sort(config.sort);
+            } else {
+                data = data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+            }
             if (config.countId) document.getElementById(config.countId).textContent = `${data.length} item(s)`;
             const body = document.getElementById(config.tableBodyId);
             if(body) body.innerHTML = data.length > 0 ? data.map(item => config.renderRow(item, state)).join('') : config.emptyRow;
@@ -1232,11 +1240,11 @@
     },
 };
     
-    App.modules.Products = { 
-        ...createCrudModule({
+    const productsCrud = createCrudModule({
             pageId: 'products', name: 'Produto', stateKey: 'products', tableName: 'products', formId: 'productForm', tableBodyId: 'productsTableBody',
             searchId: 'productSearch', clearBtnId: 'clearProductForm', exportBtnId: 'exportProducts', focusFieldId: 'productRefCode',
             filterKeys: ['name', 'ref_code'],
+            sort: (a, b) => a.ref_code.localeCompare(b.ref_code, undefined, { numeric: true, sensitivity: 'base' }),
             getFormData: f => ({ 
                 ref_code: f.productRefCode.value.trim(), 
                 name: f.productName.value.trim(), 
@@ -1283,8 +1291,52 @@
                 </tr>`;
             },
             emptyRow: `<tr><td colspan="9" class="text-center" style="padding:20px;">Nenhum produto encontrado.</td></tr>`,
-            mapExport: p => ({ codigo: p.ref_code, nome: p.name, quantidade: p.quantity, preco_custo: p.cost_price, preco_a_vista: p.sale_price, preco_a_prazo: p.prazo_price })
-        }),
+            mapExport: p => ({ 
+                codigo: p.ref_code, 
+                nome: p.name, 
+                quantidade: p.quantity, 
+                preco_custo: Utils.formatCurrency(p.cost_price), 
+                preco_a_vista: Utils.formatCurrency(p.sale_price), 
+                preco_a_prazo: Utils.formatCurrency(p.prazo_price),
+                data_cadastro: Utils.formatDate(p.created_at)
+            })
+    });
+
+    App.modules.Products = { 
+        ...productsCrud,
+        init() {
+            productsCrud.init.call(this);
+            document.getElementById('exportProductsPdf').addEventListener('click', this.exportToPdf.bind(this));
+        },
+        exportToPdf() {
+            const data = this.getFiltered().sort((a, b) => a.ref_code.localeCompare(b.ref_code, undefined, { numeric: true, sensitivity: 'base' }));
+            if (data.length === 0) return Notification.warning("Não há produtos para exportar.");
+
+            const title = "Relatório de Estoque - Flor de Maria";
+            const head = [['Código', 'Produto', 'Qtd.', 'Custo', 'Venda', 'Prazo', 'Cadastro']];
+            const body = data.map(p => [
+                p.ref_code,
+                p.name,
+                p.quantity,
+                Utils.formatCurrency(p.cost_price),
+                Utils.formatCurrency(p.sale_price),
+                Utils.formatCurrency(p.prazo_price),
+                Utils.formatDate(p.created_at)
+            ]);
+            
+            Utils.exportToPDF(title, head, body, null, {
+                styles: { fontSize: 8, cellPadding: 2 },
+                columnStyles: {
+                    0: { cellWidth: 25 }, // Código
+                    1: { cellWidth: 'auto' }, // Produto
+                    2: { cellWidth: 12, halign: 'center' }, // Qtd
+                    3: { cellWidth: 22, halign: 'right' }, // Custo
+                    4: { cellWidth: 22, halign: 'right' }, // Venda
+                    5: { cellWidth: 22, halign: 'right' }, // Prazo
+                    6: { cellWidth: 20, halign: 'center' } // Cadastro
+                }
+            });
+        },
         updateStats() {
             document.getElementById('totalProducts').textContent = state.products.length;
             document.getElementById('outOfStockProducts').textContent = state.products.filter(p => p.quantity <= 0).length;
